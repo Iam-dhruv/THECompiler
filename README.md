@@ -1,5 +1,12 @@
 ﻿# THECompiler
 
+## Students
+
+- Anjan - 24114012
+- Dhruv - 24115057
+- Keshav - 24114048
+- Mayank - 24115101
+
 A simple lexical analyzer built with Flex/C++ for a small source language inspired by C and C++. It reads a source file, tokenizes it, and produces a token stream table with lexemes and token names. It also detects lexical errors and writes them to an error log.
 
 ## What this analyzer does
