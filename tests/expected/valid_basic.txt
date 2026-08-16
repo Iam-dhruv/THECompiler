@@ -1,2 +1,33 @@
-T_INT T_IDENTIFIER T_LPAREN T_RPAREN T_LBRACE T_INT T_IDENTIFIER T_ASSIGN T_INT_CONST T_SEMICOLON T_FLOAT T_IDENTIFIER T_ASSIGN T_FLOAT_CONST T_SEMICOLON T_CHAR T_IDENTIFIER T_ASSIGN T_CHAR_CONST T_SEMICOLON T_IDENTIFIER T_CHAR T_MUL T_IDENTIFIER T_ASSIGN STRING_LITERAL: "hello" (line 5)
-T_SEMICOLON T_RETURN T_INT_CONST T_SEMICOLON T_RBRACE 
+Lexeme                      Token
+------------------------------------------------
+int                         keyword
+main                        identifier
+(                           punctuation
+)                           punctuation
+{                           punctuation
+int                         keyword
+a                           identifier
+=                           operator
+10                          integer_literal
+;                           punctuation
+float                       keyword
+b                           identifier
+=                           operator
+3.14                        float_literal
+;                           punctuation
+char                        keyword
+c                           identifier
+=                           operator
+'x'                         char_literal
+;                           punctuation
+const                       identifier
+char                        keyword
+*                           operator
+s                           identifier
+=                           operator
+"hello"                     string_literal
+;                           punctuation
+return                      keyword
+0                           integer_literal
+;                           punctuation
+}                           punctuation

@@ -1,4 +1,3 @@
-int main() {
-    int x = @;
-    return 0;
-}
+int x = @;
+int y = $;
+int z = `backtick`;

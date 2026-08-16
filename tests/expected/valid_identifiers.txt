@@ -1,0 +1,12 @@
+Lexeme                      Token
+------------------------------------------------
+x                           identifier
+_x                          identifier
+x1                          identifier
+_1                          identifier
+x_y_z                       identifier
+myVar                       identifier
+MY_CONST                    identifier
+CamelCase                   identifier
+_underscore_start           identifier
+a1b2c3                      identifier

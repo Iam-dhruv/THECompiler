@@ -1,0 +1,10 @@
+x
+_x
+x1
+_1
+x_y_z
+myVar
+MY_CONST
+CamelCase
+_underscore_start
+a1b2c3

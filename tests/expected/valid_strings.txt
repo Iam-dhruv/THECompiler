@@ -1,0 +1,13 @@
+Lexeme                      Token
+------------------------------------------------
+"hello"                     string_literal
+"world"                     string_literal
+""                          string_literal
+"with spaces and 123 numbers"string_literal
+"escape newline
+"           string_literal
+"escape tab	"               string_literal
+"escape backslash\"         string_literal
+"escape quote""             string_literal
+"mixed 
+	\ escapes"         string_literal

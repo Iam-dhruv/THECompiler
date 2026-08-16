@@ -1,0 +1,13 @@
+src/lex.yy.c
+lexer_app
+*.exe
+src/*.exe
+src/a.exe
+src/out
+
+out/
+
+*.o
+*.d
+.DS_Store
+Thumbs.db

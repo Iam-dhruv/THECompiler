@@ -1,6 +1,9 @@
-/* block comment */
-int main() {
-    int value = 1; // line comment
-    int second = 2;
-    return 0;
-}
+/* this is a block comment — should be fully ignored */
+int x = 1; /* inline block comment */ int y = 2;
+// this is a line comment: int z = 99;
+int z = 3; // trailing line comment
+/* multi
+   line
+   block
+   comment */
+int w = 4;

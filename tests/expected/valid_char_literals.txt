@@ -1,0 +1,20 @@
+Lexeme                      Token
+------------------------------------------------
+'a'                         char_literal
+'z'                         char_literal
+'A'                         char_literal
+'Z'                         char_literal
+'0'                         char_literal
+'9'                         char_literal
+' '                         char_literal
+'\n'                        char_literal
+'\t'                        char_literal
+'\r'                        char_literal
+'\\'                        char_literal
+'\''                        char_literal
+'\0'                        char_literal
+'\a'                        char_literal
+'\b'                        char_literal
+'\f'                        char_literal
+'\v'                        char_literal
+'\"'                        char_literal
