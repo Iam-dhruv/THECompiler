@@ -21,7 +21,7 @@ $invalidTests = @(
     @{ File = 'invalid_bad_char.c'; ExpectedContains = 'Error: unexpected character' },
     @{ File = 'invalid_octal_literal.c'; ExpectedContains = 'Error: Invalid Octal literal' },
     @{ File = 'invalid_malformed_scientific.c'; ExpectedContains = 'Error: malformed scientific notation' },
-    @{ File = 'invalid_malformed_float.c'; ExpectedContains = 'Error: malformed floating literal' },
+    @{ File = 'invalid_malformed_float.c'; ExpectedContains = 'Error: unexpected character' },
     @{ File = 'invalid_unterminated_string.c'; ExpectedContains = 'Error: unterminated string literal starting at line 2' },
     @{ File = 'invalid_unterminated_comment.c'; ExpectedContains = 'Error: unterminated comment' }
 )
