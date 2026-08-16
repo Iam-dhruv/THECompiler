@@ -1,4 +1,4 @@
-
+﻿
 %{
 #include <cstdio>
 #include <cstdlib>
@@ -62,6 +62,8 @@ DIGIT       [0-9]
 LETTER      [a-zA-Z_]
 WHITESPACE  [ \t\r]+
 IDENTIFIER  {LETTER}({LETTER}|{DIGIT})*
+EXP         [eE][+-]?{DIGIT}+
+BAD_EXP     [eE][+-]?
 
 %x COMMENT  
 %x STRING 
@@ -136,13 +138,42 @@ IDENTIFIER  {LETTER}({LETTER}|{DIGIT})*
 "?"             { return T_QUESTION; }
 ":"             { return T_COLON; }
 
-    /* Literals */
-0[xX][0-9a-fA-F]+  { return T_INT_CONST; }
-0[0-9]+             {fprintf(stderr,"Error: Invalid Octal literal at line %d\n", yylineno);return T_ERROR;}
-0[0-7]+             { return T_INT_CONST; }
-0|[1-9][0-9]*       { return T_INT_CONST; }
-[0-9]+\.[0-9]+([eE][+-]?[0-9]+)?   { return T_FLOAT_CONST; }  /* 3.14, 3.14e10 */
-[0-9]+[eE][+-]?[0-9]+               { return T_FLOAT_CONST; }  /* 3e10 */
+    /* Integer literals
+       Ordering here matters only for equal-length matches (flex ties break
+       on the earliest rule); everything else is resolved by longest match.
+       Hex is tried first since it has a distinct "0x" prefix. A bare "0"
+       or "0" followed only by octal digits (0-7) is accepted; a leading
+       zero followed by any digit outside that range (e.g. "08") -- or,
+       per this project's rules, ANY multi-digit leading-zero literal such
+       as "0123" -- is rejected as an invalid/unsupported octal form. */
+0[xX][0-9a-fA-F]+   { return T_INT_CONST; }
+0[0-9]+             { fprintf(stderr, "Error: Invalid Octal literal at line %d\n", yylineno); return T_ERROR; }
+0                    { return T_INT_CONST; }
+[1-9][0-9]*          { return T_INT_CONST; }
+
+    /* Float literals
+       Valid forms (dot-based rules are listed before the bare "." operator
+       further above only matters where lengths tie; longest match already
+       guarantees a leading-dot number like ".1" is never split into "."
+       and "1"):
+         .1          -> \.{DIGIT}+{EXP}?
+         1.          -> {DIGIT}+\.{DIGIT}*{EXP}?
+         1.0         -> {DIGIT}+\.{DIGIT}*{EXP}?
+         1e10        -> {DIGIT}+{EXP}
+         2.5e-3      -> {DIGIT}+\.{DIGIT}*{EXP}?
+       Malformed exponents (1e, 1e+, 1e-, 1.0e, .1e, 1.e) have no digits
+       after the [eE][+-]? part. Flex's longest-match rule guarantees the
+       *valid* exponent rules above win whenever digits are actually
+       present, so the BAD_EXP rules below only ever fire on the malformed
+       forms -- no fragile lookahead or post-processing is needed. */
+{DIGIT}+"."{DIGIT}*{EXP}?          { return T_FLOAT_CONST; }  /* 1., 1.0, 1.e10, 1.0e10 */
+"."{DIGIT}+{EXP}?                  { return T_FLOAT_CONST; }  /* .1, .1e10 */
+{DIGIT}+{EXP}                      { return T_FLOAT_CONST; }  /* 1e10 */
+
+{DIGIT}+"."{DIGIT}*{BAD_EXP}       { fprintf(stderr, "Error: malformed scientific notation at line %d\n", yylineno); return T_ERROR; } /* 1.0e, 1.e, 1.0e+, 1.0e- */
+"."{DIGIT}+{BAD_EXP}               { fprintf(stderr, "Error: malformed scientific notation at line %d\n", yylineno); return T_ERROR; } /* .1e, .1e+, .1e- */
+{DIGIT}+{BAD_EXP}                  { fprintf(stderr, "Error: malformed scientific notation at line %d\n", yylineno); return T_ERROR; } /* 1e, 1e+, 1e- */
+
 '([^\\'\n]|\\[nt\\'])'   { return T_CHAR_CONST; }
 '([^\\'\n]|\\[nt\\'])*   { fprintf(stderr, "Error: unterminated char literal at line %d\n", yylineno); return T_ERROR; }
 \"                  {
@@ -211,9 +242,16 @@ int main(int argc, char** argv) {
     FILE* input_file = nullptr;
     std::ofstream output_file;
     std::ostream* output_stream = &std::cout;
+    bool print_symbols = false;
+    int file_arg_index = 1;
 
-    if (argc >= 2) {
-        input_file = std::fopen(argv[1], "r");
+    if (argc >= 2 && std::string(argv[1]) == "--symbol-table") {
+        print_symbols = true;
+        file_arg_index = 2;
+    }
+
+    if (argc >= file_arg_index + 1) {
+        input_file = std::fopen(argv[file_arg_index], "r");
         if (!input_file) {
             std::perror("Unable to open input file");
             return 1;
@@ -223,8 +261,8 @@ int main(int argc, char** argv) {
         yyin = stdin;
     }
 
-    if (argc >= 3) {
-        output_file.open(argv[2]);
+    if (argc >= file_arg_index + 2) {
+        output_file.open(argv[file_arg_index + 1]);
         if (!output_file.is_open()) {
             std::perror("Unable to open output file");
             if (input_file) std::fclose(input_file);
@@ -234,7 +272,15 @@ int main(int argc, char** argv) {
     }
 
     while ((tok = yylex()) != T_EOF) {
+        if (tok == T_ERROR) {
+            continue;
+        }
         *output_stream << static_cast<TokenType>(tok) << " ";
+    }
+
+    if (print_symbols) {
+        *output_stream << "\n";
+        symtab.print(*output_stream);
     }
 
     if (output_file.is_open()) {

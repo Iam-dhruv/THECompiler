@@ -30,4 +30,19 @@ public:
         auto it = table.find(lexeme);
         return (it != table.end()) ? &it->second : nullptr;
     }
+
+    void print(std::ostream& os) const {
+        if (table.empty()) {
+            os << "Symbol table is empty.\n";
+            return;
+        }
+
+        os << "Symbol Table:\n";
+        for (const auto& [name, entry] : table) {
+            os << "  " << name
+               << " | token=" << entry.token_type
+               << " | declared_line=" << entry.declared_line
+               << " | usage_count=" << entry.usage_count << '\n';
+        }
+    }
 };

@@ -1083,83 +1083,88 @@ YY_RULE_SETUP
 case 58:
 YY_RULE_SETUP
 #line 145 ".\\lexer.l"
-{ return T_FLOAT_CONST; }  /* 3e10 */
+{ return T_FLOAT_CONST; }  /* 1.e10, 1.0e10 */
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
 #line 146 ".\\lexer.l"
-{ return T_CHAR_CONST; }
+{ return T_FLOAT_CONST; }  /* 3e10 */
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
 #line 147 ".\\lexer.l"
-{ fprintf(stderr, "Error: unterminated char literal at line %d\n", yylineno); return T_ERROR; }
+{ return T_CHAR_CONST; }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
 #line 148 ".\\lexer.l"
+{ fprintf(stderr, "Error: unterminated char literal at line %d\n", yylineno); return T_ERROR; }
+	YY_BREAK
+case 62:
+YY_RULE_SETUP
+#line 149 ".\\lexer.l"
 {
                         str_buf.clear();
                         str_start_line = yylineno;
                         BEGIN(STRING);
                     }
 	YY_BREAK
-case 62:
+case 63:
 YY_RULE_SETUP
-#line 154 ".\\lexer.l"
+#line 155 ".\\lexer.l"
 {
                         printf("STRING_LITERAL: \"%s\" (line %d)\n", str_buf.c_str(), str_start_line);
                         BEGIN(INITIAL);
                     }
 	YY_BREAK
-case 63:
-YY_RULE_SETUP
-#line 159 ".\\lexer.l"
-{ str_buf += '\n'; }
-	YY_BREAK
 case 64:
 YY_RULE_SETUP
 #line 160 ".\\lexer.l"
-{ str_buf += '\t'; }
+{ str_buf += '\n'; }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
 #line 161 ".\\lexer.l"
-{ str_buf += '\r'; }
+{ str_buf += '\t'; }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
 #line 162 ".\\lexer.l"
-{ str_buf += '\\'; }
+{ str_buf += '\r'; }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
 #line 163 ".\\lexer.l"
-{ str_buf += '"';  }
+{ str_buf += '\\'; }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 165 ".\\lexer.l"
+#line 164 ".\\lexer.l"
+{ str_buf += '"';  }
+	YY_BREAK
+case 69:
+YY_RULE_SETUP
+#line 166 ".\\lexer.l"
 {
                         fprintf(stderr, "Warning: unknown escape '\\%c' at line %d\n", yytext[1], yylineno);
                         str_buf += yytext[1];
                     }
 	YY_BREAK
-case 69:
+case 70:
 YY_RULE_SETUP
-#line 170 ".\\lexer.l"
+#line 171 ".\\lexer.l"
 {
                         fprintf(stderr, "Error: unterminated string literal starting at line %d\n", str_start_line);
                         BEGIN(INITIAL);
                     }
 	YY_BREAK
-case 70:
+case 71:
 YY_RULE_SETUP
-#line 175 ".\\lexer.l"
+#line 176 ".\\lexer.l"
 { str_buf += yytext; }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 177 ".\\lexer.l"
+#line 178 ".\\lexer.l"
 {
                       
                         fprintf(stderr, "Error: unterminated string literal starting at line %d\n", str_start_line);
@@ -1168,7 +1173,7 @@ case YY_STATE_EOF(STRING):
                     }
 	YY_BREAK
 /* Identifiers and keywords */
-case 71:
+case 72:
 YY_RULE_SETUP
 #line 186 ".\\lexer.l"
 {
@@ -2114,8 +2119,30 @@ int main(int argc, char** argv) {
         output_stream = &output_file;
     }
 
+    int prev_tok = -1;
     while ((tok = yylex()) != T_EOF) {
+        if (tok == T_ERROR) {
+            continue;
+        }
+        if (tok == T_IDENTIFIER && prev_tok == T_INT_CONST &&
+            (std::string(yytext) == "e" || std::string(yytext) == "E")) {
+            fprintf(stderr, "Error: malformed scientific notation at line %d\n", yylineno);
+            prev_tok = tok;
+            continue;
+        }
+        if (tok == T_IDENTIFIER && prev_tok == T_FLOAT_CONST &&
+            (std::string(yytext) == "e" || std::string(yytext) == "E")) {
+            fprintf(stderr, "Error: malformed scientific notation at line %d\n", yylineno);
+            prev_tok = tok;
+            continue;
+        }
+        if (tok == T_DOT && prev_tok == T_INT_CONST) {
+            fprintf(stderr, "Error: malformed floating literal at line %d\n", yylineno);
+            prev_tok = tok;
+            continue;
+        }
         *output_stream << static_cast<TokenType>(tok) << " ";
+        prev_tok = tok;
     }
 
     if (output_file.is_open()) {
