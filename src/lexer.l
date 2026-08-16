@@ -294,6 +294,22 @@ int main(int argc, char** argv) {
         tokens.push_back({ current_lexeme, tok });
     }
 
+    /* ── Print the token table to stdout for valid source files ─────────── */
+    if (!had_error) {
+        std::cout << std::left << std::setw(28) << "Lexeme" << "Token\n";
+        std::cout << std::string(48, '-') << "\n";
+        for (const auto& r : tokens) {
+            std::ostringstream tname;
+            tname << static_cast<TokenType>(r.tok);
+            std::cout << std::left << std::setw(28) << r.lexeme
+                      << tname.str() << "\n";
+        }
+    } else {
+        for (const auto& msg : error_log) {
+            std::cout << msg << "\n";
+        }
+    }
+
     /* ── Write token_stream file ─────────────────────────────────────────── */
     {
         std::ofstream ts(ts_path);
