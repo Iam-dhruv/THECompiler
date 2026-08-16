@@ -1,11 +1,11 @@
 Lexeme                      Token
 ------------------------------------------------
-0                           integer_literal
-1                           integer_literal
-9                           integer_literal
-123                         integer_literal
-999999                      integer_literal
-0xff                        integer_literal
-0xFF                        integer_literal
-0xABCDEF                    integer_literal
-0x0                         integer_literal
+0                           T_INT_CONST
+1                           T_INT_CONST
+9                           T_INT_CONST
+123                         T_INT_CONST
+999999                      T_INT_CONST
+0xff                        T_INT_CONST
+0xFF                        T_INT_CONST
+0xABCDEF                    T_INT_CONST
+0x0                         T_INT_CONST

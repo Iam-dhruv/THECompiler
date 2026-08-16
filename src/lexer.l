@@ -34,7 +34,7 @@ int comment_start_line;   // line where the current /* comment opened
 
 int token_start_col = 1;
 
-/* ── Lexeme / error tracking globals ──────────────────────────────────────── */
+/* Lexeme / error tracking globals */
 std::string current_lexeme;            // set by YY_USER_ACTION; overridden for strings
 std::vector<std::string> error_log;    // all collected error/warning messages
 bool had_error = false;
@@ -49,7 +49,7 @@ void log_error(const char* format, ...) {
     had_error = true;
 }
 
-/* ── Symbol table ─────────────────────────────────────────────────────────── */
+/* Symbol table */
 SymbolTable symtab;
 static const std::unordered_map<std::string, int> keywords = {
     {"if",        T_IF},       {"else",      T_ELSE},
@@ -88,7 +88,7 @@ BAD_EXP     [eE][+-]?
 
 %%
 
-    /* ── Multiline comments ─────────────────────────────────────────────── */
+    /* Multiline comments */
 "/*"              { comment_start_line = yylineno; BEGIN(COMMENT); }
 <COMMENT>"*/"     { BEGIN(INITIAL); }
 <COMMENT>\n       { col_num = 1; }
@@ -102,7 +102,7 @@ BAD_EXP     [eE][+-]?
 \n                { col_num = 1; }
 {WHITESPACE}      {}
 
-    /* ── Multi-character operators ──────────────────────────────────────── */
+    /* Multi char operators*/
 "<<="           { return T_LSHIFT_ASSIGN; }
 ">>="           { return T_RSHIFT_ASSIGN; }
 "+="            { return T_PLUS_ASSIGN; }
@@ -125,7 +125,7 @@ BAD_EXP     [eE][+-]?
 "<<"            { return T_LSHIFT; }
 ">>"            { return T_RSHIFT; }
 
-    /* ── Single-character operators and punctuation ─────────────────────── */
+    /* Single char operators and punctuation */
 "+"             { return T_PLUS; }
 "-"             { return T_MINUS; }
 "*"             { return T_MUL; }
@@ -151,7 +151,7 @@ BAD_EXP     [eE][+-]?
 "?"             { return T_QUESTION; }
 ":"             { return T_COLON; }
 
-    /* ── Integer literals ───────────────────────────────────────────────── */
+    /* Integer literals */
     /* Hex first (distinct 0x prefix); bare 0 accepted; multi-digit
        leading-zero is rejected as invalid/unsupported octal. */
 0[xX][0-9a-fA-F]+   { return T_INT_CONST; }

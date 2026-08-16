@@ -1,0 +1,5 @@
+NOTE: Lexical errors were found. Token stream may be incomplete.
+      See: out/error_log_invalid_comment_eof.txt
+
+Lexeme                      Token
+------------------------------------------------

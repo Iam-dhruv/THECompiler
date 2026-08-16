@@ -1,31 +1,25 @@
+NOTE: Lexical errors were found. Token stream may be incomplete.
+      See: out/error_log_invalid_malformed_scientific.txt
+
 Lexeme                      Token
 ------------------------------------------------
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-{                           T_LBRACE
 float                       T_FLOAT
 a                           T_IDENTIFIER
 =                           T_ASSIGN
-.1                          T_FLOAT_CONST
 ;                           T_SEMICOLON
 float                       T_FLOAT
 b                           T_IDENTIFIER
 =                           T_ASSIGN
-1.                          T_FLOAT_CONST
 ;                           T_SEMICOLON
 float                       T_FLOAT
 c                           T_IDENTIFIER
 =                           T_ASSIGN
-1.5                         T_FLOAT_CONST
 ;                           T_SEMICOLON
 float                       T_FLOAT
 d                           T_IDENTIFIER
 =                           T_ASSIGN
-.5e-2                       T_FLOAT_CONST
 ;                           T_SEMICOLON
-return                      T_RETURN
-0                           T_INT_CONST
+float                       T_FLOAT
+e                           T_IDENTIFIER
+=                           T_ASSIGN
 ;                           T_SEMICOLON
-}                           T_RBRACE

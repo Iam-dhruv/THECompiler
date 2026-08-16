@@ -1,5 +1,5 @@
 NOTE: Lexical errors were found. Token stream may be incomplete.
-      See: out/error_log_invalid_bad_char.txt
+      See: out/error_log_invalid_octal_literal.txt
 
 Lexeme                      Token
 ------------------------------------------------
@@ -14,5 +14,8 @@ y                           T_IDENTIFIER
 int                         T_INT
 z                           T_IDENTIFIER
 =                           T_ASSIGN
-backtick                    T_IDENTIFIER
+;                           T_SEMICOLON
+int                         T_INT
+w                           T_IDENTIFIER
+=                           T_ASSIGN
 ;                           T_SEMICOLON

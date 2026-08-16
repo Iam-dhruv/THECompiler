@@ -1,14 +1,14 @@
 Lexeme                      Token
 ------------------------------------------------
-1.0                         float_literal
-1.                          float_literal
-.1                          float_literal
-1.5                         float_literal
-1e3                         float_literal
-1E3                         float_literal
-1e+3                        float_literal
-1e-3                        float_literal
-1.5e10                      float_literal
-1.5E-10                     float_literal
-.5e+2                       float_literal
-0.0                         float_literal
+1.0                         T_FLOAT_CONST
+1.                          T_FLOAT_CONST
+.1                          T_FLOAT_CONST
+1.5                         T_FLOAT_CONST
+1e3                         T_FLOAT_CONST
+1E3                         T_FLOAT_CONST
+1e+3                        T_FLOAT_CONST
+1e-3                        T_FLOAT_CONST
+1.5e10                      T_FLOAT_CONST
+1.5E-10                     T_FLOAT_CONST
+.5e+2                       T_FLOAT_CONST
+0.0                         T_FLOAT_CONST

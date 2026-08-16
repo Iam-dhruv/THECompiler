@@ -1,6 +1,3 @@
-NOTE: Lexical errors were found. Token stream may be incomplete.
-      See: out/error_log_invalid_string.txt
-
 Lexeme                      Token
 ------------------------------------------------
 int                         keyword
@@ -8,9 +5,11 @@ main                        identifier
 (                           punctuation
 )                           punctuation
 {                           punctuation
-char                        keyword
-s                           identifier
+float                       keyword
+x                           identifier
 =                           operator
+1.                          float_literal
+;                           punctuation
 return                      keyword
 0                           integer_literal
 ;                           punctuation

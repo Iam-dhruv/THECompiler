@@ -1,13 +1,13 @@
 Lexeme                      Token
 ------------------------------------------------
-"hello"                     string_literal
-"world"                     string_literal
-""                          string_literal
-"with spaces and 123 numbers"string_literal
+"hello"                     T_STRING_LITERAL
+"world"                     T_STRING_LITERAL
+""                          T_STRING_LITERAL
+"with spaces and 123 numbers"T_STRING_LITERAL
 "escape newline
-"           string_literal
-"escape tab	"               string_literal
-"escape backslash\"         string_literal
-"escape quote""             string_literal
+"           T_STRING_LITERAL
+"escape tab	"               T_STRING_LITERAL
+"escape backslash\"         T_STRING_LITERAL
+"escape quote""             T_STRING_LITERAL
 "mixed 
-	\ escapes"         string_literal
+	\ escapes"         T_STRING_LITERAL

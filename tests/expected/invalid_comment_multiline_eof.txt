@@ -1,0 +1,10 @@
+NOTE: Lexical errors were found. Token stream may be incomplete.
+      See: out/error_log_invalid_comment_multiline_eof.txt
+
+Lexeme                      Token
+------------------------------------------------
+int                         T_INT
+x                           T_IDENTIFIER
+=                           T_ASSIGN
+1                           T_INT_CONST
+;                           T_SEMICOLON

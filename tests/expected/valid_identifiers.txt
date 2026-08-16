@@ -1,12 +1,12 @@
 Lexeme                      Token
 ------------------------------------------------
-x                           identifier
-_x                          identifier
-x1                          identifier
-_1                          identifier
-x_y_z                       identifier
-myVar                       identifier
-MY_CONST                    identifier
-CamelCase                   identifier
-_underscore_start           identifier
-a1b2c3                      identifier
+x                           T_IDENTIFIER
+_x                          T_IDENTIFIER
+x1                          T_IDENTIFIER
+_1                          T_IDENTIFIER
+x_y_z                       T_IDENTIFIER
+myVar                       T_IDENTIFIER
+MY_CONST                    T_IDENTIFIER
+CamelCase                   T_IDENTIFIER
+_underscore_start           T_IDENTIFIER
+a1b2c3                      T_IDENTIFIER

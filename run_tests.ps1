@@ -17,7 +17,7 @@ function Stem([string]$FileName) {
     return [System.IO.Path]::GetFileNameWithoutExtension($FileName)
 }
 
-# ── Build ─────────────────────────────────────────────────────────────────────
+# Build
 # Ensure lex.yy.c exists; rebuild with flex if missing.
 $yyc = Join-Path $srcDir 'lex.yy.c'
 if (-not (Test-Path $yyc)) {
@@ -35,7 +35,7 @@ if (-not (Test-Path $yyc)) {
 # Re-run `flex` + `g++` only when necessary to keep the script fast,
 # but always ensures a working binary is present before running any tests.
 if (-not (Test-Path $lexer)) {
-    Write-Host "Binary not found — building lexer..."
+    Write-Host "Binary not found - building lexer..."
     $yyc = Join-Path $srcDir 'lex.yy.c'
     if (-not (Test-Path $yyc)) {
         if (Get-Command flex -ErrorAction SilentlyContinue) {
@@ -52,21 +52,20 @@ if (-not (Test-Path $lexer)) {
     Write-Host "Using existing binary: $lexer"
 }
 
-# ── Ensure out/ directory exists ─────────────────────────────────────────────
+#  Ensure out/ directory exists 
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
-# ── Valid tests ───────────────────────────────────────────────────────────────
 # Each valid test lexes cleanly (exit 0).  We compare the token_stream output
 # file against a stored expected file in tests/expected/.
 $validTests = @(
-    # ── Original (improved inputs) ──
+    # Original
     @{ File = 'valid_basic.c';           Note = 'basic program: int/float/char/string/return' },
     @{ File = 'valid_keywords_ops.c';    Note = 'all compound-assign + relational + logical ops' },
     @{ File = 'valid_literals.c';        Note = 'all int forms, float forms, char escapes, strings' },
     @{ File = 'valid_comments.c';        Note = 'inline block, leading block, multi-line, trailing line comments' },
     @{ File = 'valid_numeric_edges.c';   Note = 'zero, dec, hex, floats, exponents' },
     @{ File = 'valid_float_dot_forms.c'; Note = 'leading-dot, trailing-dot, and mixed float forms' },
-    # ── New: keyword / operator coverage ──
+    #New: keyword / operator coverage ──
     @{ File = 'valid_control_flow.c';    Note = 'if/else/for/while/do/switch/case/default/break/continue/goto/return' },
     @{ File = 'valid_type_keywords.c';   Note = 'int/char/float/double/void/static/struct/typedef/enum/union/class/access/this/new/delete/virtual/friend' },
     @{ File = 'valid_all_operators.c';   Note = 'arithmetic/bitwise/shift/incr/relational/logical' },
@@ -90,8 +89,8 @@ $invalidTests = @(
     @{ File = 'invalid_bad_char.c';              ExpectedContains = 'Error: unexpected character';                   Note = 'bad chars: @, $, backtick' },
     @{ File = 'invalid_octal_literal.c';         ExpectedContains = 'Error: Invalid Octal literal';                 Note = 'leading-zero multi-digit literals' },
     @{ File = 'invalid_malformed_scientific.c';  ExpectedContains = 'Error: malformed scientific notation';         Note = 'missing digits after e/E' },
-    @{ File = 'invalid_unterminated_string.c';   ExpectedContains = 'Error: unterminated string literal starting at line 2'; Note = 'unterminated string — start line reported' },
-    @{ File = 'invalid_unterminated_comment.c';  ExpectedContains = 'Error: unterminated comment starting at line 2'; Note = 'unterminated comment — correct start line' },
+    @{ File = 'invalid_unterminated_string.c';   ExpectedContains = 'Error: unterminated string literal starting at line 2'; Note = 'unterminated string - start line reported' },
+    @{ File = 'invalid_unterminated_comment.c';  ExpectedContains = 'Error: unterminated comment starting at line 2'; Note = 'unterminated comment - correct start line' },
     # ── New: comment errors ──
     @{ File = 'invalid_comment_eof.c';            ExpectedContains = 'Error: unterminated comment starting at line 1'; Note = 'comment opens at line 1, EOF hit' },
     @{ File = 'invalid_comment_multiline_eof.c';  ExpectedContains = 'Error: unterminated comment starting at line 2'; Note = 'multi-line: /* at line 2' },
@@ -155,7 +154,7 @@ foreach ($test in $invalidTests) {
     } else {
         $failed++
         Write-Host "[FAIL] $($test.File)  # $($test.Note)"
-        if (-not $exitNonZero) { Write-Host "  lexer exited 0 — expected non-zero for error case" }
+        if (-not $exitNonZero) { Write-Host "  lexer exited 0 - expected non-zero for error case" }
         if (-not $errContent.Contains($test.ExpectedContains)) {
             Write-Host "  error_log ($errFile):"
             Write-Host "  $errContent"

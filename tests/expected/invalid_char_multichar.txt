@@ -1,0 +1,9 @@
+NOTE: Lexical errors were found. Token stream may be incomplete.
+      See: out/error_log_invalid_char_multichar.txt
+
+Lexeme                      Token
+------------------------------------------------
+int                         T_INT
+x                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON

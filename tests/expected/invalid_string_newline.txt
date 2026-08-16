@@ -1,18 +1,13 @@
 NOTE: Lexical errors were found. Token stream may be incomplete.
-      See: out/error_log_invalid_bad_char.txt
+      See: out/error_log_invalid_string_newline.txt
 
 Lexeme                      Token
 ------------------------------------------------
 int                         T_INT
 x                           T_IDENTIFIER
 =                           T_ASSIGN
-;                           T_SEMICOLON
 int                         T_INT
 y                           T_IDENTIFIER
 =                           T_ASSIGN
-;                           T_SEMICOLON
-int                         T_INT
-z                           T_IDENTIFIER
-=                           T_ASSIGN
-backtick                    T_IDENTIFIER
+1                           T_INT_CONST
 ;                           T_SEMICOLON

@@ -1,1 +1,10 @@
-Error: unterminated comment (started before line 2)
+NOTE: Lexical errors were found. Token stream may be incomplete.
+      See: out/error_log_invalid_unterminated_comment.txt
+
+Lexeme                      Token
+------------------------------------------------
+int                         T_INT
+main                        T_IDENTIFIER
+(                           T_LPAREN
+)                           T_RPAREN
+{                           T_LBRACE

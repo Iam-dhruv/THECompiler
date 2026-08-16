@@ -1,20 +1,20 @@
 Lexeme                      Token
 ------------------------------------------------
-'a'                         char_literal
-'z'                         char_literal
-'A'                         char_literal
-'Z'                         char_literal
-'0'                         char_literal
-'9'                         char_literal
-' '                         char_literal
-'\n'                        char_literal
-'\t'                        char_literal
-'\r'                        char_literal
-'\\'                        char_literal
-'\''                        char_literal
-'\0'                        char_literal
-'\a'                        char_literal
-'\b'                        char_literal
-'\f'                        char_literal
-'\v'                        char_literal
-'\"'                        char_literal
+'a'                         T_CHAR_CONST
+'z'                         T_CHAR_CONST
+'A'                         T_CHAR_CONST
+'Z'                         T_CHAR_CONST
+'0'                         T_CHAR_CONST
+'9'                         T_CHAR_CONST
+' '                         T_CHAR_CONST
+'\n'                        T_CHAR_CONST
+'\t'                        T_CHAR_CONST
+'\r'                        T_CHAR_CONST
+'\\'                        T_CHAR_CONST
+'\''                        T_CHAR_CONST
+'\0'                        T_CHAR_CONST
+'\a'                        T_CHAR_CONST
+'\b'                        T_CHAR_CONST
+'\f'                        T_CHAR_CONST
+'\v'                        T_CHAR_CONST
+'\"'                        T_CHAR_CONST
