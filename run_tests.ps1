@@ -6,7 +6,7 @@ $testsDir = Join-Path $repo 'tests'
 $outDir   = Join-Path $repo 'out'
 $lexer    = Join-Path $repo 'lexer_app.exe'   # built at project root by Makefile
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# Helpers
 function Normalize-Text {
     param([string]$Text)
     if ($null -eq $Text) { return "" }
@@ -30,10 +30,8 @@ if (-not (Test-Path $yyc)) {
         exit 1
     }
 }
-# Compile → lexer_app.exe at project root (not inside src/).
+# Compile → lexer_app.exe at project root.
 # Build the binary if it doesn't exist yet.
-# Re-run `flex` + `g++` only when necessary to keep the script fast,
-# but always ensures a working binary is present before running any tests.
 if (-not (Test-Path $lexer)) {
     Write-Host "Binary not found - building lexer..."
     $yyc = Join-Path $srcDir 'lex.yy.c'
@@ -55,23 +53,18 @@ if (-not (Test-Path $lexer)) {
 #  Ensure out/ directory exists 
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
-# Each valid test lexes cleanly (exit 0).  We compare the token_stream output
-# file against a stored expected file in tests/expected/.
 $validTests = @(
-    # Original
     @{ File = 'valid_basic.c';           Note = 'basic program: int/float/char/string/return' },
     @{ File = 'valid_keywords_ops.c';    Note = 'all compound-assign + relational + logical ops' },
     @{ File = 'valid_literals.c';        Note = 'all int forms, float forms, char escapes, strings' },
     @{ File = 'valid_comments.c';        Note = 'inline block, leading block, multi-line, trailing line comments' },
     @{ File = 'valid_numeric_edges.c';   Note = 'zero, dec, hex, floats, exponents' },
     @{ File = 'valid_float_dot_forms.c'; Note = 'leading-dot, trailing-dot, and mixed float forms' },
-    #New: keyword / operator coverage ──
     @{ File = 'valid_control_flow.c';    Note = 'if/else/for/while/do/switch/case/default/break/continue/goto/return' },
     @{ File = 'valid_type_keywords.c';   Note = 'int/char/float/double/void/static/struct/typedef/enum/union/class/access/this/new/delete/virtual/friend' },
     @{ File = 'valid_all_operators.c';   Note = 'arithmetic/bitwise/shift/incr/relational/logical' },
     @{ File = 'valid_assign_ops.c';      Note = 'all assignment and compound-assignment operators' },
     @{ File = 'valid_punctuation.c';     Note = 'dot/arrow/brackets/parens/braces/ternary/semicolon/comma' },
-    # ── New: literal coverage ──
     @{ File = 'valid_int_literals.c';    Note = 'zero, single-digit, multi-digit, all hex forms' },
     @{ File = 'valid_float_literals.c';  Note = 'all float literal forms' },
     @{ File = 'valid_char_literals.c';   Note = 'all valid char literals incl. expanded escapes \r\0\a\b\f\v\"' },
@@ -81,37 +74,31 @@ $validTests = @(
     @{ File = 'valid_combined.c';        Note = 'real-world: keywords + ops + string/char + control flow' }
 )
 
-# ── Invalid tests ─────────────────────────────────────────────────────────────
+#  Invalid tests 
 # Each invalid test exits non-zero.  We check that the error_log file contains
 # the expected substring.
 $invalidTests = @(
-    # ── Original ──
     @{ File = 'invalid_bad_char.c';              ExpectedContains = 'Error: unexpected character';                   Note = 'bad chars: @, $, backtick' },
     @{ File = 'invalid_octal_literal.c';         ExpectedContains = 'Error: Invalid Octal literal';                 Note = 'leading-zero multi-digit literals' },
     @{ File = 'invalid_malformed_scientific.c';  ExpectedContains = 'Error: malformed scientific notation';         Note = 'missing digits after e/E' },
     @{ File = 'invalid_unterminated_string.c';   ExpectedContains = 'Error: unterminated string literal starting at line 2'; Note = 'unterminated string - start line reported' },
     @{ File = 'invalid_unterminated_comment.c';  ExpectedContains = 'Error: unterminated comment starting at line 2'; Note = 'unterminated comment - correct start line' },
-    # ── New: comment errors ──
     @{ File = 'invalid_comment_eof.c';            ExpectedContains = 'Error: unterminated comment starting at line 1'; Note = 'comment opens at line 1, EOF hit' },
     @{ File = 'invalid_comment_multiline_eof.c';  ExpectedContains = 'Error: unterminated comment starting at line 2'; Note = 'multi-line: /* at line 2' },
-    # ── New: char literal errors ──
     @{ File = 'invalid_char_multichar.c';         ExpectedContains = 'Error: multi-character char literal';           Note = "Bug-4: 'ab' must error" },
     @{ File = 'invalid_char_unterminated.c';      ExpectedContains = 'Error: unterminated char literal';              Note = 'char literal terminated by newline' },
-    # ── New: string errors ──
     @{ File = 'invalid_string_newline.c';         ExpectedContains = 'Error: unterminated string literal starting at line 1'; Note = 'newline inside string returns T_ERROR' },
     @{ File = 'invalid_string_eof.c';             ExpectedContains = 'Error: unterminated string literal starting at line 1'; Note = 'string hits EOF without closing quote' }
 )
 
 $passed = 0; $failed = 0
 
-# ── Run valid tests ───────────────────────────────────────────────────────────
 foreach ($test in $validTests) {
     $input   = Join-Path $testsDir $test.File
     $stem    = Stem $test.File
     $expFile = Join-Path $testsDir "expected\$stem.txt"
     $tsFile  = Join-Path $outDir   "token_stream_$stem.txt"
 
-    # Run lexer (output goes to out/ automatically)
     & $lexer $input | Out-Null
     $exitOk = ($LASTEXITCODE -eq 0)
 
@@ -135,13 +122,11 @@ foreach ($test in $validTests) {
     }
 }
 
-# ── Run invalid tests ─────────────────────────────────────────────────────────
 foreach ($test in $invalidTests) {
     $input   = Join-Path $testsDir $test.File
     $stem    = Stem $test.File
     $errFile = Join-Path $outDir "error_log_$stem.txt"
 
-    # Run lexer
     & $lexer $input 2>&1 | Out-Null
     $exitNonZero = ($LASTEXITCODE -ne 0)
 
@@ -164,7 +149,7 @@ foreach ($test in $invalidTests) {
     }
 }
 
-# ── Summary ───────────────────────────────────────────────────────────────────
+#summary
 $total = $validTests.Count + $invalidTests.Count
 Write-Host ""
 Write-Host "Summary: $passed passed, $failed failed, $total total."

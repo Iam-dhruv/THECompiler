@@ -22,11 +22,8 @@
 int col_num = 1;
 std::string str_buf;
 int str_start_line;
-int comment_start_line;   // line where the current /* comment opened
+int comment_start_line;
 
-/* YY_USER_ACTION runs before every rule action.
-   We use it to snapshot the current lexeme (yytext) for the token table.
-   String literals override this later with the reconstructed full string. */
 #define YY_USER_ACTION \
     token_start_col = col_num; \
     col_num += yyleng; \
@@ -34,9 +31,8 @@ int comment_start_line;   // line where the current /* comment opened
 
 int token_start_col = 1;
 
-/* Lexeme / error tracking globals */
-std::string current_lexeme;            // set by YY_USER_ACTION; overridden for strings
-std::vector<std::string> error_log;    // all collected error/warning messages
+std::string current_lexeme;           
+std::vector<std::string> error_log;   
 bool had_error = false;
 
 void log_error(const char* format, ...) {
@@ -152,31 +148,26 @@ BAD_EXP     [eE][+-]?
 ":"             { return T_COLON; }
 
     /* Integer literals */
-    /* Hex first (distinct 0x prefix); bare 0 accepted; multi-digit
-       leading-zero is rejected as invalid/unsupported octal. */
 0[xX][0-9a-fA-F]+   { return T_INT_CONST; }
 0[0-9]+             { log_error("Error: Invalid Octal literal at line %d", yylineno); return T_ERROR; }
 0                    { return T_INT_CONST; }
 [1-9][0-9]*          { return T_INT_CONST; }
 
-    /* ── Float literals ─────────────────────────────────────────────────── */
-    /* Valid forms: 1.0  1.  .1  1e10  2.5e-3  .5e+2
-       BAD_EXP rules fire only when no digits follow [eE][+-]? */
-{DIGIT}+"."{DIGIT}*{EXP}?          { return T_FLOAT_CONST; }  /* 1., 1.0, 1.0e10 */
-"."{DIGIT}+{EXP}?                  { return T_FLOAT_CONST; }  /* .1, .1e10 */
-{DIGIT}+{EXP}                      { return T_FLOAT_CONST; }  /* 1e10 */
+    /* Float literals */
+{DIGIT}+"."{DIGIT}*{EXP}?          { return T_FLOAT_CONST; }
+"."{DIGIT}+{EXP}?                  { return T_FLOAT_CONST; }
+{DIGIT}+{EXP}                      { return T_FLOAT_CONST; }
 
 {DIGIT}+"."{DIGIT}*{BAD_EXP}       { log_error("Error: malformed scientific notation at line %d", yylineno); return T_ERROR; }
 "."{DIGIT}+{BAD_EXP}               { log_error("Error: malformed scientific notation at line %d", yylineno); return T_ERROR; }
 {DIGIT}+{BAD_EXP}                  { log_error("Error: malformed scientific notation at line %d", yylineno); return T_ERROR; }
 
-    /* ── Char literals ──────────────────────────────────────────────────── */
-    /* Supported escapes: \n \t \r \\ \' \" \a \b \f \v \0               */
+    /* Char literals */
 '([^\\'\n]|\\[ntr\\'\"abfv0])'      { return T_CHAR_CONST; }
 '([^\\'\n]|\\[ntr\\'\"abfv0]){2,}'  { log_error("Error: multi-character char literal at line %d", yylineno); return T_ERROR; }
 '([^\\'\n]|\\[ntr\\'\"abfv0])*      { log_error("Error: unterminated char literal at line %d", yylineno); return T_ERROR; }
 
-    /* ── String literals (exclusive STRING state) ────────────────────────── */
+    /* String literals */
 \"                  {
                         str_buf.clear();
                         str_start_line = yylineno;
@@ -184,8 +175,6 @@ BAD_EXP     [eE][+-]?
                     }
 
 <STRING>\"          {
-                        /* Override the lexeme set by YY_USER_ACTION with the
-                           full reconstructed quoted string. */
                         current_lexeme = "\"" + str_buf + "\"";
                         BEGIN(INITIAL);
                         return T_STRING_LITERAL;
@@ -216,7 +205,7 @@ BAD_EXP     [eE][+-]?
                         yyterminate();
                     }
 
-    /* ── Identifiers and keywords ─────────────────────────────────────── */
+    /* Identifiers and keywords */
 {IDENTIFIER}      {
     auto it = keywords.find(yytext);
     if (it != keywords.end()) {
@@ -226,7 +215,7 @@ BAD_EXP     [eE][+-]?
     return T_IDENTIFIER;
 }
 
-    /* ── Catch-all for illegal characters ──────────────────────────────── */
+    /*Catch-all for illegal characters */
 .                 {
                       log_error("Error: unexpected character '%s' at line %d", yytext, yylineno);
                       return T_ERROR;
@@ -252,12 +241,10 @@ int main(int argc, char** argv) {
     FILE* input_file   = nullptr;
     int   file_arg_idx = 1;
 
-    /* Legacy flag kept for backward compatibility */
     if (argc >= 2 && std::string(argv[1]) == "--symbol-table") {
         file_arg_idx = 2;
     }
 
-    /* ── Open input ──────────────────────────────────────────────────────── */
     std::string stem = "stdin";
     if (argc >= file_arg_idx + 1) {
         input_file = std::fopen(argv[file_arg_idx], "r");
@@ -278,14 +265,13 @@ int main(int argc, char** argv) {
         yyin = stdin;
     }
 
-    /* ── Create out/ directory ───────────────────────────────────────────── */
-    make_dir("out");   /* silently ignored if already exists */
+    /* Create out/ directory */
+    make_dir("out");  
 
     const std::string ts_path  = "out/token_stream_"  + stem + ".txt";
     const std::string sym_path = "out/symbol_table_"  + stem + ".txt";
     const std::string err_path = "out/error_log_"     + stem + ".txt";
 
-    /* ── Lex the entire file, collect valid tokens ───────────────────────── */
     struct TokenRecord { std::string lexeme; int tok; };
     std::vector<TokenRecord> tokens;
     int tok;
@@ -294,7 +280,6 @@ int main(int argc, char** argv) {
         tokens.push_back({ current_lexeme, tok });
     }
 
-    /* ── Print the token table to stdout for valid source files ─────────── */
     if (!had_error) {
         std::cout << std::left << std::setw(28) << "Lexeme" << "Token\n";
         std::cout << std::string(48, '-') << "\n";
@@ -310,7 +295,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    /* ── Write token_stream file ─────────────────────────────────────────── */
+    /* Write token_stream file */
     {
         std::ofstream ts(ts_path);
         if (had_error) {
@@ -321,7 +306,6 @@ int main(int argc, char** argv) {
         ts << std::left << std::setw(28) << "Lexeme" << "Token\n";
         ts << std::string(48, '-') << "\n";
         for (auto& r : tokens) {
-            /* Use the existing operator<< from tokens.h to get the real enum name. */
         std::ostringstream tname;
         tname << static_cast<TokenType>(r.tok);
         ts << std::left << std::setw(28) << r.lexeme
@@ -329,13 +313,13 @@ int main(int argc, char** argv) {
         }
     }
 
-    /* ── Write symbol_table file ─────────────────────────────────────────── */
+    /* Write symbol_table file */
     {
         std::ofstream sym(sym_path);
         symtab.print(sym);
     }
 
-    /* ── Write error_log file ────────────────────────────────────────────── */
+    /* Write error_log file */
     {
         std::ofstream err(err_path);
         if (error_log.empty()) {
@@ -347,7 +331,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    /* ── Console summary (brief) ─────────────────────────────────────────── */
+    /* Console summary */
     if (had_error) {
         std::cerr << "[ERRORS] " << error_log.size() << " error(s) in '"
                   << stem << "'. See " << err_path << "\n";
