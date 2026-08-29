@@ -3,15 +3,15 @@ NOTE: Lexical errors were found. Token stream may be incomplete.
 
 Lexeme                      Token
 ------------------------------------------------
-int                         keyword
-main                        identifier
-(                           punctuation
-)                           punctuation
-{                           punctuation
-char                        keyword
-s                           identifier
-=                           operator
-return                      keyword
-0                           integer_literal
-;                           punctuation
-}                           punctuation
+int                         T_INT
+main                        T_IDENTIFIER
+(                           T_LPAREN
+)                           T_RPAREN
+{                           T_LBRACE
+char                        T_CHAR
+s                           T_IDENTIFIER
+=                           T_ASSIGN
+return                      T_RETURN
+0                           T_INT_CONST
+;                           T_SEMICOLON
+}                           T_RBRACE

@@ -11,3 +11,10 @@ out/
 *.d
 .DS_Store
 Thumbs.db
+
+# Assignment 2 — syntax analyzer generated files
+src/parser.tab.c
+src/parser.tab.h
+src/lex.yy.parser.c
+syntax_analyzer
+src/parser.output
