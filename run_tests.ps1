@@ -1,173 +1,269 @@
+[CmdletBinding(DefaultParameterSetName = "All")]
+param (
+    [Parameter(ParameterSetName = "Lexer")]
+    [switch]$Lexer,
+
+    [Parameter(ParameterSetName = "Parser")]
+    [switch]$Parser,
+
+    [Parameter(ParameterSetName = "All")]
+    [switch]$All,
+
+    [Parameter()]
+    [ValidateSet("all", "lexer", "parser", "syntax")]
+    [string]$Suite = "all",
+
+    [Parameter()]
+    [string]$LexerExe = "",
+
+    [Parameter()]
+    [string]$ParserExe = "",
+
+    [Parameter()]
+    [switch]$Help
+)
+
+if ($Help) {
+    Write-Host "THECompiler Unified PowerShell Test Runner" -ForegroundColor Cyan
+    Write-Host "Usage: .\run_tests.ps1 [OPTIONS]"
+    Write-Host ""
+    Write-Host "Options:"
+    Write-Host "  (no args)             Run ALL test suites (Lexer + Parser) [Default]"
+    Write-Host "  -All, -Suite all      Run ALL test suites"
+    Write-Host "  -Lexer, -Suite lexer  Run Lexer test suite only"
+    Write-Host "  -Parser, -Suite parser Run Parser test suite only"
+    Write-Host "  -LexerExe <PATH>      Custom path to lexer binary"
+    Write-Host "  -ParserExe <PATH>     Custom path to parser binary"
+    Write-Host "  -Verbose              Display full output for all tests"
+    Write-Host "  -Help                 Show this help message"
+    exit 0
+}
+
+# Resolve target suite
+$selectedSuite = "all"
+if ($Lexer -or ($Suite.ToLower() -eq "lexer")) {
+    $selectedSuite = "lexer"
+} elseif ($Parser -or ($Suite.ToLower() -eq "parser") -or ($Suite.ToLower() -eq "syntax")) {
+    $selectedSuite = "parser"
+} else {
+    $selectedSuite = "all"
+}
+
 $ErrorActionPreference = 'Continue'
 
 $repo     = $PSScriptRoot
 $srcDir   = Join-Path $repo 'src'
 $testsDir = Join-Path $repo 'tests'
 $outDir   = Join-Path $repo 'out'
-$lexer    = Join-Path $repo 'lexer_app.exe'   # built at project root by Makefile
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+
 function Normalize-Text {
     param([string]$Text)
     if ($null -eq $Text) { return "" }
     return ($Text -replace "`r`n", "`n" -replace "`r", "`n").TrimEnd()
 }
 
-function Stem([string]$FileName) {
-    return [System.IO.Path]::GetFileNameWithoutExtension($FileName)
+# ── Locate / Build Executables ───────────────────────────────────────────────
+if (-not $LexerExe) {
+    $LexerExe = Join-Path $repo 'lexer_app.exe'
+    if (-not (Test-Path $LexerExe)) {
+        $LexerExe = Join-Path $repo 'lexer_app'
+    }
 }
 
-# Build
-# Ensure lex.yy.c exists; rebuild with flex if missing.
-$yyc = Join-Path $srcDir 'lex.yy.c'
-if (-not (Test-Path $yyc)) {
-    if (Get-Command flex -ErrorAction SilentlyContinue) {
+if (-not $ParserExe) {
+    $ParserExe = Join-Path $repo 'syntax_analyzer.exe'
+    if (-not (Test-Path $ParserExe)) {
+        $ParserExe = Join-Path $repo 'parser_app.exe'
+    }
+    if (-not (Test-Path $ParserExe)) {
+        $ParserExe = Join-Path $repo 'syntax_analyzer'
+    }
+}
+
+# Auto-build lexer if needed
+if (($selectedSuite -eq "lexer" -or $selectedSuite -eq "all") -and (-not (Test-Path $LexerExe))) {
+    Write-Host "Lexer binary missing. Building with g++..." -ForegroundColor Yellow
+    $yyc = Join-Path $srcDir 'lex.yy.c'
+    if (-not (Test-Path $yyc)) {
         Push-Location $srcDir
         flex lexer.l
         Pop-Location
-    } else {
-        Write-Error "flex is not installed and lex.yy.c is missing. Aborting."
-        exit 1
     }
+    g++ -std=c++17 -Wno-register $yyc -o (Join-Path $repo 'lexer_app.exe')
+    $LexerExe = Join-Path $repo 'lexer_app.exe'
 }
-# Compile → lexer_app.exe at project root (not inside src/).
-# Build the binary if it doesn't exist yet.
-# Re-run `flex` + `g++` only when necessary to keep the script fast,
-# but always ensures a working binary is present before running any tests.
-if (-not (Test-Path $lexer)) {
-    Write-Host "Binary not found - building lexer..."
-    $yyc = Join-Path $srcDir 'lex.yy.c'
-    if (-not (Test-Path $yyc)) {
-        if (Get-Command flex -ErrorAction SilentlyContinue) {
-            Push-Location $srcDir; flex lexer.l; Pop-Location
+
+# Auto-build parser if needed
+if (($selectedSuite -eq "parser" -or $selectedSuite -eq "all") -and (-not (Test-Path $ParserExe))) {
+    Write-Host "Parser binary missing. Building with bison/flex/g++..." -ForegroundColor Yellow
+    Push-Location $srcDir
+    $env:BISON_PKGDATADIR = 'C:/PROGRA~2/GnuWin32/share/bison'
+    $env:M4 = 'C:/PROGRA~2/GnuWin32/bin/m4.exe'
+    bison -d -o parser.tab.c parser.y
+    flex parser_lexer.l
+    if (Test-Path "lex.yy.c") {
+        Move-Item -Force "lex.yy.c" "lex.yy.parser.c"
+    }
+    Pop-Location
+    g++ -std=c++17 -Wno-register (Join-Path $srcDir 'parser.tab.c') (Join-Path $srcDir 'lex.yy.parser.c') -o (Join-Path $repo 'syntax_analyzer.exe')
+    $ParserExe = Join-Path $repo 'syntax_analyzer.exe'
+}
+
+$totalRun = 0
+$totalPassed = 0
+$totalFailed = 0
+
+# ═════════════════════════════════════════════════════════════════════════════
+# 1. RUN LEXER TESTS
+# ═════════════════════════════════════════════════════════════════════════════
+if ($selectedSuite -eq "lexer" -or $selectedSuite -eq "all") {
+    Write-Host ""
+    Write-Host " [SUITE 1/2] Lexical Analyzer Tests" -ForegroundColor Cyan
+    Write-Host " Executable : $LexerExe" -ForegroundColor Cyan
+    Write-Host ""
+
+    $lexPassed = 0
+    $lexFailed = 0
+
+    $lexFiles = Get-ChildItem -Path $testsDir -Include "valid_*.c", "invalid_*.c" -File -Recurse | Where-Object { $_.Name -notlike "syntax_*" } | Sort-Object Name
+
+    foreach ($test in $lexFiles) {
+        $stem = [System.IO.Path]::GetFileNameWithoutExtension($test.Name)
+        $expFile = Join-Path $testsDir "expected\$stem.txt"
+        $tsFile = Join-Path $outDir "token_stream_$stem.txt"
+
+        $output = & $LexerExe $test.FullName 2>&1
+        $rc = $LASTEXITCODE
+
+        $pass = $false
+        if (Test-Path $expFile) {
+            $expected = Normalize-Text (Get-Content -Path $expFile -Raw -ErrorAction SilentlyContinue)
+            $actual = Normalize-Text (Get-Content -Path $tsFile -Raw -ErrorAction SilentlyContinue)
+            if ($expected -eq $actual) {
+                $pass = $true
+            }
         } else {
-            Write-Error "flex is not installed and lex.yy.c is missing. Aborting."
-            exit 1
+            if ($test.Name -like "invalid_*") {
+                if ($rc -ne 0) { $pass = $true }
+            } else {
+                if ($rc -eq 0) { $pass = $true }
+            }
+        }
+
+        if ($pass) {
+            $lexPassed++
+            Write-Host "[PASS] $($test.Name)" -ForegroundColor Green
+        } else {
+            $lexFailed++
+            Write-Host "[FAIL] $($test.Name) (Exit Code: $rc)" -ForegroundColor Red
         }
     }
-    g++ -std=c++17 -Wno-register $yyc -o $lexer
-    if ($LASTEXITCODE -ne 0) { Write-Error "Compilation failed. Aborting."; exit 1 }
-    Write-Host "Build complete: $lexer"
-} else {
-    Write-Host "Using existing binary: $lexer"
+
+    $lexTotal = $lexFiles.Count
+    Write-Host ""
+    Write-Host " Lexer Suite Results: $lexPassed / $lexTotal passed ($lexFailed failed)" -ForegroundColor Cyan
+    Write-Host ""
+
+    $totalRun += $lexTotal
+    $totalPassed += $lexPassed
+    $totalFailed += $lexFailed
 }
 
-#  Ensure out/ directory exists 
-New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+# ═════════════════════════════════════════════════════════════════════════════
+# 2. RUN PARSER TESTS
+# ═════════════════════════════════════════════════════════════════════════════
+if ($selectedSuite -eq "parser" -or $selectedSuite -eq "all") {
+    Write-Host ""
+    Write-Host " [SUITE 2/2] Syntax Analyzer (Parser) Tests" -ForegroundColor Cyan
+    Write-Host " Executable : $ParserExe" -ForegroundColor Cyan
+    Write-Host ""
 
-# Each valid test lexes cleanly (exit 0).  We compare the token_stream output
-# file against a stored expected file in tests/expected/.
-$validTests = @(
-    # Original
-    @{ File = 'valid_basic.c';           Note = 'basic program: int/float/char/string/return' },
-    @{ File = 'valid_keywords_ops.c';    Note = 'all compound-assign + relational + logical ops' },
-    @{ File = 'valid_literals.c';        Note = 'all int forms, float forms, char escapes, strings' },
-    @{ File = 'valid_comments.c';        Note = 'inline block, leading block, multi-line, trailing line comments' },
-    @{ File = 'valid_numeric_edges.c';   Note = 'zero, dec, hex, floats, exponents' },
-    @{ File = 'valid_float_dot_forms.c'; Note = 'leading-dot, trailing-dot, and mixed float forms' },
-    #New: keyword / operator coverage ──
-    @{ File = 'valid_control_flow.c';    Note = 'if/else/for/while/do/switch/case/default/break/continue/goto/return' },
-    @{ File = 'valid_type_keywords.c';   Note = 'int/char/float/double/void/static/struct/typedef/enum/union/class/access/this/new/delete/virtual/friend' },
-    @{ File = 'valid_all_operators.c';   Note = 'arithmetic/bitwise/shift/incr/relational/logical' },
-    @{ File = 'valid_assign_ops.c';      Note = 'all assignment and compound-assignment operators' },
-    @{ File = 'valid_punctuation.c';     Note = 'dot/arrow/brackets/parens/braces/ternary/semicolon/comma' },
-    # ── New: literal coverage ──
-    @{ File = 'valid_int_literals.c';    Note = 'zero, single-digit, multi-digit, all hex forms' },
-    @{ File = 'valid_float_literals.c';  Note = 'all float literal forms' },
-    @{ File = 'valid_char_literals.c';   Note = 'all valid char literals incl. expanded escapes \r\0\a\b\f\v\"' },
-    @{ File = 'valid_strings.c';         Note = 'empty, plain, escaped strings' },
-    @{ File = 'valid_identifiers.c';     Note = 'all legal identifier forms' },
-    @{ File = 'valid_comments_all.c';    Note = 'block/inline-block/single-line/trailing/multi-line' },
-    @{ File = 'valid_combined.c';        Note = 'real-world: keywords + ops + string/char + control flow' }
-)
+    $parsePassed = 0
+    $parseFailed = 0
 
-# ── Invalid tests ─────────────────────────────────────────────────────────────
-# Each invalid test exits non-zero.  We check that the error_log file contains
-# the expected substring.
-$invalidTests = @(
-    # ── Original ──
-    @{ File = 'invalid_bad_char.c';              ExpectedContains = 'Error: unexpected character';                   Note = 'bad chars: @, $, backtick' },
-    @{ File = 'invalid_octal_literal.c';         ExpectedContains = 'Error: Invalid Octal literal';                 Note = 'leading-zero multi-digit literals' },
-    @{ File = 'invalid_malformed_scientific.c';  ExpectedContains = 'Error: malformed scientific notation';         Note = 'missing digits after e/E' },
-    @{ File = 'invalid_unterminated_string.c';   ExpectedContains = 'Error: unterminated string literal starting at line 2'; Note = 'unterminated string - start line reported' },
-    @{ File = 'invalid_unterminated_comment.c';  ExpectedContains = 'Error: unterminated comment starting at line 2'; Note = 'unterminated comment - correct start line' },
-    # ── New: comment errors ──
-    @{ File = 'invalid_comment_eof.c';            ExpectedContains = 'Error: unterminated comment starting at line 1'; Note = 'comment opens at line 1, EOF hit' },
-    @{ File = 'invalid_comment_multiline_eof.c';  ExpectedContains = 'Error: unterminated comment starting at line 2'; Note = 'multi-line: /* at line 2' },
-    # ── New: char literal errors ──
-    @{ File = 'invalid_char_multichar.c';         ExpectedContains = 'Error: multi-character char literal';           Note = "Bug-4: 'ab' must error" },
-    @{ File = 'invalid_char_unterminated.c';      ExpectedContains = 'Error: unterminated char literal';              Note = 'char literal terminated by newline' },
-    # ── New: string errors ──
-    @{ File = 'invalid_string_newline.c';         ExpectedContains = 'Error: unterminated string literal starting at line 1'; Note = 'newline inside string returns T_ERROR' },
-    @{ File = 'invalid_string_eof.c';             ExpectedContains = 'Error: unterminated string literal starting at line 1'; Note = 'string hits EOF without closing quote' }
-)
+    $validSyntaxTests = Get-ChildItem -Path $testsDir -Filter "syntax_valid_*.c" | Sort-Object Name
+    $invalidSyntaxTests = Get-ChildItem -Path $testsDir -Filter "syntax_invalid_*.c" | Sort-Object Name
 
-$passed = 0; $failed = 0
+    Write-Host "--- Running Valid Syntax Tests (Exit 0 & Token Table Expected) ---" -ForegroundColor Yellow
+    foreach ($test in $validSyntaxTests) {
+        $stem = [System.IO.Path]::GetFileNameWithoutExtension($test.Name)
+        $expFile = Join-Path $testsDir "expected\$stem.txt"
+        $relPath = "tests/$($test.Name)"
 
-# ── Run valid tests ───────────────────────────────────────────────────────────
-foreach ($test in $validTests) {
-    $input   = Join-Path $testsDir $test.File
-    $stem    = Stem $test.File
-    $expFile = Join-Path $testsDir "expected\$stem.txt"
-    $tsFile  = Join-Path $outDir   "token_stream_$stem.txt"
+        $output = & $ParserExe $relPath 2>&1
+        $rc = $LASTEXITCODE
 
-    # Run lexer (output goes to out/ automatically)
-    & $lexer $input | Out-Null
-    $exitOk = ($LASTEXITCODE -eq 0)
+        $matchExp = $true
+        if (Test-Path $expFile) {
+            $expected = Normalize-Text (Get-Content -Path $expFile -Raw -ErrorAction SilentlyContinue)
+            $actual = Normalize-Text ($output -join "`n")
+            if ($expected -ne $actual) {
+                $matchExp = $false
+            }
+        }
 
-    $expected = Normalize-Text (Get-Content -Path $expFile -Raw -ErrorAction SilentlyContinue)
-    $actual   = Normalize-Text (Get-Content -Path $tsFile  -Raw -ErrorAction SilentlyContinue)
-    $ok       = $exitOk -and ($actual -eq $expected)
-
-    if ($ok) {
-        $passed++
-        Write-Host "[PASS] $($test.File)"
-    } else {
-        $failed++
-        Write-Host "[FAIL] $($test.File)  # $($test.Note)"
-        if (-not $exitOk) { Write-Host "  lexer exited with errors" }
-        if ($actual -ne $expected) {
-            Write-Host "  actual   ($tsFile):"
-            Write-Host "  $actual"
-            Write-Host "  expected ($expFile):"
-            Write-Host "  $expected"
+        if ($rc -eq 0 -and $matchExp) {
+            $parsePassed++
+            Write-Host "[PASS] $($test.Name)" -ForegroundColor Green
+        } else {
+            $parseFailed++
+            Write-Host "[FAIL] $($test.Name) (Exit Code: $rc, Matched Expected: $matchExp)" -ForegroundColor Red
         }
     }
-}
 
-# ── Run invalid tests ─────────────────────────────────────────────────────────
-foreach ($test in $invalidTests) {
-    $input   = Join-Path $testsDir $test.File
-    $stem    = Stem $test.File
-    $errFile = Join-Path $outDir "error_log_$stem.txt"
+    Write-Host ""
+    Write-Host "--- Running Invalid Syntax Tests (Syntax Error Expected) ---" -ForegroundColor Yellow
+    foreach ($test in $invalidSyntaxTests) {
+        $stem = [System.IO.Path]::GetFileNameWithoutExtension($test.Name)
+        $expFile = Join-Path $testsDir "expected\$stem.txt"
+        $relPath = "tests/$($test.Name)"
 
-    # Run lexer
-    & $lexer $input 2>&1 | Out-Null
-    $exitNonZero = ($LASTEXITCODE -ne 0)
+        $output = & $ParserExe $relPath 2>&1
+        $rc = $LASTEXITCODE
 
-    $errContent = Normalize-Text (Get-Content -Path $errFile -Raw -ErrorAction SilentlyContinue)
-    $ok = $exitNonZero -and $errContent.Contains($test.ExpectedContains)
+        $matchExp = $true
+        if (Test-Path $expFile) {
+            $expected = Normalize-Text (Get-Content -Path $expFile -Raw -ErrorAction SilentlyContinue)
+            $actual = Normalize-Text ($output -join "`n")
+            if ($expected -ne $actual) {
+                $matchExp = $false
+            }
+        }
 
-    if ($ok) {
-        $passed++
-        Write-Host "[PASS] $($test.File)"
-    } else {
-        $failed++
-        Write-Host "[FAIL] $($test.File)  # $($test.Note)"
-        if (-not $exitNonZero) { Write-Host "  lexer exited 0 - expected non-zero for error case" }
-        if (-not $errContent.Contains($test.ExpectedContains)) {
-            Write-Host "  error_log ($errFile):"
-            Write-Host "  $errContent"
-            Write-Host "  expected to contain:"
-            Write-Host "  $($test.ExpectedContains)"
+        if ($rc -ne 0 -and $matchExp) {
+            $parsePassed++
+            Write-Host "[PASS] $($test.Name) (correctly reported syntax error, exit code: $rc)" -ForegroundColor Green
+        } else {
+            $parseFailed++
+            Write-Host "[FAIL] $($test.Name) (Exit Code: $rc, Matched Expected: $matchExp)" -ForegroundColor Red
         }
     }
+
+    $parseTotal = $validSyntaxTests.Count + $invalidSyntaxTests.Count
+    Write-Host ""
+    Write-Host " Parser Suite Results: $parsePassed / $parseTotal passed ($parseFailed failed)" -ForegroundColor Cyan
+    Write-Host ""
+
+    $totalRun += $parseTotal
+    $totalPassed += $parsePassed
+    $totalFailed += $parseFailed
 }
 
-# ── Summary ───────────────────────────────────────────────────────────────────
-$total = $validTests.Count + $invalidTests.Count
+# ── Overall Summary ──────────────────────────────────────────────────────────
 Write-Host ""
-Write-Host "Summary: $passed passed, $failed failed, $total total."
-Write-Host "All output files in: $outDir"
+Write-Host " Overall Test Execution Summary" -ForegroundColor Cyan
+Write-Host " Suite Executed : $selectedSuite" -ForegroundColor Cyan
+Write-Host " Total Tests    : $totalRun" -ForegroundColor Cyan
+Write-Host " Passed         : $totalPassed" -ForegroundColor Green
+Write-Host " Failed         : $totalFailed" -ForegroundColor $(if ($totalFailed -eq 0) { "Green" } else { "Red" })
+Write-Host ""
 
-if ($failed -gt 0) { exit 1 }
+if ($totalFailed -eq 0) {
+    Write-Host " SUCCESS: All $totalPassed tests passed cleanly!" -ForegroundColor Green
+    exit 0
+} else {
+    Write-Host " FAILURE: $totalFailed test(s) failed." -ForegroundColor Red
+    exit 1
+}

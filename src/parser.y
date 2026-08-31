@@ -88,7 +88,7 @@ void yyerror(const char* msg);
 %nonassoc IFX
 %nonassoc T_ELSE
 
-%define parse.error verbose
+%error-verbose
 
 %start program
 
@@ -212,6 +212,8 @@ init_declarator
 declarator
     : direct_declarator
     | pointer direct_declarator
+    | T_BIT_AND direct_declarator
+    | pointer T_BIT_AND direct_declarator
     ;
 
 pointer
@@ -300,6 +302,7 @@ stmt_list_opt
 
 iteration_stmt
     : T_WHILE T_LPAREN expr T_RPAREN stmt
+    | T_UNTIL T_LPAREN expr T_RPAREN stmt
     | T_DO stmt T_WHILE T_LPAREN expr T_RPAREN T_SEMICOLON
     | T_DO stmt T_UNTIL T_LPAREN expr T_RPAREN T_SEMICOLON
     | T_FOR T_LPAREN for_init expr_stmt for_incr_opt T_RPAREN stmt
@@ -362,7 +365,9 @@ unary_expr
     | T_DECR unary_expr
     | unary_operator unary_expr
     | T_NEW type_specifier
+    | T_NEW type_specifier T_LBRACKET expr T_RBRACKET
     | T_DELETE unary_expr
+    | T_DELETE T_LBRACKET T_RBRACKET unary_expr
     ;
 
 unary_operator

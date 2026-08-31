@@ -1,20 +1,39 @@
-src/lex.yy.c
-lexer_app
+# Binaries and executables
 *.exe
+lexer_app
+syntax_analyzer
+parser_app
 src/*.exe
 src/a.exe
+src/parser
+src/lexer_app
+src/syntax_analyzer
 src/out
 
-out/
-
+# Build objects
 *.o
 *.d
-.DS_Store
-Thumbs.db
+*.obj
 
-# Assignment 2 — syntax analyzer generated files
+# Flex & Bison generated files
+src/lex.yy.c
+src/lex.yy.*.c
 src/parser.tab.c
 src/parser.tab.h
-src/lex.yy.parser.c
-syntax_analyzer
 src/parser.output
+src/location.hh
+src/position.hh
+src/stack.hh
+
+# Test outputs
+out/
+
+# System / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Phase Notes & Requirements Tracking (user configured)
+PARSER_PHASE_NOTES.md
+REQUIREMENTS.md

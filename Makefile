@@ -18,9 +18,18 @@ SRC_DIR  = src
 LEXER    = lexer_app
 PARSER   = syntax_analyzer
 
-.PHONY: all clean
+.PHONY: all clean lexer parser syntax test
 
 all: $(LEXER) $(PARSER)
+
+lexer: $(LEXER)
+
+parser: $(PARSER)
+
+syntax: $(PARSER)
+
+test: $(PARSER)
+	bash ./run.sh || powershell -ExecutionPolicy Bypass -File ./run_tests.ps1
 
 # ═══════════════════════ Assignment 1 — Lexical Analyzer ═══════════════════
 
@@ -36,13 +45,11 @@ $(LEXER): $(SRC_DIR)/lex.yy.c
 
 # ── Step 1: Run Bison on the grammar file to produce parser.tab.c/.h ────────
 $(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h: $(SRC_DIR)/parser.y
-	cd $(SRC_DIR) && $(BISON) -d -o parser.tab.c parser.y
+	cd $(SRC_DIR) && (set BISON_PKGDATADIR=C:/PROGRA~2/GnuWin32/share/bison& set M4=C:/PROGRA~2/GnuWin32/bin/m4.exe& $(BISON) -d -o parser.tab.c parser.y) || $(BISON) -d -o parser.tab.c parser.y
 
 # ── Step 2: Run Flex on the Bison-driving lexer spec ─────────────────────────
-#           (a separate file from src/lexer.l — different token codes, no
-#            main() of its own, feeds tokens to the Bison parser instead)
 $(SRC_DIR)/lex.yy.parser.c: $(SRC_DIR)/parser_lexer.l $(SRC_DIR)/parser.tab.h $(SRC_DIR)/common.h
-	cd $(SRC_DIR) && $(FLEX) -o lex.yy.parser.c parser_lexer.l
+	cd $(SRC_DIR) && $(FLEX) parser_lexer.l && (move /Y lex.yy.c lex.yy.parser.c 2>NUL || mv -f lex.yy.c lex.yy.parser.c)
 
 # ── Step 3: Compile + link into syntax_analyzer (placed in project root) ───
 $(PARSER): $(SRC_DIR)/parser.tab.c $(SRC_DIR)/lex.yy.parser.c
@@ -51,8 +58,5 @@ $(PARSER): $(SRC_DIR)/parser.tab.c $(SRC_DIR)/lex.yy.parser.c
 # ═══════════════════════════════ Cleanup ════════════════════════════════════
 
 clean:
-	rm -f $(SRC_DIR)/lex.yy.c
-	rm -f $(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h $(SRC_DIR)/lex.yy.parser.c
-	rm -f $(SRC_DIR)/parser.output
-	rm -f $(LEXER) $(LEXER).exe $(PARSER) $(PARSER).exe
-	rm -rf out/
+	-rm -f $(SRC_DIR)/lex.yy.c $(SRC_DIR)/lex.yy.*.c $(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h $(SRC_DIR)/lex.yy.parser.c $(SRC_DIR)/parser.output $(SRC_DIR)/parser $(LEXER) $(LEXER).exe $(PARSER) $(PARSER).exe *.o $(SRC_DIR)/*.o 2>/dev/null || (del /Q /F $(SRC_DIR)\lex.yy.c $(SRC_DIR)\parser.tab.c $(SRC_DIR)\parser.tab.h $(SRC_DIR)\lex.yy.parser.c $(SRC_DIR)\parser.output $(SRC_DIR)\parser $(LEXER).exe $(PARSER).exe *.o 2>NUL) || echo Cleaned
+	-rm -rf out/ 2>/dev/null || (rd /S /Q out 2>NUL) || echo Cleaned

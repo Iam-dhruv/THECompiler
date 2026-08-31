@@ -1,0 +1,5 @@
+Syntax errors were found in 'tests/syntax_invalid_bad_control_flow.c':
+Syntax Error at line 4: syntax error, unexpected T_LBRACE, expecting T_RPAREN
+Syntax Error at line 7: syntax error, unexpected T_RETURN
+Syntax Error at line 8: syntax error, unexpected T_RBRACE
+3 syntax error(s) found.

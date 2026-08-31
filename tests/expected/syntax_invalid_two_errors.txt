@@ -1,0 +1,4 @@
+Syntax errors were found in 'tests/syntax_invalid_two_errors.c':
+Syntax Error at line 2: syntax error, unexpected T_SEMICOLON
+Syntax Error at line 4: syntax error, unexpected T_SEMICOLON
+2 syntax error(s) found.

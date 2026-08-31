@@ -1,0 +1,5 @@
+Syntax errors were found in 'tests/syntax_invalid_bad_switch.c':
+Syntax Error at line 4: syntax error, unexpected T_LBRACE, expecting T_LPAREN
+Syntax Error at line 9: syntax error, unexpected T_RETURN
+Syntax Error at line 10: syntax error, unexpected T_RBRACE
+3 syntax error(s) found.
