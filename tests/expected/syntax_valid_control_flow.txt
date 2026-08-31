@@ -1,154 +1,154 @@
-Token                       Token_Type
-------------------------------------------------
-int                         T_INT
-classify                    T_IDENTIFIER
-(                           T_LPAREN
-int                         T_INT
-n                           T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-i                           T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-if                          T_IF
-(                           T_LPAREN
-n                           T_IDENTIFIER
-<                           T_LT
-0                           T_INT_CONST
-)                           T_RPAREN
-{                           T_LBRACE
-result                      T_IDENTIFIER
-=                           T_ASSIGN
--                           T_MINUS
-1                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
-else                        T_ELSE
-{                           T_LBRACE
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-1                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
-for                         T_FOR
-(                           T_LPAREN
-i                           T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-i                           T_IDENTIFIER
-<                           T_LT
-n                           T_IDENTIFIER
-;                           T_SEMICOLON
-i                           T_IDENTIFIER
-++                          T_INCR
-)                           T_RPAREN
-{                           T_LBRACE
-result                      T_IDENTIFIER
-+=                          T_PLUS_ASSIGN
-i                           T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-i                           T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-while                       T_WHILE
-(                           T_LPAREN
-i                           T_IDENTIFIER
-<                           T_LT
-n                           T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-i                           T_IDENTIFIER
-++                          T_INCR
-;                           T_SEMICOLON
-}                           T_RBRACE
-i                           T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-do                          T_DO
-{                           T_LBRACE
-i                           T_IDENTIFIER
-++                          T_INCR
-;                           T_SEMICOLON
-}                           T_RBRACE
-while                       T_WHILE
-(                           T_LPAREN
-i                           T_IDENTIFIER
-<                           T_LT
-n                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-i                           T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-do                          T_DO
-{                           T_LBRACE
-i                           T_IDENTIFIER
-++                          T_INCR
-;                           T_SEMICOLON
-}                           T_RBRACE
-until                       T_UNTIL
-(                           T_LPAREN
-i                           T_IDENTIFIER
->=                          T_GE
-n                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-switch                      T_SWITCH
-(                           T_LPAREN
-n                           T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-case                        T_CASE
-0                           T_INT_CONST
-:                           T_COLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-100                         T_INT_CONST
-;                           T_SEMICOLON
-break                       T_BREAK
-;                           T_SEMICOLON
-case                        T_CASE
-1                           T_INT_CONST
-:                           T_COLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-200                         T_INT_CONST
-;                           T_SEMICOLON
-break                       T_BREAK
-;                           T_SEMICOLON
-default                     T_DEFAULT
-:                           T_COLON
-continue                    T_CONTINUE
-;                           T_SEMICOLON
-}                           T_RBRACE
-if                          T_IF
-(                           T_LPAREN
-result                      T_IDENTIFIER
->                           T_GT
-1000                        T_INT_CONST
-)                           T_RPAREN
-goto                        T_GOTO
-done                        T_IDENTIFIER
-;                           T_SEMICOLON
-return                      T_RETURN
-result                      T_IDENTIFIER
-;                           T_SEMICOLON
-done                        T_IDENTIFIER
-:                           T_COLON
-return                      T_RETURN
--                           T_MINUS
-1                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+int                 T_INT               T_INT                                   global
+classify            T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+n                   T_IDENTIFIER        INT_PARAMETER                           classify
+)                   T_RPAREN            T_RPAREN                                classify
+{                   T_LBRACE            T_LBRACE                                classify
+int                 T_INT               T_INT                                   classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+int                 T_INT               T_INT                                   classify
+result              T_IDENTIFIER        INT_VARIABLE                            classify
+=                   T_ASSIGN            T_ASSIGN                                classify
+0                   T_INT_CONST         T_INT_CONST                             classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+if                  T_IF                T_IF                                    classify
+(                   T_LPAREN            T_LPAREN                                classify
+n                   T_IDENTIFIER        INT_PARAMETER                           classify
+<                   T_LT                T_LT                                    classify
+0                   T_INT_CONST         T_INT_CONST                             classify
+)                   T_RPAREN            T_RPAREN                                classify
+{                   T_LBRACE            T_LBRACE                                classify
+result              T_IDENTIFIER        INT_VARIABLE                            classify
+=                   T_ASSIGN            T_ASSIGN                                classify.block1
+-                   T_MINUS             T_MINUS                                 classify.block1
+1                   T_INT_CONST         T_INT_CONST                             classify.block1
+;                   T_SEMICOLON         T_SEMICOLON                             classify.block1
+}                   T_RBRACE            T_RBRACE                                classify.block1
+else                T_ELSE              T_ELSE                                  classify
+{                   T_LBRACE            T_LBRACE                                classify
+result              T_IDENTIFIER        INT_VARIABLE                            classify
+=                   T_ASSIGN            T_ASSIGN                                classify.block2
+1                   T_INT_CONST         T_INT_CONST                             classify.block2
+;                   T_SEMICOLON         T_SEMICOLON                             classify.block2
+}                   T_RBRACE            T_RBRACE                                classify.block2
+for                 T_FOR               T_FOR                                   classify
+(                   T_LPAREN            T_LPAREN                                classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+=                   T_ASSIGN            T_ASSIGN                                classify
+0                   T_INT_CONST         T_INT_CONST                             classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+<                   T_LT                T_LT                                    classify
+n                   T_IDENTIFIER        INT_PARAMETER                           classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+++                  T_INCR              T_INCR                                  classify
+)                   T_RPAREN            T_RPAREN                                classify
+{                   T_LBRACE            T_LBRACE                                classify
+result              T_IDENTIFIER        INT_VARIABLE                            classify
++=                  T_PLUS_ASSIGN       T_PLUS_ASSIGN                           classify.block3
+i                   T_IDENTIFIER        INT_VARIABLE                            classify.block3
+;                   T_SEMICOLON         T_SEMICOLON                             classify.block3
+}                   T_RBRACE            T_RBRACE                                classify.block3
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+=                   T_ASSIGN            T_ASSIGN                                classify
+0                   T_INT_CONST         T_INT_CONST                             classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+while               T_WHILE             T_WHILE                                 classify
+(                   T_LPAREN            T_LPAREN                                classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+<                   T_LT                T_LT                                    classify
+n                   T_IDENTIFIER        INT_PARAMETER                           classify
+)                   T_RPAREN            T_RPAREN                                classify
+{                   T_LBRACE            T_LBRACE                                classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+++                  T_INCR              T_INCR                                  classify.block4
+;                   T_SEMICOLON         T_SEMICOLON                             classify.block4
+}                   T_RBRACE            T_RBRACE                                classify.block4
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+=                   T_ASSIGN            T_ASSIGN                                classify
+0                   T_INT_CONST         T_INT_CONST                             classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+do                  T_DO                T_DO                                    classify
+{                   T_LBRACE            T_LBRACE                                classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+++                  T_INCR              T_INCR                                  classify.block5
+;                   T_SEMICOLON         T_SEMICOLON                             classify.block5
+}                   T_RBRACE            T_RBRACE                                classify.block5
+while               T_WHILE             T_WHILE                                 classify
+(                   T_LPAREN            T_LPAREN                                classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+<                   T_LT                T_LT                                    classify
+n                   T_IDENTIFIER        INT_PARAMETER                           classify
+)                   T_RPAREN            T_RPAREN                                classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+=                   T_ASSIGN            T_ASSIGN                                classify
+0                   T_INT_CONST         T_INT_CONST                             classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+do                  T_DO                T_DO                                    classify
+{                   T_LBRACE            T_LBRACE                                classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+++                  T_INCR              T_INCR                                  classify.block6
+;                   T_SEMICOLON         T_SEMICOLON                             classify.block6
+}                   T_RBRACE            T_RBRACE                                classify.block6
+until               T_UNTIL             T_UNTIL                                 classify
+(                   T_LPAREN            T_LPAREN                                classify
+i                   T_IDENTIFIER        INT_VARIABLE                            classify
+>=                  T_GE                T_GE                                    classify
+n                   T_IDENTIFIER        INT_PARAMETER                           classify
+)                   T_RPAREN            T_RPAREN                                classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+switch              T_SWITCH            T_SWITCH                                classify
+(                   T_LPAREN            T_LPAREN                                classify
+n                   T_IDENTIFIER        INT_PARAMETER                           classify
+)                   T_RPAREN            T_RPAREN                                classify
+{                   T_LBRACE            T_LBRACE                                classify
+case                T_CASE              T_CASE                                  classify
+0                   T_INT_CONST         T_INT_CONST                             classify
+:                   T_COLON             T_COLON                                 classify
+result              T_IDENTIFIER        INT_VARIABLE                            classify
+=                   T_ASSIGN            T_ASSIGN                                classify
+100                 T_INT_CONST         T_INT_CONST                             classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+break               T_BREAK             T_BREAK                                 classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+case                T_CASE              T_CASE                                  classify
+1                   T_INT_CONST         T_INT_CONST                             classify
+:                   T_COLON             T_COLON                                 classify
+result              T_IDENTIFIER        INT_VARIABLE                            classify
+=                   T_ASSIGN            T_ASSIGN                                classify
+200                 T_INT_CONST         T_INT_CONST                             classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+break               T_BREAK             T_BREAK                                 classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+default             T_DEFAULT           T_DEFAULT                               classify
+:                   T_COLON             T_COLON                                 classify
+continue            T_CONTINUE          T_CONTINUE                              classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+}                   T_RBRACE            T_RBRACE                                classify
+if                  T_IF                T_IF                                    classify
+(                   T_LPAREN            T_LPAREN                                classify
+result              T_IDENTIFIER        INT_VARIABLE                            classify
+>                   T_GT                T_GT                                    classify
+1000                T_INT_CONST         T_INT_CONST                             classify
+)                   T_RPAREN            T_RPAREN                                classify
+goto                T_GOTO              T_GOTO                                  classify
+done                T_IDENTIFIER        LABEL                                   classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+return              T_RETURN            T_RETURN                                classify
+result              T_IDENTIFIER        INT_VARIABLE                            classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+done                T_IDENTIFIER        LABEL                                   classify
+:                   T_COLON             T_COLON                                 classify
+return              T_RETURN            T_RETURN                                classify
+-                   T_MINUS             T_MINUS                                 classify
+1                   T_INT_CONST         T_INT_CONST                             classify
+;                   T_SEMICOLON         T_SEMICOLON                             classify
+}                   T_RBRACE            T_RBRACE                                classify
 
 150 token(s). No syntax errors found in 'tests/syntax_valid_control_flow.c'.

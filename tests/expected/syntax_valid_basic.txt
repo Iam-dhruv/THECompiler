@@ -1,56 +1,56 @@
-Token                       Token_Type
-------------------------------------------------
-int                         T_INT
-add                         T_IDENTIFIER
-(                           T_LPAREN
-int                         T_INT
-a                           T_IDENTIFIER
-,                           T_COMMA
-int                         T_INT
-b                           T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-result                      T_IDENTIFIER
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-a                           T_IDENTIFIER
-+                           T_PLUS
-b                           T_IDENTIFIER
-;                           T_SEMICOLON
-return                      T_RETURN
-result                      T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-x                           T_IDENTIFIER
-=                           T_ASSIGN
-10                          T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-y                           T_IDENTIFIER
-=                           T_ASSIGN
-20                          T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-sum                         T_IDENTIFIER
-=                           T_ASSIGN
-add                         T_IDENTIFIER
-(                           T_LPAREN
-x                           T_IDENTIFIER
-,                           T_COMMA
-y                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-return                      T_RETURN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+int                 T_INT               T_INT                                   global
+add                 T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+a                   T_IDENTIFIER        INT_PARAMETER                           add
+,                   T_COMMA             T_COMMA                                 add
+int                 T_INT               T_INT                                   add
+b                   T_IDENTIFIER        INT_PARAMETER                           add
+)                   T_RPAREN            T_RPAREN                                add
+{                   T_LBRACE            T_LBRACE                                add
+int                 T_INT               T_INT                                   add
+result              T_IDENTIFIER        INT_VARIABLE                            add
+;                   T_SEMICOLON         T_SEMICOLON                             add
+result              T_IDENTIFIER        INT_VARIABLE                            add
+=                   T_ASSIGN            T_ASSIGN                                add
+a                   T_IDENTIFIER        INT_PARAMETER                           add
++                   T_PLUS              T_PLUS                                  add
+b                   T_IDENTIFIER        INT_PARAMETER                           add
+;                   T_SEMICOLON         T_SEMICOLON                             add
+return              T_RETURN            T_RETURN                                add
+result              T_IDENTIFIER        INT_VARIABLE                            add
+;                   T_SEMICOLON         T_SEMICOLON                             add
+}                   T_RBRACE            T_RBRACE                                add
+int                 T_INT               T_INT                                   global
+main                T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+)                   T_RPAREN            T_RPAREN                                global
+{                   T_LBRACE            T_LBRACE                                main
+int                 T_INT               T_INT                                   main
+x                   T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+10                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+y                   T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+20                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+sum                 T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+add                 T_IDENTIFIER        FUNCTION_CALL(returns:INT)              main
+(                   T_LPAREN            T_LPAREN                                main
+x                   T_IDENTIFIER        INT_VARIABLE                            main
+,                   T_COMMA             T_COMMA                                 main
+y                   T_IDENTIFIER        INT_VARIABLE                            main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+return              T_RETURN            T_RETURN                                main
+0                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+}                   T_RBRACE            T_RBRACE                                main
 
 52 token(s). No syntax errors found in 'tests/syntax_valid_basic.c'.

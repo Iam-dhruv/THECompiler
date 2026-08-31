@@ -1,293 +1,293 @@
-Token                       Token_Type
-------------------------------------------------
-typedef                     T_TYPEDEF
-int                         T_INT
-Integer                     T_IDENTIFIER
-;                           T_SEMICOLON
-enum                        T_ENUM
-Status                      T_IDENTIFIER
-{                           T_LBRACE
-STATUS_OK                   T_IDENTIFIER
-,                           T_COMMA
-STATUS_ERROR                T_IDENTIFIER
-,                           T_COMMA
-STATUS_PENDING              T_IDENTIFIER
-}                           T_RBRACE
-;                           T_SEMICOLON
-union                       T_UNION
-DataHolder                  T_IDENTIFIER
-{                           T_LBRACE
-int                         T_INT
-i_val                       T_IDENTIFIER
-;                           T_SEMICOLON
-float                       T_FLOAT
-f_val                       T_IDENTIFIER
-;                           T_SEMICOLON
-char                        T_CHAR
-c_val                       T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-;                           T_SEMICOLON
-struct                      T_STRUCT
-Node                        T_IDENTIFIER
-{                           T_LBRACE
-int                         T_INT
-value                       T_IDENTIFIER
-;                           T_SEMICOLON
-struct                      T_STRUCT
-Node                        T_IDENTIFIER
-*                           T_MUL
-next                        T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-;                           T_SEMICOLON
-int                         T_INT
-factorial                   T_IDENTIFIER
-(                           T_LPAREN
-int                         T_INT
-n                           T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-if                          T_IF
-(                           T_LPAREN
-n                           T_IDENTIFIER
-<=                          T_LE
-1                           T_INT_CONST
-)                           T_RPAREN
-{                           T_LBRACE
-return                      T_RETURN
-1                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
-return                      T_RETURN
-n                           T_IDENTIFIER
-*                           T_MUL
-factorial                   T_IDENTIFIER
-(                           T_LPAREN
-n                           T_IDENTIFIER
--                           T_MINUS
-1                           T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-}                           T_RBRACE
-int                         T_INT
-process_matrix              T_IDENTIFIER
-(                           T_LPAREN
-int                         T_INT
-matrix                      T_IDENTIFIER
-[                           T_LBRACKET
-3                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-4                           T_INT_CONST
-]                           T_RBRACKET
-,                           T_COMMA
-int                         T_INT
-*                           T_MUL
-*                           T_MUL
-pptr                        T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-i                           T_IDENTIFIER
-,                           T_COMMA
-j                           T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-sum                         T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-static                      T_STATIC
-int                         T_INT
-call_count                  T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-call_count                  T_IDENTIFIER
-++                          T_INCR
-;                           T_SEMICOLON
-for                         T_FOR
-(                           T_LPAREN
-i                           T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-i                           T_IDENTIFIER
-<                           T_LT
-3                           T_INT_CONST
-;                           T_SEMICOLON
-i                           T_IDENTIFIER
-++                          T_INCR
-)                           T_RPAREN
-{                           T_LBRACE
-for                         T_FOR
-(                           T_LPAREN
-j                           T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-j                           T_IDENTIFIER
-<                           T_LT
-4                           T_INT_CONST
-;                           T_SEMICOLON
-j                           T_IDENTIFIER
-++                          T_INCR
-)                           T_RPAREN
-{                           T_LBRACE
-matrix                      T_IDENTIFIER
-[                           T_LBRACKET
-i                           T_IDENTIFIER
-]                           T_RBRACKET
-[                           T_LBRACKET
-j                           T_IDENTIFIER
-]                           T_RBRACKET
-=                           T_ASSIGN
-i                           T_IDENTIFIER
-*                           T_MUL
-4                           T_INT_CONST
-+                           T_PLUS
-j                           T_IDENTIFIER
-;                           T_SEMICOLON
-sum                         T_IDENTIFIER
-+=                          T_PLUS_ASSIGN
-matrix                      T_IDENTIFIER
-[                           T_LBRACKET
-i                           T_IDENTIFIER
-]                           T_RBRACKET
-[                           T_LBRACKET
-j                           T_IDENTIFIER
-]                           T_RBRACKET
-;                           T_SEMICOLON
-}                           T_RBRACE
-}                           T_RBRACE
-if                          T_IF
-(                           T_LPAREN
-pptr                        T_IDENTIFIER
-!=                          T_NE
-0                           T_INT_CONST
-&&                          T_AND
-*                           T_MUL
-pptr                        T_IDENTIFIER
-!=                          T_NE
-0                           T_INT_CONST
-)                           T_RPAREN
-{                           T_LBRACE
-*                           T_MUL
-*                           T_MUL
-pptr                        T_IDENTIFIER
-=                           T_ASSIGN
-sum                         T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-return                      T_RETURN
-sum                         T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-int                         T_INT
-argc                        T_IDENTIFIER
-,                           T_COMMA
-char                        T_CHAR
-*                           T_MUL
-argv                        T_IDENTIFIER
-[                           T_LBRACKET
-]                           T_RBRACKET
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-grid                        T_IDENTIFIER
-[                           T_LBRACKET
-3                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-4                           T_INT_CONST
-]                           T_RBRACKET
-;                           T_SEMICOLON
-int                         T_INT
-val                         T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-ptr                         T_IDENTIFIER
-=                           T_ASSIGN
-&                           T_BIT_AND
-val                         T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-*                           T_MUL
-pptr                        T_IDENTIFIER
-=                           T_ASSIGN
-&                           T_BIT_AND
-ptr                         T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-fact_res                    T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-count                       T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-union                       T_UNION
-DataHolder                  T_IDENTIFIER
-data                        T_IDENTIFIER
-;                           T_SEMICOLON
-enum                        T_ENUM
-Status                      T_IDENTIFIER
-current_status              T_IDENTIFIER
-=                           T_ASSIGN
-STATUS_OK                   T_IDENTIFIER
-;                           T_SEMICOLON
-data                        T_IDENTIFIER
-.                           T_DOT
-i_val                       T_IDENTIFIER
-=                           T_ASSIGN
-42                          T_INT_CONST
-;                           T_SEMICOLON
-printf                      T_IDENTIFIER
-(                           T_LPAREN
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+typedef             T_TYPEDEF           T_TYPEDEF                               global
+int                 T_INT               T_INT                                   global
+Integer             T_IDENTIFIER        TYPEDEF_NAME                            global
+;                   T_SEMICOLON         T_SEMICOLON                             global
+enum                T_ENUM              T_ENUM                                  global
+Status              T_IDENTIFIER        ENUM_TAG                                global
+{                   T_LBRACE            T_LBRACE                                global
+STATUS_OK           T_IDENTIFIER        ENUM_CONSTANT                           enum:Status
+,                   T_COMMA             T_COMMA                                 enum:Status
+STATUS_ERROR        T_IDENTIFIER        ENUM_CONSTANT                           enum:Status
+,                   T_COMMA             T_COMMA                                 enum:Status
+STATUS_PENDING      T_IDENTIFIER        ENUM_CONSTANT                           enum:Status
+}                   T_RBRACE            T_RBRACE                                enum:Status
+;                   T_SEMICOLON         T_SEMICOLON                             global
+union               T_UNION             T_UNION                                 global
+DataHolder          T_IDENTIFIER        UNION_TAG                               global
+{                   T_LBRACE            T_LBRACE                                global
+int                 T_INT               T_INT                                   union:DataHolder
+i_val               T_IDENTIFIER        INT_VARIABLE                            union:DataHolder
+;                   T_SEMICOLON         T_SEMICOLON                             union:DataHolder
+float               T_FLOAT             T_FLOAT                                 union:DataHolder
+f_val               T_IDENTIFIER        FLOAT_VARIABLE                          union:DataHolder
+;                   T_SEMICOLON         T_SEMICOLON                             union:DataHolder
+char                T_CHAR              T_CHAR                                  union:DataHolder
+c_val               T_IDENTIFIER        CHAR_VARIABLE                           union:DataHolder
+;                   T_SEMICOLON         T_SEMICOLON                             union:DataHolder
+}                   T_RBRACE            T_RBRACE                                union:DataHolder
+;                   T_SEMICOLON         T_SEMICOLON                             global
+struct              T_STRUCT            T_STRUCT                                global
+Node                T_IDENTIFIER        STRUCT_TAG                              global
+{                   T_LBRACE            T_LBRACE                                global
+int                 T_INT               T_INT                                   struct:Node
+value               T_IDENTIFIER        INT_VARIABLE                            struct:Node
+;                   T_SEMICOLON         T_SEMICOLON                             struct:Node
+struct              T_STRUCT            T_STRUCT                                struct:Node
+Node                T_IDENTIFIER        STRUCT_TAG                              struct:Node
+*                   T_MUL               T_MUL                                   struct:Node
+next                T_IDENTIFIER        STRUCT_POINTER                          struct:Node
+;                   T_SEMICOLON         T_SEMICOLON                             struct:Node
+}                   T_RBRACE            T_RBRACE                                struct:Node
+;                   T_SEMICOLON         T_SEMICOLON                             global
+int                 T_INT               T_INT                                   global
+factorial           T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+n                   T_IDENTIFIER        INT_PARAMETER                           factorial
+)                   T_RPAREN            T_RPAREN                                factorial
+{                   T_LBRACE            T_LBRACE                                factorial
+if                  T_IF                T_IF                                    factorial
+(                   T_LPAREN            T_LPAREN                                factorial
+n                   T_IDENTIFIER        INT_PARAMETER                           factorial
+<=                  T_LE                T_LE                                    factorial
+1                   T_INT_CONST         T_INT_CONST                             factorial
+)                   T_RPAREN            T_RPAREN                                factorial
+{                   T_LBRACE            T_LBRACE                                factorial
+return              T_RETURN            T_RETURN                                factorial
+1                   T_INT_CONST         T_INT_CONST                             factorial.block1
+;                   T_SEMICOLON         T_SEMICOLON                             factorial.block1
+}                   T_RBRACE            T_RBRACE                                factorial.block1
+return              T_RETURN            T_RETURN                                factorial
+n                   T_IDENTIFIER        INT_PARAMETER                           factorial
+*                   T_MUL               T_MUL                                   factorial
+factorial           T_IDENTIFIER        FUNCTION_CALL(returns:INT)              factorial
+(                   T_LPAREN            T_LPAREN                                factorial
+n                   T_IDENTIFIER        INT_PARAMETER                           factorial
+-                   T_MINUS             T_MINUS                                 factorial
+1                   T_INT_CONST         T_INT_CONST                             factorial
+)                   T_RPAREN            T_RPAREN                                factorial
+;                   T_SEMICOLON         T_SEMICOLON                             factorial
+}                   T_RBRACE            T_RBRACE                                factorial
+int                 T_INT               T_INT                                   global
+process_matrix      T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+matrix              T_IDENTIFIER        INT_ARRAY_PARAMETER                     process_matrix
+[                   T_LBRACKET          T_LBRACKET                              process_matrix
+3                   T_INT_CONST         T_INT_CONST                             process_matrix
+]                   T_RBRACKET          T_RBRACKET                              process_matrix
+[                   T_LBRACKET          T_LBRACKET                              process_matrix
+4                   T_INT_CONST         T_INT_CONST                             process_matrix
+]                   T_RBRACKET          T_RBRACKET                              process_matrix
+,                   T_COMMA             T_COMMA                                 process_matrix
+int                 T_INT               T_INT                                   process_matrix
+*                   T_MUL               T_MUL                                   process_matrix
+*                   T_MUL               T_MUL                                   process_matrix
+pptr                T_IDENTIFIER        INT_POINTER_POINTER_PARAMETER           process_matrix
+)                   T_RPAREN            T_RPAREN                                process_matrix
+{                   T_LBRACE            T_LBRACE                                process_matrix
+int                 T_INT               T_INT                                   process_matrix
+i                   T_IDENTIFIER        INT_VARIABLE                            process_matrix
+,                   T_COMMA             T_COMMA                                 process_matrix
+j                   T_IDENTIFIER        INT_VARIABLE                            process_matrix
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix
+int                 T_INT               T_INT                                   process_matrix
+sum                 T_IDENTIFIER        INT_VARIABLE                            process_matrix
+=                   T_ASSIGN            T_ASSIGN                                process_matrix
+0                   T_INT_CONST         T_INT_CONST                             process_matrix
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix
+static              T_STATIC            T_STATIC                                process_matrix
+int                 T_INT               T_INT                                   process_matrix
+call_count          T_IDENTIFIER        INT_VARIABLE                            process_matrix
+=                   T_ASSIGN            T_ASSIGN                                process_matrix
+0                   T_INT_CONST         T_INT_CONST                             process_matrix
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix
+call_count          T_IDENTIFIER        INT_VARIABLE                            process_matrix
+++                  T_INCR              T_INCR                                  process_matrix
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix
+for                 T_FOR               T_FOR                                   process_matrix
+(                   T_LPAREN            T_LPAREN                                process_matrix
+i                   T_IDENTIFIER        INT_VARIABLE                            process_matrix
+=                   T_ASSIGN            T_ASSIGN                                process_matrix
+0                   T_INT_CONST         T_INT_CONST                             process_matrix
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix
+i                   T_IDENTIFIER        INT_VARIABLE                            process_matrix
+<                   T_LT                T_LT                                    process_matrix
+3                   T_INT_CONST         T_INT_CONST                             process_matrix
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix
+i                   T_IDENTIFIER        INT_VARIABLE                            process_matrix
+++                  T_INCR              T_INCR                                  process_matrix
+)                   T_RPAREN            T_RPAREN                                process_matrix
+{                   T_LBRACE            T_LBRACE                                process_matrix
+for                 T_FOR               T_FOR                                   process_matrix
+(                   T_LPAREN            T_LPAREN                                process_matrix.block1
+j                   T_IDENTIFIER        INT_VARIABLE                            process_matrix.block1
+=                   T_ASSIGN            T_ASSIGN                                process_matrix.block1
+0                   T_INT_CONST         T_INT_CONST                             process_matrix.block1
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix.block1
+j                   T_IDENTIFIER        INT_VARIABLE                            process_matrix.block1
+<                   T_LT                T_LT                                    process_matrix.block1
+4                   T_INT_CONST         T_INT_CONST                             process_matrix.block1
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix.block1
+j                   T_IDENTIFIER        INT_VARIABLE                            process_matrix.block1
+++                  T_INCR              T_INCR                                  process_matrix.block1
+)                   T_RPAREN            T_RPAREN                                process_matrix.block1
+{                   T_LBRACE            T_LBRACE                                process_matrix.block1
+matrix              T_IDENTIFIER        INT_ARRAY_PARAMETER                     process_matrix.block1
+[                   T_LBRACKET          T_LBRACKET                              process_matrix.block1.block1
+i                   T_IDENTIFIER        INT_VARIABLE                            process_matrix.block1.block1
+]                   T_RBRACKET          T_RBRACKET                              process_matrix.block1.block1
+[                   T_LBRACKET          T_LBRACKET                              process_matrix.block1.block1
+j                   T_IDENTIFIER        INT_VARIABLE                            process_matrix.block1.block1
+]                   T_RBRACKET          T_RBRACKET                              process_matrix.block1.block1
+=                   T_ASSIGN            T_ASSIGN                                process_matrix.block1.block1
+i                   T_IDENTIFIER        INT_VARIABLE                            process_matrix.block1.block1
+*                   T_MUL               T_MUL                                   process_matrix.block1.block1
+4                   T_INT_CONST         T_INT_CONST                             process_matrix.block1.block1
++                   T_PLUS              T_PLUS                                  process_matrix.block1.block1
+j                   T_IDENTIFIER        INT_VARIABLE                            process_matrix.block1.block1
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix.block1.block1
+sum                 T_IDENTIFIER        INT_VARIABLE                            process_matrix.block1.block1
++=                  T_PLUS_ASSIGN       T_PLUS_ASSIGN                           process_matrix.block1.block1
+matrix              T_IDENTIFIER        INT_ARRAY_PARAMETER                     process_matrix.block1.block1
+[                   T_LBRACKET          T_LBRACKET                              process_matrix.block1.block1
+i                   T_IDENTIFIER        INT_VARIABLE                            process_matrix.block1.block1
+]                   T_RBRACKET          T_RBRACKET                              process_matrix.block1.block1
+[                   T_LBRACKET          T_LBRACKET                              process_matrix.block1.block1
+j                   T_IDENTIFIER        INT_VARIABLE                            process_matrix.block1.block1
+]                   T_RBRACKET          T_RBRACKET                              process_matrix.block1.block1
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix.block1.block1
+}                   T_RBRACE            T_RBRACE                                process_matrix.block1.block1
+}                   T_RBRACE            T_RBRACE                                process_matrix.block1
+if                  T_IF                T_IF                                    process_matrix
+(                   T_LPAREN            T_LPAREN                                process_matrix
+pptr                T_IDENTIFIER        INT_POINTER_POINTER_PARAMETER           process_matrix
+!=                  T_NE                T_NE                                    process_matrix
+0                   T_INT_CONST         T_INT_CONST                             process_matrix
+&&                  T_AND               T_AND                                   process_matrix
+*                   T_MUL               T_MUL                                   process_matrix
+pptr                T_IDENTIFIER        INT_POINTER_POINTER_PARAMETER           process_matrix
+!=                  T_NE                T_NE                                    process_matrix
+0                   T_INT_CONST         T_INT_CONST                             process_matrix
+)                   T_RPAREN            T_RPAREN                                process_matrix
+{                   T_LBRACE            T_LBRACE                                process_matrix
+*                   T_MUL               T_MUL                                   process_matrix
+*                   T_MUL               T_MUL                                   process_matrix.block2
+pptr                T_IDENTIFIER        INT_POINTER_POINTER_PARAMETER           process_matrix.block2
+=                   T_ASSIGN            T_ASSIGN                                process_matrix.block2
+sum                 T_IDENTIFIER        INT_VARIABLE                            process_matrix.block2
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix.block2
+}                   T_RBRACE            T_RBRACE                                process_matrix.block2
+return              T_RETURN            T_RETURN                                process_matrix
+sum                 T_IDENTIFIER        INT_VARIABLE                            process_matrix
+;                   T_SEMICOLON         T_SEMICOLON                             process_matrix
+}                   T_RBRACE            T_RBRACE                                process_matrix
+int                 T_INT               T_INT                                   global
+main                T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+argc                T_IDENTIFIER        INT_PARAMETER                           main
+,                   T_COMMA             T_COMMA                                 main
+char                T_CHAR              T_CHAR                                  main
+*                   T_MUL               T_MUL                                   main
+argv                T_IDENTIFIER        CHAR_ARRAY_PARAMETER                    main
+[                   T_LBRACKET          T_LBRACKET                              main
+]                   T_RBRACKET          T_RBRACKET                              main
+)                   T_RPAREN            T_RPAREN                                main
+{                   T_LBRACE            T_LBRACE                                main
+int                 T_INT               T_INT                                   main
+grid                T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+3                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+4                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+val                 T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+0                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+ptr                 T_IDENTIFIER        INT_POINTER                             main
+=                   T_ASSIGN            T_ASSIGN                                main
+&                   T_BIT_AND           T_BIT_AND                               main
+val                 T_IDENTIFIER        INT_VARIABLE                            main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+*                   T_MUL               T_MUL                                   main
+pptr                T_IDENTIFIER        INT_POINTER_POINTER                     main
+=                   T_ASSIGN            T_ASSIGN                                main
+&                   T_BIT_AND           T_BIT_AND                               main
+ptr                 T_IDENTIFIER        INT_POINTER                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+fact_res            T_IDENTIFIER        INT_VARIABLE                            main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+count               T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+0                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+union               T_UNION             T_UNION                                 main
+DataHolder          T_IDENTIFIER        UNION_TAG                               main
+data                T_IDENTIFIER        UNION_VARIABLE                          main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+enum                T_ENUM              T_ENUM                                  main
+Status              T_IDENTIFIER        ENUM_TAG                                main
+current_status      T_IDENTIFIER        ENUM_VARIABLE                           main
+=                   T_ASSIGN            T_ASSIGN                                main
+STATUS_OK           T_IDENTIFIER        ENUM_CONSTANT                           main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+data                T_IDENTIFIER        UNION_VARIABLE                          main
+.                   T_DOT               T_DOT                                   main
+i_val               T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+42                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+printf              T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
 "Processing arguments count: %d
-"T_STRING_LITERAL
-,                           T_COMMA
-argc                        T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-fact_res                    T_IDENTIFIER
-=                           T_ASSIGN
-factorial                   T_IDENTIFIER
-(                           T_LPAREN
-5                           T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-process_matrix              T_IDENTIFIER
-(                           T_LPAREN
-grid                        T_IDENTIFIER
-,                           T_COMMA
-pptr                        T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-do                          T_DO
-{                           T_LBRACE
-count                       T_IDENTIFIER
-++                          T_INCR
-;                           T_SEMICOLON
-}                           T_RBRACE
-until                       T_UNTIL
-(                           T_LPAREN
-count                       T_IDENTIFIER
->=                          T_GE
-10                          T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-return                      T_RETURN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
+"T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+argc                T_IDENTIFIER        INT_PARAMETER                           main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+fact_res            T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+factorial           T_IDENTIFIER        FUNCTION_CALL(returns:INT)              main
+(                   T_LPAREN            T_LPAREN                                main
+5                   T_INT_CONST         T_INT_CONST                             main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+process_matrix      T_IDENTIFIER        FUNCTION_CALL(returns:INT)              main
+(                   T_LPAREN            T_LPAREN                                main
+grid                T_IDENTIFIER        INT_ARRAY                               main
+,                   T_COMMA             T_COMMA                                 main
+pptr                T_IDENTIFIER        INT_POINTER_POINTER                     main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+do                  T_DO                T_DO                                    main
+{                   T_LBRACE            T_LBRACE                                main
+count               T_IDENTIFIER        INT_VARIABLE                            main
+++                  T_INCR              T_INCR                                  main.block1
+;                   T_SEMICOLON         T_SEMICOLON                             main.block1
+}                   T_RBRACE            T_RBRACE                                main.block1
+until               T_UNTIL             T_UNTIL                                 main
+(                   T_LPAREN            T_LPAREN                                main
+count               T_IDENTIFIER        INT_VARIABLE                            main
+>=                  T_GE                T_GE                                    main
+10                  T_INT_CONST         T_INT_CONST                             main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+return              T_RETURN            T_RETURN                                main
+0                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+}                   T_RBRACE            T_RBRACE                                main
 
 288 token(s). No syntax errors found in 'tests/syntax_valid_advanced.c'.

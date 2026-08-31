@@ -35,5 +35,5 @@ Thumbs.db
 .idea/
 
 # Phase Notes & Requirements Tracking (user configured)
-PARSER_PHASE_NOTES.md
+implementation_plan.md
 REQUIREMENTS.md

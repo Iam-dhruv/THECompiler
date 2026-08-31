@@ -1,245 +1,245 @@
-Token                       Token_Type
-------------------------------------------------
-typedef                     T_TYPEDEF
-int                         T_INT
-Integer                     T_IDENTIFIER
-;                           T_SEMICOLON
-typedef                     T_TYPEDEF
-char                        T_CHAR
-Character                   T_IDENTIFIER
-;                           T_SEMICOLON
-enum                        T_ENUM
-StatusCode                  T_IDENTIFIER
-{                           T_LBRACE
-SUCCESS                     T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-,                           T_COMMA
-ERROR_NOT_FOUND             T_IDENTIFIER
-=                           T_ASSIGN
-404                         T_INT_CONST
-,                           T_COMMA
-ERROR_INTERNAL              T_IDENTIFIER
-=                           T_ASSIGN
-500                         T_INT_CONST
-}                           T_RBRACE
-;                           T_SEMICOLON
-union                       T_UNION
-DataValue                   T_IDENTIFIER
-{                           T_LBRACE
-int                         T_INT
-int_val                     T_IDENTIFIER
-;                           T_SEMICOLON
-float                       T_FLOAT
-float_val                   T_IDENTIFIER
-;                           T_SEMICOLON
-char                        T_CHAR
-char_val                    T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-;                           T_SEMICOLON
-struct                      T_STRUCT
-Point                       T_IDENTIFIER
-{                           T_LBRACE
-int                         T_INT
-x                           T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-y                           T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-;                           T_SEMICOLON
-struct                      T_STRUCT
-Rectangle                   T_IDENTIFIER
-{                           T_LBRACE
-struct                      T_STRUCT
-Point                       T_IDENTIFIER
-top_left                    T_IDENTIFIER
-;                           T_SEMICOLON
-struct                      T_STRUCT
-Point                       T_IDENTIFIER
-bottom_right                T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-;                           T_SEMICOLON
-static                      T_STATIC
-int                         T_INT
-g_counter                   T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-static                      T_STATIC
-void                        T_VOID
-update_counter              T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-{                           T_LBRACE
-static                      T_STATIC
-int                         T_INT
-local_call_count            T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-local_call_count            T_IDENTIFIER
-++                          T_INCR
-;                           T_SEMICOLON
-g_counter                   T_IDENTIFIER
-+=                          T_PLUS_ASSIGN
-local_call_count            T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-{                           T_LBRACE
-struct                      T_STRUCT
-Point                       T_IDENTIFIER
-p1                          T_IDENTIFIER
-;                           T_SEMICOLON
-struct                      T_STRUCT
-Rectangle                   T_IDENTIFIER
-rect                        T_IDENTIFIER
-;                           T_SEMICOLON
-struct                      T_STRUCT
-Point                       T_IDENTIFIER
-*                           T_MUL
-p_ptr                       T_IDENTIFIER
-;                           T_SEMICOLON
-union                       T_UNION
-DataValue                   T_IDENTIFIER
-data                        T_IDENTIFIER
-;                           T_SEMICOLON
-enum                        T_ENUM
-StatusCode                  T_IDENTIFIER
-code                        T_IDENTIFIER
-;                           T_SEMICOLON
-p1                          T_IDENTIFIER
-.                           T_DOT
-x                           T_IDENTIFIER
-=                           T_ASSIGN
-10                          T_INT_CONST
-;                           T_SEMICOLON
-p1                          T_IDENTIFIER
-.                           T_DOT
-y                           T_IDENTIFIER
-=                           T_ASSIGN
-20                          T_INT_CONST
-;                           T_SEMICOLON
-rect                        T_IDENTIFIER
-.                           T_DOT
-top_left                    T_IDENTIFIER
-.                           T_DOT
-x                           T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-rect                        T_IDENTIFIER
-.                           T_DOT
-top_left                    T_IDENTIFIER
-.                           T_DOT
-y                           T_IDENTIFIER
-=                           T_ASSIGN
-10                          T_INT_CONST
-;                           T_SEMICOLON
-rect                        T_IDENTIFIER
-.                           T_DOT
-bottom_right                T_IDENTIFIER
-.                           T_DOT
-x                           T_IDENTIFIER
-=                           T_ASSIGN
-20                          T_INT_CONST
-;                           T_SEMICOLON
-rect                        T_IDENTIFIER
-.                           T_DOT
-bottom_right                T_IDENTIFIER
-.                           T_DOT
-y                           T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-p_ptr                       T_IDENTIFIER
-=                           T_ASSIGN
-&                           T_BIT_AND
-p1                          T_IDENTIFIER
-;                           T_SEMICOLON
-p_ptr                       T_IDENTIFIER
-->                          T_ARROW
-x                           T_IDENTIFIER
-=                           T_ASSIGN
-30                          T_INT_CONST
-;                           T_SEMICOLON
-p_ptr                       T_IDENTIFIER
-->                          T_ARROW
-y                           T_IDENTIFIER
-=                           T_ASSIGN
-40                          T_INT_CONST
-;                           T_SEMICOLON
-data                        T_IDENTIFIER
-.                           T_DOT
-int_val                     T_IDENTIFIER
-=                           T_ASSIGN
-1024                        T_INT_CONST
-;                           T_SEMICOLON
-data                        T_IDENTIFIER
-.                           T_DOT
-float_val                   T_IDENTIFIER
-=                           T_ASSIGN
-3.14                        T_FLOAT_CONST
-;                           T_SEMICOLON
-code                        T_IDENTIFIER
-=                           T_ASSIGN
-SUCCESS                     T_IDENTIFIER
-;                           T_SEMICOLON
-update_counter              T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-;                           T_SEMICOLON
-printf                      T_IDENTIFIER
-(                           T_LPAREN
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+typedef             T_TYPEDEF           T_TYPEDEF                               global
+int                 T_INT               T_INT                                   global
+Integer             T_IDENTIFIER        TYPEDEF_NAME                            global
+;                   T_SEMICOLON         T_SEMICOLON                             global
+typedef             T_TYPEDEF           T_TYPEDEF                               global
+char                T_CHAR              T_CHAR                                  global
+Character           T_IDENTIFIER        TYPEDEF_NAME                            global
+;                   T_SEMICOLON         T_SEMICOLON                             global
+enum                T_ENUM              T_ENUM                                  global
+StatusCode          T_IDENTIFIER        ENUM_TAG                                global
+{                   T_LBRACE            T_LBRACE                                global
+SUCCESS             T_IDENTIFIER        ENUM_CONSTANT                           enum:StatusCode
+=                   T_ASSIGN            T_ASSIGN                                enum:StatusCode
+0                   T_INT_CONST         T_INT_CONST                             enum:StatusCode
+,                   T_COMMA             T_COMMA                                 enum:StatusCode
+ERROR_NOT_FOUND     T_IDENTIFIER        ENUM_CONSTANT                           enum:StatusCode
+=                   T_ASSIGN            T_ASSIGN                                enum:StatusCode
+404                 T_INT_CONST         T_INT_CONST                             enum:StatusCode
+,                   T_COMMA             T_COMMA                                 enum:StatusCode
+ERROR_INTERNAL      T_IDENTIFIER        ENUM_CONSTANT                           enum:StatusCode
+=                   T_ASSIGN            T_ASSIGN                                enum:StatusCode
+500                 T_INT_CONST         T_INT_CONST                             enum:StatusCode
+}                   T_RBRACE            T_RBRACE                                enum:StatusCode
+;                   T_SEMICOLON         T_SEMICOLON                             global
+union               T_UNION             T_UNION                                 global
+DataValue           T_IDENTIFIER        UNION_TAG                               global
+{                   T_LBRACE            T_LBRACE                                global
+int                 T_INT               T_INT                                   union:DataValue
+int_val             T_IDENTIFIER        INT_VARIABLE                            union:DataValue
+;                   T_SEMICOLON         T_SEMICOLON                             union:DataValue
+float               T_FLOAT             T_FLOAT                                 union:DataValue
+float_val           T_IDENTIFIER        FLOAT_VARIABLE                          union:DataValue
+;                   T_SEMICOLON         T_SEMICOLON                             union:DataValue
+char                T_CHAR              T_CHAR                                  union:DataValue
+char_val            T_IDENTIFIER        CHAR_VARIABLE                           union:DataValue
+;                   T_SEMICOLON         T_SEMICOLON                             union:DataValue
+}                   T_RBRACE            T_RBRACE                                union:DataValue
+;                   T_SEMICOLON         T_SEMICOLON                             global
+struct              T_STRUCT            T_STRUCT                                global
+Point               T_IDENTIFIER        STRUCT_TAG                              global
+{                   T_LBRACE            T_LBRACE                                global
+int                 T_INT               T_INT                                   struct:Point
+x                   T_IDENTIFIER        INT_VARIABLE                            struct:Point
+;                   T_SEMICOLON         T_SEMICOLON                             struct:Point
+int                 T_INT               T_INT                                   struct:Point
+y                   T_IDENTIFIER        INT_VARIABLE                            struct:Point
+;                   T_SEMICOLON         T_SEMICOLON                             struct:Point
+}                   T_RBRACE            T_RBRACE                                struct:Point
+;                   T_SEMICOLON         T_SEMICOLON                             global
+struct              T_STRUCT            T_STRUCT                                global
+Rectangle           T_IDENTIFIER        STRUCT_TAG                              global
+{                   T_LBRACE            T_LBRACE                                global
+struct              T_STRUCT            T_STRUCT                                struct:Rectangle
+Point               T_IDENTIFIER        STRUCT_TAG                              struct:Rectangle
+top_left            T_IDENTIFIER        STRUCT_VARIABLE                         struct:Rectangle
+;                   T_SEMICOLON         T_SEMICOLON                             struct:Rectangle
+struct              T_STRUCT            T_STRUCT                                struct:Rectangle
+Point               T_IDENTIFIER        STRUCT_TAG                              struct:Rectangle
+bottom_right        T_IDENTIFIER        STRUCT_VARIABLE                         struct:Rectangle
+;                   T_SEMICOLON         T_SEMICOLON                             struct:Rectangle
+}                   T_RBRACE            T_RBRACE                                struct:Rectangle
+;                   T_SEMICOLON         T_SEMICOLON                             global
+static              T_STATIC            T_STATIC                                global
+int                 T_INT               T_INT                                   global
+g_counter           T_IDENTIFIER        INT_VARIABLE                            global
+=                   T_ASSIGN            T_ASSIGN                                global
+0                   T_INT_CONST         T_INT_CONST                             global
+;                   T_SEMICOLON         T_SEMICOLON                             global
+static              T_STATIC            T_STATIC                                global
+void                T_VOID              T_VOID                                  global
+update_counter      T_IDENTIFIER        FUNCTION_DEFINITION(returns:VOID)       global
+(                   T_LPAREN            T_LPAREN                                global
+)                   T_RPAREN            T_RPAREN                                global
+{                   T_LBRACE            T_LBRACE                                update_counter
+static              T_STATIC            T_STATIC                                update_counter
+int                 T_INT               T_INT                                   update_counter
+local_call_count    T_IDENTIFIER        INT_VARIABLE                            update_counter
+=                   T_ASSIGN            T_ASSIGN                                update_counter
+0                   T_INT_CONST         T_INT_CONST                             update_counter
+;                   T_SEMICOLON         T_SEMICOLON                             update_counter
+local_call_count    T_IDENTIFIER        INT_VARIABLE                            update_counter
+++                  T_INCR              T_INCR                                  update_counter
+;                   T_SEMICOLON         T_SEMICOLON                             update_counter
+g_counter           T_IDENTIFIER        INT_VARIABLE                            update_counter
++=                  T_PLUS_ASSIGN       T_PLUS_ASSIGN                           update_counter
+local_call_count    T_IDENTIFIER        INT_VARIABLE                            update_counter
+;                   T_SEMICOLON         T_SEMICOLON                             update_counter
+}                   T_RBRACE            T_RBRACE                                update_counter
+int                 T_INT               T_INT                                   global
+main                T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+)                   T_RPAREN            T_RPAREN                                global
+{                   T_LBRACE            T_LBRACE                                main
+struct              T_STRUCT            T_STRUCT                                main
+Point               T_IDENTIFIER        STRUCT_TAG                              main
+p1                  T_IDENTIFIER        STRUCT_VARIABLE                         main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+struct              T_STRUCT            T_STRUCT                                main
+Rectangle           T_IDENTIFIER        STRUCT_TAG                              main
+rect                T_IDENTIFIER        STRUCT_VARIABLE                         main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+struct              T_STRUCT            T_STRUCT                                main
+Point               T_IDENTIFIER        STRUCT_TAG                              main
+*                   T_MUL               T_MUL                                   main
+p_ptr               T_IDENTIFIER        STRUCT_POINTER                          main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+union               T_UNION             T_UNION                                 main
+DataValue           T_IDENTIFIER        UNION_TAG                               main
+data                T_IDENTIFIER        UNION_VARIABLE                          main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+enum                T_ENUM              T_ENUM                                  main
+StatusCode          T_IDENTIFIER        ENUM_TAG                                main
+code                T_IDENTIFIER        ENUM_VARIABLE                           main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+p1                  T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+x                   T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+10                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+p1                  T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+y                   T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+20                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+rect                T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+top_left            T_IDENTIFIER        T_IDENTIFIER                            main
+.                   T_DOT               T_DOT                                   main
+x                   T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+0                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+rect                T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+top_left            T_IDENTIFIER        T_IDENTIFIER                            main
+.                   T_DOT               T_DOT                                   main
+y                   T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+10                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+rect                T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+bottom_right        T_IDENTIFIER        T_IDENTIFIER                            main
+.                   T_DOT               T_DOT                                   main
+x                   T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+20                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+rect                T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+bottom_right        T_IDENTIFIER        T_IDENTIFIER                            main
+.                   T_DOT               T_DOT                                   main
+y                   T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+0                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+p_ptr               T_IDENTIFIER        STRUCT_POINTER                          main
+=                   T_ASSIGN            T_ASSIGN                                main
+&                   T_BIT_AND           T_BIT_AND                               main
+p1                  T_IDENTIFIER        STRUCT_VARIABLE                         main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+p_ptr               T_IDENTIFIER        STRUCT_POINTER                          main
+->                  T_ARROW             T_ARROW                                 main
+x                   T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+30                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+p_ptr               T_IDENTIFIER        STRUCT_POINTER                          main
+->                  T_ARROW             T_ARROW                                 main
+y                   T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+40                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+data                T_IDENTIFIER        UNION_VARIABLE                          main
+.                   T_DOT               T_DOT                                   main
+int_val             T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+1024                T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+data                T_IDENTIFIER        UNION_VARIABLE                          main
+.                   T_DOT               T_DOT                                   main
+float_val           T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+3.14                T_FLOAT_CONST       T_FLOAT_CONST                           main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+code                T_IDENTIFIER        ENUM_VARIABLE                           main
+=                   T_ASSIGN            T_ASSIGN                                main
+SUCCESS             T_IDENTIFIER        ENUM_CONSTANT                           main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+update_counter      T_IDENTIFIER        FUNCTION_CALL(returns:VOID)             main
+(                   T_LPAREN            T_LPAREN                                main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+printf              T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
 "Point Coordinates: (%d, %d)
-"T_STRING_LITERAL
-,                           T_COMMA
-p_ptr                       T_IDENTIFIER
-->                          T_ARROW
-x                           T_IDENTIFIER
-,                           T_COMMA
-p_ptr                       T_IDENTIFIER
-->                          T_ARROW
-y                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-printf                      T_IDENTIFIER
-(                           T_LPAREN
+"T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+p_ptr               T_IDENTIFIER        STRUCT_POINTER                          main
+->                  T_ARROW             T_ARROW                                 main
+x                   T_IDENTIFIER        T_IDENTIFIER                            main
+,                   T_COMMA             T_COMMA                                 main
+p_ptr               T_IDENTIFIER        STRUCT_POINTER                          main
+->                  T_ARROW             T_ARROW                                 main
+y                   T_IDENTIFIER        T_IDENTIFIER                            main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+printf              T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
 "Rectangle Area Width: %d
-" T_STRING_LITERAL
-,                           T_COMMA
-rect                        T_IDENTIFIER
-.                           T_DOT
-bottom_right                T_IDENTIFIER
-.                           T_DOT
-x                           T_IDENTIFIER
--                           T_MINUS
-rect                        T_IDENTIFIER
-.                           T_DOT
-top_left                    T_IDENTIFIER
-.                           T_DOT
-x                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-scanf                       T_IDENTIFIER
-(                           T_LPAREN
-"%d"                        T_STRING_LITERAL
-,                           T_COMMA
-&                           T_BIT_AND
-p1                          T_IDENTIFIER
-.                           T_DOT
-x                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-return                      T_RETURN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
+"T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+rect                T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+bottom_right        T_IDENTIFIER        T_IDENTIFIER                            main
+.                   T_DOT               T_DOT                                   main
+x                   T_IDENTIFIER        T_IDENTIFIER                            main
+-                   T_MINUS             T_MINUS                                 main
+rect                T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+top_left            T_IDENTIFIER        T_IDENTIFIER                            main
+.                   T_DOT               T_DOT                                   main
+x                   T_IDENTIFIER        T_IDENTIFIER                            main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+scanf               T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
+"%d"                T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+&                   T_BIT_AND           T_BIT_AND                               main
+p1                  T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+x                   T_IDENTIFIER        T_IDENTIFIER                            main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+return              T_RETURN            T_RETURN                                main
+0                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+}                   T_RBRACE            T_RBRACE                                main
 
 239 token(s). No syntax errors found in 'tests/syntax_valid_composite_types.c'.

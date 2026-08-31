@@ -1,0 +1,5 @@
+Syntax errors were found in 'tests/syntax_invalid_bad_class_access.c':
+Syntax Error at line 4: syntax error, unexpected T_INT, expecting T_COLON
+Syntax Error at line 5: syntax error, unexpected T_RBRACE
+Syntax Error at line 5: syntax error, unexpected T_SEMICOLON
+3 syntax error(s) found.

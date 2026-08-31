@@ -44,7 +44,7 @@ $(LEXER): $(SRC_DIR)/lex.yy.c
 # ═══════════════════════ Assignment 2 — Syntax Analyzer ════════════════════
 
 # ── Step 1: Run Bison on the grammar file to produce parser.tab.c/.h ────────
-$(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h: $(SRC_DIR)/parser.y
+$(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h: $(SRC_DIR)/parser.y $(SRC_DIR)/common.h $(SRC_DIR)/scoped_symbol_table.h $(SRC_DIR)/semantic_types.h
 	cd $(SRC_DIR) && (set BISON_PKGDATADIR=C:/PROGRA~2/GnuWin32/share/bison& set M4=C:/PROGRA~2/GnuWin32/bin/m4.exe& $(BISON) -d -o parser.tab.c parser.y) || $(BISON) -d -o parser.tab.c parser.y
 
 # ── Step 2: Run Flex on the Bison-driving lexer spec ─────────────────────────

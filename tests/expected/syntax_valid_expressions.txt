@@ -1,210 +1,210 @@
-Token                       Token_Type
-------------------------------------------------
-int                         T_INT
-compute                     T_IDENTIFIER
-(                           T_LPAREN
-int                         T_INT
-a                           T_IDENTIFIER
-,                           T_COMMA
-int                         T_INT
-b                           T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-arr                         T_IDENTIFIER
-[                           T_LBRACKET
-10                          T_INT_CONST
-]                           T_RBRACKET
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-p                           T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-i                           T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-result                      T_IDENTIFIER
-;                           T_SEMICOLON
-arr                         T_IDENTIFIER
-[                           T_LBRACKET
-0                           T_INT_CONST
-]                           T_RBRACKET
-=                           T_ASSIGN
-a                           T_IDENTIFIER
-;                           T_SEMICOLON
-p                           T_IDENTIFIER
-=                           T_ASSIGN
-&                           T_BIT_AND
-arr                         T_IDENTIFIER
-[                           T_LBRACKET
-0                           T_INT_CONST
-]                           T_RBRACKET
-;                           T_SEMICOLON
-*                           T_MUL
-p                           T_IDENTIFIER
-=                           T_ASSIGN
-b                           T_IDENTIFIER
-;                           T_SEMICOLON
-i                           T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-a                           T_IDENTIFIER
-+                           T_PLUS
-b                           T_IDENTIFIER
-)                           T_RPAREN
-*                           T_MUL
-2                           T_INT_CONST
--                           T_MINUS
-(                           T_LPAREN
-a                           T_IDENTIFIER
-/                           T_DIV
-(                           T_LPAREN
-b                           T_IDENTIFIER
-+                           T_PLUS
-1                           T_INT_CONST
-)                           T_RPAREN
-)                           T_RPAREN
-%                           T_MOD
-3                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-a                           T_IDENTIFIER
->                           T_GT
-b                           T_IDENTIFIER
-)                           T_RPAREN
-?                           T_QUESTION
-a                           T_IDENTIFIER
-:                           T_COLON
-b                           T_IDENTIFIER
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-a                           T_IDENTIFIER
-==                          T_EQ
-b                           T_IDENTIFIER
-)                           T_RPAREN
-&&                          T_AND
-(                           T_LPAREN
-a                           T_IDENTIFIER
-!=                          T_NE
-0                           T_INT_CONST
-)                           T_RPAREN
-||                          T_OR
-(                           T_LPAREN
-b                           T_IDENTIFIER
-<=                          T_LE
-10                          T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-a                           T_IDENTIFIER
-&                           T_BIT_AND
-b                           T_IDENTIFIER
-)                           T_RPAREN
-|                           T_BIT_OR
-(                           T_LPAREN
-a                           T_IDENTIFIER
-^                           T_BIT_XOR
-b                           T_IDENTIFIER
-)                           T_RPAREN
-&                           T_BIT_AND
-~                           T_BIT_NOT
-b                           T_IDENTIFIER
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-a                           T_IDENTIFIER
-<<                          T_LSHIFT
-2                           T_INT_CONST
->>                          T_RSHIFT
-1                           T_INT_CONST
-;                           T_SEMICOLON
-i                           T_IDENTIFIER
-++                          T_INCR
-;                           T_SEMICOLON
-i                           T_IDENTIFIER
---                          T_DECR
-;                           T_SEMICOLON
-++                          T_INCR
-i                           T_IDENTIFIER
-;                           T_SEMICOLON
---                          T_DECR
-i                           T_IDENTIFIER
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-+=                          T_PLUS_ASSIGN
-1                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
--=                          T_MINUS_ASSIGN
-1                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-*=                          T_MUL_ASSIGN
-2                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-/=                          T_DIV_ASSIGN
-2                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-%=                          T_MOD_ASSIGN
-3                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-&=                          T_AND_ASSIGN
-0xF                         T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-|=                          T_OR_ASSIGN
-0x1                         T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-^=                          T_XOR_ASSIGN
-0x2                         T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-<<=                         T_LSHIFT_ASSIGN
-1                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
->>=                         T_RSHIFT_ASSIGN
-1                           T_INT_CONST
-;                           T_SEMICOLON
-return                      T_RETURN
-result                      T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-r                           T_IDENTIFIER
-;                           T_SEMICOLON
-r                           T_IDENTIFIER
-=                           T_ASSIGN
-compute                     T_IDENTIFIER
-(                           T_LPAREN
-3                           T_INT_CONST
-,                           T_COMMA
-4                           T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-return                      T_RETURN
-r                           T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+int                 T_INT               T_INT                                   global
+compute             T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
+,                   T_COMMA             T_COMMA                                 compute
+int                 T_INT               T_INT                                   compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
+)                   T_RPAREN            T_RPAREN                                compute
+{                   T_LBRACE            T_LBRACE                                compute
+int                 T_INT               T_INT                                   compute
+arr                 T_IDENTIFIER        INT_ARRAY                               compute
+[                   T_LBRACKET          T_LBRACKET                              compute
+10                  T_INT_CONST         T_INT_CONST                             compute
+]                   T_RBRACKET          T_RBRACKET                              compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+int                 T_INT               T_INT                                   compute
+*                   T_MUL               T_MUL                                   compute
+p                   T_IDENTIFIER        INT_POINTER                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+int                 T_INT               T_INT                                   compute
+i                   T_IDENTIFIER        INT_VARIABLE                            compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+int                 T_INT               T_INT                                   compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+arr                 T_IDENTIFIER        INT_ARRAY                               compute
+[                   T_LBRACKET          T_LBRACKET                              compute
+0                   T_INT_CONST         T_INT_CONST                             compute
+]                   T_RBRACKET          T_RBRACKET                              compute
+=                   T_ASSIGN            T_ASSIGN                                compute
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+p                   T_IDENTIFIER        INT_POINTER                             compute
+=                   T_ASSIGN            T_ASSIGN                                compute
+&                   T_BIT_AND           T_BIT_AND                               compute
+arr                 T_IDENTIFIER        INT_ARRAY                               compute
+[                   T_LBRACKET          T_LBRACKET                              compute
+0                   T_INT_CONST         T_INT_CONST                             compute
+]                   T_RBRACKET          T_RBRACKET                              compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+*                   T_MUL               T_MUL                                   compute
+p                   T_IDENTIFIER        INT_POINTER                             compute
+=                   T_ASSIGN            T_ASSIGN                                compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+i                   T_IDENTIFIER        INT_VARIABLE                            compute
+=                   T_ASSIGN            T_ASSIGN                                compute
+0                   T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+=                   T_ASSIGN            T_ASSIGN                                compute
+(                   T_LPAREN            T_LPAREN                                compute
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
++                   T_PLUS              T_PLUS                                  compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
+)                   T_RPAREN            T_RPAREN                                compute
+*                   T_MUL               T_MUL                                   compute
+2                   T_INT_CONST         T_INT_CONST                             compute
+-                   T_MINUS             T_MINUS                                 compute
+(                   T_LPAREN            T_LPAREN                                compute
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
+/                   T_DIV               T_DIV                                   compute
+(                   T_LPAREN            T_LPAREN                                compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
++                   T_PLUS              T_PLUS                                  compute
+1                   T_INT_CONST         T_INT_CONST                             compute
+)                   T_RPAREN            T_RPAREN                                compute
+)                   T_RPAREN            T_RPAREN                                compute
+%                   T_MOD               T_MOD                                   compute
+3                   T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+=                   T_ASSIGN            T_ASSIGN                                compute
+(                   T_LPAREN            T_LPAREN                                compute
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
+>                   T_GT                T_GT                                    compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
+)                   T_RPAREN            T_RPAREN                                compute
+?                   T_QUESTION          T_QUESTION                              compute
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
+:                   T_COLON             T_COLON                                 compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+=                   T_ASSIGN            T_ASSIGN                                compute
+(                   T_LPAREN            T_LPAREN                                compute
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
+==                  T_EQ                T_EQ                                    compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
+)                   T_RPAREN            T_RPAREN                                compute
+&&                  T_AND               T_AND                                   compute
+(                   T_LPAREN            T_LPAREN                                compute
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
+!=                  T_NE                T_NE                                    compute
+0                   T_INT_CONST         T_INT_CONST                             compute
+)                   T_RPAREN            T_RPAREN                                compute
+||                  T_OR                T_OR                                    compute
+(                   T_LPAREN            T_LPAREN                                compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
+<=                  T_LE                T_LE                                    compute
+10                  T_INT_CONST         T_INT_CONST                             compute
+)                   T_RPAREN            T_RPAREN                                compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+=                   T_ASSIGN            T_ASSIGN                                compute
+(                   T_LPAREN            T_LPAREN                                compute
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
+&                   T_BIT_AND           T_BIT_AND                               compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
+)                   T_RPAREN            T_RPAREN                                compute
+|                   T_BIT_OR            T_BIT_OR                                compute
+(                   T_LPAREN            T_LPAREN                                compute
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
+^                   T_BIT_XOR           T_BIT_XOR                               compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
+)                   T_RPAREN            T_RPAREN                                compute
+&                   T_BIT_AND           T_BIT_AND                               compute
+~                   T_BIT_NOT           T_BIT_NOT                               compute
+b                   T_IDENTIFIER        INT_PARAMETER                           compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+=                   T_ASSIGN            T_ASSIGN                                compute
+a                   T_IDENTIFIER        INT_PARAMETER                           compute
+<<                  T_LSHIFT            T_LSHIFT                                compute
+2                   T_INT_CONST         T_INT_CONST                             compute
+>>                  T_RSHIFT            T_RSHIFT                                compute
+1                   T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+i                   T_IDENTIFIER        INT_VARIABLE                            compute
+++                  T_INCR              T_INCR                                  compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+i                   T_IDENTIFIER        INT_VARIABLE                            compute
+--                  T_DECR              T_DECR                                  compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+++                  T_INCR              T_INCR                                  compute
+i                   T_IDENTIFIER        INT_VARIABLE                            compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+--                  T_DECR              T_DECR                                  compute
+i                   T_IDENTIFIER        INT_VARIABLE                            compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
++=                  T_PLUS_ASSIGN       T_PLUS_ASSIGN                           compute
+1                   T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+-=                  T_MINUS_ASSIGN      T_MINUS_ASSIGN                          compute
+1                   T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+*=                  T_MUL_ASSIGN        T_MUL_ASSIGN                            compute
+2                   T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+/=                  T_DIV_ASSIGN        T_DIV_ASSIGN                            compute
+2                   T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+%=                  T_MOD_ASSIGN        T_MOD_ASSIGN                            compute
+3                   T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+&=                  T_AND_ASSIGN        T_AND_ASSIGN                            compute
+0xF                 T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+|=                  T_OR_ASSIGN         T_OR_ASSIGN                             compute
+0x1                 T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+^=                  T_XOR_ASSIGN        T_XOR_ASSIGN                            compute
+0x2                 T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+<<=                 T_LSHIFT_ASSIGN     T_LSHIFT_ASSIGN                         compute
+1                   T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+>>=                 T_RSHIFT_ASSIGN     T_RSHIFT_ASSIGN                         compute
+1                   T_INT_CONST         T_INT_CONST                             compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+return              T_RETURN            T_RETURN                                compute
+result              T_IDENTIFIER        INT_VARIABLE                            compute
+;                   T_SEMICOLON         T_SEMICOLON                             compute
+}                   T_RBRACE            T_RBRACE                                compute
+int                 T_INT               T_INT                                   global
+main                T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+)                   T_RPAREN            T_RPAREN                                global
+{                   T_LBRACE            T_LBRACE                                main
+int                 T_INT               T_INT                                   main
+r                   T_IDENTIFIER        INT_VARIABLE                            main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+r                   T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+compute             T_IDENTIFIER        FUNCTION_CALL(returns:INT)              main
+(                   T_LPAREN            T_LPAREN                                main
+3                   T_INT_CONST         T_INT_CONST                             main
+,                   T_COMMA             T_COMMA                                 main
+4                   T_INT_CONST         T_INT_CONST                             main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+return              T_RETURN            T_RETURN                                main
+r                   T_IDENTIFIER        INT_VARIABLE                            main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+}                   T_RBRACE            T_RBRACE                                main
 
 206 token(s). No syntax errors found in 'tests/syntax_valid_expressions.c'.

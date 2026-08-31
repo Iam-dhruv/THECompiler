@@ -1,269 +1,269 @@
-Token                       Token_Type
-------------------------------------------------
-int                         T_INT
-add                         T_IDENTIFIER
-(                           T_LPAREN
-int                         T_INT
-a                           T_IDENTIFIER
-,                           T_COMMA
-int                         T_INT
-b                           T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-return                      T_RETURN
-a                           T_IDENTIFIER
-+                           T_PLUS
-b                           T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-void                        T_VOID
-swap                        T_IDENTIFIER
-(                           T_LPAREN
-int                         T_INT
-&                           T_BIT_AND
-a                           T_IDENTIFIER
-,                           T_COMMA
-int                         T_INT
-&                           T_BIT_AND
-b                           T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-temp                        T_IDENTIFIER
-=                           T_ASSIGN
-a                           T_IDENTIFIER
-;                           T_SEMICOLON
-a                           T_IDENTIFIER
-=                           T_ASSIGN
-b                           T_IDENTIFIER
-;                           T_SEMICOLON
-b                           T_IDENTIFIER
-=                           T_ASSIGN
-temp                        T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-int                         T_INT
-fibonacci                   T_IDENTIFIER
-(                           T_LPAREN
-int                         T_INT
-n                           T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-if                          T_IF
-(                           T_LPAREN
-n                           T_IDENTIFIER
-<=                          T_LE
-0                           T_INT_CONST
-)                           T_RPAREN
-return                      T_RETURN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-if                          T_IF
-(                           T_LPAREN
-n                           T_IDENTIFIER
-==                          T_EQ
-1                           T_INT_CONST
-)                           T_RPAREN
-return                      T_RETURN
-1                           T_INT_CONST
-;                           T_SEMICOLON
-return                      T_RETURN
-fibonacci                   T_IDENTIFIER
-(                           T_LPAREN
-n                           T_IDENTIFIER
--                           T_MINUS
-1                           T_INT_CONST
-)                           T_RPAREN
-+                           T_PLUS
-fibonacci                   T_IDENTIFIER
-(                           T_LPAREN
-n                           T_IDENTIFIER
--                           T_MINUS
-2                           T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-}                           T_RBRACE
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-x                           T_IDENTIFIER
-=                           T_ASSIGN
-10                          T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-y                           T_IDENTIFIER
-=                           T_ASSIGN
-20                          T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-&                           T_BIT_AND
-ref                         T_IDENTIFIER
-=                           T_ASSIGN
-x                           T_IDENTIFIER
-;                           T_SEMICOLON
-ref                         T_IDENTIFIER
-=                           T_ASSIGN
-15                          T_INT_CONST
-;                           T_SEMICOLON
-swap                        T_IDENTIFIER
-(                           T_LPAREN
-x                           T_IDENTIFIER
-,                           T_COMMA
-y                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-until                       T_UNTIL
-(                           T_LPAREN
-x                           T_IDENTIFIER
->=                          T_GE
-50                          T_INT_CONST
-)                           T_RPAREN
-{                           T_LBRACE
-x                           T_IDENTIFIER
-+=                          T_PLUS_ASSIGN
-5                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
-do                          T_DO
-{                           T_LBRACE
-y                           T_IDENTIFIER
---                          T_DECR
-;                           T_SEMICOLON
-}                           T_RBRACE
-until                       T_UNTIL
-(                           T_LPAREN
-y                           T_IDENTIFIER
-<=                          T_LE
-0                           T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-dyn_arr                     T_IDENTIFIER
-=                           T_ASSIGN
-new                         T_NEW
-int                         T_INT
-[                           T_LBRACKET
-100                         T_INT_CONST
-]                           T_RBRACKET
-;                           T_SEMICOLON
-dyn_arr                     T_IDENTIFIER
-[                           T_LBRACKET
-0                           T_INT_CONST
-]                           T_RBRACKET
-=                           T_ASSIGN
-42                          T_INT_CONST
-;                           T_SEMICOLON
-delete                      T_DELETE
-[                           T_LBRACKET
-]                           T_RBRACKET
-dyn_arr                     T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-single_val                  T_IDENTIFIER
-=                           T_ASSIGN
-new                         T_NEW
-int                         T_INT
-;                           T_SEMICOLON
-*                           T_MUL
-single_val                  T_IDENTIFIER
-=                           T_ASSIGN
-99                          T_INT_CONST
-;                           T_SEMICOLON
-delete                      T_DELETE
-single_val                  T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-(                           T_LPAREN
-*                           T_MUL
-fp                          T_IDENTIFIER
-)                           T_RPAREN
-(                           T_LPAREN
-int                         T_INT
-,                           T_COMMA
-int                         T_INT
-)                           T_RPAREN
-;                           T_SEMICOLON
-fp                          T_IDENTIFIER
-=                           T_ASSIGN
-add                         T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-sum                         T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-*                           T_MUL
-fp                          T_IDENTIFIER
-)                           T_RPAREN
-(                           T_LPAREN
-x                           T_IDENTIFIER
-,                           T_COMMA
-y                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-int                         T_INT
-direct_sum                  T_IDENTIFIER
-=                           T_ASSIGN
-fp                          T_IDENTIFIER
-(                           T_LPAREN
-x                           T_IDENTIFIER
-,                           T_COMMA
-y                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-int                         T_INT
-fib                         T_IDENTIFIER
-=                           T_ASSIGN
-fibonacci                   T_IDENTIFIER
-(                           T_LPAREN
-6                           T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-int                         T_INT
-matrix                      T_IDENTIFIER
-[                           T_LBRACKET
-2                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-3                           T_INT_CONST
-]                           T_RBRACKET
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-p                           T_IDENTIFIER
-=                           T_ASSIGN
-&                           T_BIT_AND
-matrix                      T_IDENTIFIER
-[                           T_LBRACKET
-0                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-0                           T_INT_CONST
-]                           T_RBRACKET
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-*                           T_MUL
-pp                          T_IDENTIFIER
-=                           T_ASSIGN
-&                           T_BIT_AND
-p                           T_IDENTIFIER
-;                           T_SEMICOLON
-*                           T_MUL
-*                           T_MUL
-*                           T_MUL
-&                           T_BIT_AND
-pp                          T_IDENTIFIER
-=                           T_ASSIGN
-123                         T_INT_CONST
-;                           T_SEMICOLON
-return                      T_RETURN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+int                 T_INT               T_INT                                   global
+add                 T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+a                   T_IDENTIFIER        INT_PARAMETER                           add
+,                   T_COMMA             T_COMMA                                 add
+int                 T_INT               T_INT                                   add
+b                   T_IDENTIFIER        INT_PARAMETER                           add
+)                   T_RPAREN            T_RPAREN                                add
+{                   T_LBRACE            T_LBRACE                                add
+return              T_RETURN            T_RETURN                                add
+a                   T_IDENTIFIER        INT_PARAMETER                           add
++                   T_PLUS              T_PLUS                                  add
+b                   T_IDENTIFIER        INT_PARAMETER                           add
+;                   T_SEMICOLON         T_SEMICOLON                             add
+}                   T_RBRACE            T_RBRACE                                add
+void                T_VOID              T_VOID                                  global
+swap                T_IDENTIFIER        FUNCTION_DEFINITION(returns:VOID)       global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+&                   T_BIT_AND           T_BIT_AND                               swap
+a                   T_IDENTIFIER        INT_PARAMETER                           swap
+,                   T_COMMA             T_COMMA                                 swap
+int                 T_INT               T_INT                                   swap
+&                   T_BIT_AND           T_BIT_AND                               swap
+b                   T_IDENTIFIER        INT_PARAMETER                           swap
+)                   T_RPAREN            T_RPAREN                                swap
+{                   T_LBRACE            T_LBRACE                                swap
+int                 T_INT               T_INT                                   swap
+temp                T_IDENTIFIER        INT_VARIABLE                            swap
+=                   T_ASSIGN            T_ASSIGN                                swap
+a                   T_IDENTIFIER        INT_PARAMETER                           swap
+;                   T_SEMICOLON         T_SEMICOLON                             swap
+a                   T_IDENTIFIER        INT_PARAMETER                           swap
+=                   T_ASSIGN            T_ASSIGN                                swap
+b                   T_IDENTIFIER        INT_PARAMETER                           swap
+;                   T_SEMICOLON         T_SEMICOLON                             swap
+b                   T_IDENTIFIER        INT_PARAMETER                           swap
+=                   T_ASSIGN            T_ASSIGN                                swap
+temp                T_IDENTIFIER        INT_VARIABLE                            swap
+;                   T_SEMICOLON         T_SEMICOLON                             swap
+}                   T_RBRACE            T_RBRACE                                swap
+int                 T_INT               T_INT                                   global
+fibonacci           T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+n                   T_IDENTIFIER        INT_PARAMETER                           fibonacci
+)                   T_RPAREN            T_RPAREN                                fibonacci
+{                   T_LBRACE            T_LBRACE                                fibonacci
+if                  T_IF                T_IF                                    fibonacci
+(                   T_LPAREN            T_LPAREN                                fibonacci
+n                   T_IDENTIFIER        INT_PARAMETER                           fibonacci
+<=                  T_LE                T_LE                                    fibonacci
+0                   T_INT_CONST         T_INT_CONST                             fibonacci
+)                   T_RPAREN            T_RPAREN                                fibonacci
+return              T_RETURN            T_RETURN                                fibonacci
+0                   T_INT_CONST         T_INT_CONST                             fibonacci
+;                   T_SEMICOLON         T_SEMICOLON                             fibonacci
+if                  T_IF                T_IF                                    fibonacci
+(                   T_LPAREN            T_LPAREN                                fibonacci
+n                   T_IDENTIFIER        INT_PARAMETER                           fibonacci
+==                  T_EQ                T_EQ                                    fibonacci
+1                   T_INT_CONST         T_INT_CONST                             fibonacci
+)                   T_RPAREN            T_RPAREN                                fibonacci
+return              T_RETURN            T_RETURN                                fibonacci
+1                   T_INT_CONST         T_INT_CONST                             fibonacci
+;                   T_SEMICOLON         T_SEMICOLON                             fibonacci
+return              T_RETURN            T_RETURN                                fibonacci
+fibonacci           T_IDENTIFIER        FUNCTION_CALL(returns:INT)              fibonacci
+(                   T_LPAREN            T_LPAREN                                fibonacci
+n                   T_IDENTIFIER        INT_PARAMETER                           fibonacci
+-                   T_MINUS             T_MINUS                                 fibonacci
+1                   T_INT_CONST         T_INT_CONST                             fibonacci
+)                   T_RPAREN            T_RPAREN                                fibonacci
++                   T_PLUS              T_PLUS                                  fibonacci
+fibonacci           T_IDENTIFIER        FUNCTION_CALL(returns:INT)              fibonacci
+(                   T_LPAREN            T_LPAREN                                fibonacci
+n                   T_IDENTIFIER        INT_PARAMETER                           fibonacci
+-                   T_MINUS             T_MINUS                                 fibonacci
+2                   T_INT_CONST         T_INT_CONST                             fibonacci
+)                   T_RPAREN            T_RPAREN                                fibonacci
+;                   T_SEMICOLON         T_SEMICOLON                             fibonacci
+}                   T_RBRACE            T_RBRACE                                fibonacci
+int                 T_INT               T_INT                                   global
+main                T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+)                   T_RPAREN            T_RPAREN                                global
+{                   T_LBRACE            T_LBRACE                                main
+int                 T_INT               T_INT                                   main
+x                   T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+10                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+y                   T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+20                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+&                   T_BIT_AND           T_BIT_AND                               main
+ref                 T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+x                   T_IDENTIFIER        INT_VARIABLE                            main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+ref                 T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+15                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+swap                T_IDENTIFIER        FUNCTION_CALL(returns:VOID)             main
+(                   T_LPAREN            T_LPAREN                                main
+x                   T_IDENTIFIER        INT_VARIABLE                            main
+,                   T_COMMA             T_COMMA                                 main
+y                   T_IDENTIFIER        INT_VARIABLE                            main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+until               T_UNTIL             T_UNTIL                                 main
+(                   T_LPAREN            T_LPAREN                                main
+x                   T_IDENTIFIER        INT_VARIABLE                            main
+>=                  T_GE                T_GE                                    main
+50                  T_INT_CONST         T_INT_CONST                             main
+)                   T_RPAREN            T_RPAREN                                main
+{                   T_LBRACE            T_LBRACE                                main
+x                   T_IDENTIFIER        INT_VARIABLE                            main
++=                  T_PLUS_ASSIGN       T_PLUS_ASSIGN                           main.block1
+5                   T_INT_CONST         T_INT_CONST                             main.block1
+;                   T_SEMICOLON         T_SEMICOLON                             main.block1
+}                   T_RBRACE            T_RBRACE                                main.block1
+do                  T_DO                T_DO                                    main
+{                   T_LBRACE            T_LBRACE                                main
+y                   T_IDENTIFIER        INT_VARIABLE                            main
+--                  T_DECR              T_DECR                                  main.block2
+;                   T_SEMICOLON         T_SEMICOLON                             main.block2
+}                   T_RBRACE            T_RBRACE                                main.block2
+until               T_UNTIL             T_UNTIL                                 main
+(                   T_LPAREN            T_LPAREN                                main
+y                   T_IDENTIFIER        INT_VARIABLE                            main
+<=                  T_LE                T_LE                                    main
+0                   T_INT_CONST         T_INT_CONST                             main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+dyn_arr             T_IDENTIFIER        INT_POINTER                             main
+=                   T_ASSIGN            T_ASSIGN                                main
+new                 T_NEW               T_NEW                                   main
+int                 T_INT               T_INT                                   main
+[                   T_LBRACKET          T_LBRACKET                              main
+100                 T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+dyn_arr             T_IDENTIFIER        INT_POINTER                             main
+[                   T_LBRACKET          T_LBRACKET                              main
+0                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+=                   T_ASSIGN            T_ASSIGN                                main
+42                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+delete              T_DELETE            T_DELETE                                main
+[                   T_LBRACKET          T_LBRACKET                              main
+]                   T_RBRACKET          T_RBRACKET                              main
+dyn_arr             T_IDENTIFIER        INT_POINTER                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+single_val          T_IDENTIFIER        INT_POINTER                             main
+=                   T_ASSIGN            T_ASSIGN                                main
+new                 T_NEW               T_NEW                                   main
+int                 T_INT               T_INT                                   main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+*                   T_MUL               T_MUL                                   main
+single_val          T_IDENTIFIER        INT_POINTER                             main
+=                   T_ASSIGN            T_ASSIGN                                main
+99                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+delete              T_DELETE            T_DELETE                                main
+single_val          T_IDENTIFIER        INT_POINTER                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+(                   T_LPAREN            T_LPAREN                                main
+*                   T_MUL               T_MUL                                   main
+fp                  T_IDENTIFIER        FUNCTION_PROTOTYPE(returns:INT)         main
+)                   T_RPAREN            T_RPAREN                                main
+(                   T_LPAREN            T_LPAREN                                main
+int                 T_INT               T_INT                                   main
+,                   T_COMMA             T_COMMA                                 main.fp
+int                 T_INT               T_INT                                   main.fp
+)                   T_RPAREN            T_RPAREN                                main.fp
+;                   T_SEMICOLON         T_SEMICOLON                             main.fp
+fp                  T_IDENTIFIER        FUNCTION_PROTOTYPE(returns:INT)         main
+=                   T_ASSIGN            T_ASSIGN                                main
+add                 T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+sum                 T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+(                   T_LPAREN            T_LPAREN                                main
+*                   T_MUL               T_MUL                                   main
+fp                  T_IDENTIFIER        FUNCTION_PROTOTYPE(returns:INT)         main
+)                   T_RPAREN            T_RPAREN                                main
+(                   T_LPAREN            T_LPAREN                                main
+x                   T_IDENTIFIER        INT_VARIABLE                            main
+,                   T_COMMA             T_COMMA                                 main
+y                   T_IDENTIFIER        INT_VARIABLE                            main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+direct_sum          T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+fp                  T_IDENTIFIER        FUNCTION_CALL(returns:INT)              main
+(                   T_LPAREN            T_LPAREN                                main
+x                   T_IDENTIFIER        INT_VARIABLE                            main
+,                   T_COMMA             T_COMMA                                 main
+y                   T_IDENTIFIER        INT_VARIABLE                            main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+fib                 T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+fibonacci           T_IDENTIFIER        FUNCTION_CALL(returns:INT)              main
+(                   T_LPAREN            T_LPAREN                                main
+6                   T_INT_CONST         T_INT_CONST                             main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+matrix              T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+2                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+3                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+p                   T_IDENTIFIER        INT_POINTER                             main
+=                   T_ASSIGN            T_ASSIGN                                main
+&                   T_BIT_AND           T_BIT_AND                               main
+matrix              T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+0                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+0                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+*                   T_MUL               T_MUL                                   main
+pp                  T_IDENTIFIER        INT_POINTER_POINTER                     main
+=                   T_ASSIGN            T_ASSIGN                                main
+&                   T_BIT_AND           T_BIT_AND                               main
+p                   T_IDENTIFIER        INT_POINTER                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+*                   T_MUL               T_MUL                                   main
+*                   T_MUL               T_MUL                                   main
+*                   T_MUL               T_MUL                                   main
+&                   T_BIT_AND           T_BIT_AND                               main
+pp                  T_IDENTIFIER        INT_POINTER_POINTER                     main
+=                   T_ASSIGN            T_ASSIGN                                main
+123                 T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+return              T_RETURN            T_RETURN                                main
+0                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+}                   T_RBRACE            T_RBRACE                                main
 
 265 token(s). No syntax errors found in 'tests/syntax_valid_advanced_features.c'.

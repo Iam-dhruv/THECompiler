@@ -1,110 +1,110 @@
-Token                       Token_Type
-------------------------------------------------
-struct                      T_STRUCT
-Point                       T_IDENTIFIER
-{                           T_LBRACE
-int                         T_INT
-x                           T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-y                           T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-;                           T_SEMICOLON
-enum                        T_ENUM
-Color                       T_IDENTIFIER
-{                           T_LBRACE
-RED                         T_IDENTIFIER
-,                           T_COMMA
-GREEN                       T_IDENTIFIER
-,                           T_COMMA
-BLUE                        T_IDENTIFIER
-}                           T_RBRACE
-;                           T_SEMICOLON
-typedef                     T_TYPEDEF
-int                         T_INT
-Integer                     T_IDENTIFIER
-;                           T_SEMICOLON
-class                       T_CLASS
-Shape                       T_IDENTIFIER
-{                           T_LBRACE
-public                      T_PUBLIC
-:                           T_COLON
-int                         T_INT
-area                        T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-getArea                     T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-{                           T_LBRACE
-return                      T_RETURN
-this                        T_THIS
-->                          T_ARROW
-area                        T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-private                     T_PRIVATE
-:                           T_COLON
-int                         T_INT
-hidden                      T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-;                           T_SEMICOLON
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-{                           T_LBRACE
-struct                      T_STRUCT
-Point                       T_IDENTIFIER
-p                           T_IDENTIFIER
-;                           T_SEMICOLON
-p                           T_IDENTIFIER
-.                           T_DOT
-x                           T_IDENTIFIER
-=                           T_ASSIGN
-1                           T_INT_CONST
-;                           T_SEMICOLON
-p                           T_IDENTIFIER
-.                           T_DOT
-y                           T_IDENTIFIER
-=                           T_ASSIGN
-2                           T_INT_CONST
-;                           T_SEMICOLON
-enum                        T_ENUM
-Color                       T_IDENTIFIER
-c                           T_IDENTIFIER
-;                           T_SEMICOLON
-c                           T_IDENTIFIER
-=                           T_ASSIGN
-RED                         T_IDENTIFIER
-;                           T_SEMICOLON
-class                       T_CLASS
-Shape                       T_IDENTIFIER
-s                           T_IDENTIFIER
-;                           T_SEMICOLON
-s                           T_IDENTIFIER
-.                           T_DOT
-area                        T_IDENTIFIER
-=                           T_ASSIGN
-10                          T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-dyn                         T_IDENTIFIER
-;                           T_SEMICOLON
-dyn                         T_IDENTIFIER
-=                           T_ASSIGN
-new                         T_NEW
-int                         T_INT
-;                           T_SEMICOLON
-delete                      T_DELETE
-dyn                         T_IDENTIFIER
-;                           T_SEMICOLON
-return                      T_RETURN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+struct              T_STRUCT            T_STRUCT                                global
+Point               T_IDENTIFIER        STRUCT_TAG                              global
+{                   T_LBRACE            T_LBRACE                                global
+int                 T_INT               T_INT                                   struct:Point
+x                   T_IDENTIFIER        INT_VARIABLE                            struct:Point
+;                   T_SEMICOLON         T_SEMICOLON                             struct:Point
+int                 T_INT               T_INT                                   struct:Point
+y                   T_IDENTIFIER        INT_VARIABLE                            struct:Point
+;                   T_SEMICOLON         T_SEMICOLON                             struct:Point
+}                   T_RBRACE            T_RBRACE                                struct:Point
+;                   T_SEMICOLON         T_SEMICOLON                             global
+enum                T_ENUM              T_ENUM                                  global
+Color               T_IDENTIFIER        ENUM_TAG                                global
+{                   T_LBRACE            T_LBRACE                                global
+RED                 T_IDENTIFIER        ENUM_CONSTANT                           enum:Color
+,                   T_COMMA             T_COMMA                                 enum:Color
+GREEN               T_IDENTIFIER        ENUM_CONSTANT                           enum:Color
+,                   T_COMMA             T_COMMA                                 enum:Color
+BLUE                T_IDENTIFIER        ENUM_CONSTANT                           enum:Color
+}                   T_RBRACE            T_RBRACE                                enum:Color
+;                   T_SEMICOLON         T_SEMICOLON                             global
+typedef             T_TYPEDEF           T_TYPEDEF                               global
+int                 T_INT               T_INT                                   global
+Integer             T_IDENTIFIER        TYPEDEF_NAME                            global
+;                   T_SEMICOLON         T_SEMICOLON                             global
+class               T_CLASS             T_CLASS                                 global
+Shape               T_IDENTIFIER        CLASS_TAG                               global
+{                   T_LBRACE            T_LBRACE                                global
+public              T_PUBLIC            T_PUBLIC                                class:Shape
+:                   T_COLON             T_COLON                                 class:Shape
+int                 T_INT               T_INT                                   class:Shape
+area                T_IDENTIFIER        INT_VARIABLE                            class:Shape
+;                   T_SEMICOLON         T_SEMICOLON                             class:Shape
+int                 T_INT               T_INT                                   class:Shape
+getArea             T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        class:Shape
+(                   T_LPAREN            T_LPAREN                                class:Shape
+)                   T_RPAREN            T_RPAREN                                class:Shape
+{                   T_LBRACE            T_LBRACE                                class:Shape.getArea
+return              T_RETURN            T_RETURN                                class:Shape.getArea
+this                T_THIS              T_THIS                                  class:Shape.getArea
+->                  T_ARROW             T_ARROW                                 class:Shape.getArea
+area                T_IDENTIFIER        T_IDENTIFIER                            class:Shape.getArea
+;                   T_SEMICOLON         T_SEMICOLON                             class:Shape.getArea
+}                   T_RBRACE            T_RBRACE                                class:Shape.getArea
+private             T_PRIVATE           T_PRIVATE                               class:Shape
+:                   T_COLON             T_COLON                                 class:Shape
+int                 T_INT               T_INT                                   class:Shape
+hidden              T_IDENTIFIER        INT_VARIABLE                            class:Shape
+;                   T_SEMICOLON         T_SEMICOLON                             class:Shape
+}                   T_RBRACE            T_RBRACE                                class:Shape
+;                   T_SEMICOLON         T_SEMICOLON                             global
+int                 T_INT               T_INT                                   global
+main                T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+)                   T_RPAREN            T_RPAREN                                global
+{                   T_LBRACE            T_LBRACE                                main
+struct              T_STRUCT            T_STRUCT                                main
+Point               T_IDENTIFIER        STRUCT_TAG                              main
+p                   T_IDENTIFIER        STRUCT_VARIABLE                         main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+p                   T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+x                   T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+1                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+p                   T_IDENTIFIER        STRUCT_VARIABLE                         main
+.                   T_DOT               T_DOT                                   main
+y                   T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+2                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+enum                T_ENUM              T_ENUM                                  main
+Color               T_IDENTIFIER        ENUM_TAG                                main
+c                   T_IDENTIFIER        ENUM_VARIABLE                           main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+c                   T_IDENTIFIER        ENUM_VARIABLE                           main
+=                   T_ASSIGN            T_ASSIGN                                main
+RED                 T_IDENTIFIER        ENUM_CONSTANT                           main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+class               T_CLASS             T_CLASS                                 main
+Shape               T_IDENTIFIER        CLASS_TAG                               main
+s                   T_IDENTIFIER        CLASS_VARIABLE                          main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+s                   T_IDENTIFIER        CLASS_VARIABLE                          main
+.                   T_DOT               T_DOT                                   main
+area                T_IDENTIFIER        T_IDENTIFIER                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+10                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+dyn                 T_IDENTIFIER        INT_POINTER                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+dyn                 T_IDENTIFIER        INT_POINTER                             main
+=                   T_ASSIGN            T_ASSIGN                                main
+new                 T_NEW               T_NEW                                   main
+int                 T_INT               T_INT                                   main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+delete              T_DELETE            T_DELETE                                main
+dyn                 T_IDENTIFIER        INT_POINTER                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+return              T_RETURN            T_RETURN                                main
+0                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+}                   T_RBRACE            T_RBRACE                                main
 
 106 token(s). No syntax errors found in 'tests/syntax_valid_oop_features.c'.

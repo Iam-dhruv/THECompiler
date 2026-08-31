@@ -1,272 +1,272 @@
-Token                       Token_Type
-------------------------------------------------
-int                         T_INT
-test_operators              T_IDENTIFIER
-(                           T_LPAREN
-int                         T_INT
-a                           T_IDENTIFIER
-,                           T_COMMA
-int                         T_INT
-b                           T_IDENTIFIER
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-x                           T_IDENTIFIER
-=                           T_ASSIGN
-10                          T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-y                           T_IDENTIFIER
-=                           T_ASSIGN
-20                          T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-a                           T_IDENTIFIER
-+                           T_PLUS
-b                           T_IDENTIFIER
--                           T_MINUS
-5                           T_INT_CONST
-*                           T_MUL
-(                           T_LPAREN
-a                           T_IDENTIFIER
-/                           T_DIV
-(                           T_LPAREN
-b                           T_IDENTIFIER
-+                           T_PLUS
-1                           T_INT_CONST
-)                           T_RPAREN
-)                           T_RPAREN
-%                           T_MOD
-3                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-+                           T_PLUS
-x                           T_IDENTIFIER
--                           T_MINUS
--                           T_MINUS
-y                           T_IDENTIFIER
-;                           T_SEMICOLON
-x                           T_IDENTIFIER
-++                          T_INCR
-;                           T_SEMICOLON
-x                           T_IDENTIFIER
---                          T_DECR
-;                           T_SEMICOLON
-++                          T_INCR
-x                           T_IDENTIFIER
-;                           T_SEMICOLON
---                          T_DECR
-x                           T_IDENTIFIER
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-++                          T_INCR
-x                           T_IDENTIFIER
-+                           T_PLUS
-y                           T_IDENTIFIER
---                          T_DECR
-*                           T_MUL
---                          T_DECR
-x                           T_IDENTIFIER
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-a                           T_IDENTIFIER
-<                           T_LT
-b                           T_IDENTIFIER
-)                           T_RPAREN
-+                           T_PLUS
-(                           T_LPAREN
-a                           T_IDENTIFIER
->                           T_GT
-b                           T_IDENTIFIER
-)                           T_RPAREN
-+                           T_PLUS
-(                           T_LPAREN
-a                           T_IDENTIFIER
-<=                          T_LE
-b                           T_IDENTIFIER
-)                           T_RPAREN
-+                           T_PLUS
-(                           T_LPAREN
-a                           T_IDENTIFIER
->=                          T_GE
-b                           T_IDENTIFIER
-)                           T_RPAREN
-+                           T_PLUS
-(                           T_LPAREN
-a                           T_IDENTIFIER
-==                          T_EQ
-b                           T_IDENTIFIER
-)                           T_RPAREN
-+                           T_PLUS
-(                           T_LPAREN
-a                           T_IDENTIFIER
-!=                          T_NE
-b                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-a                           T_IDENTIFIER
->                           T_GT
-0                           T_INT_CONST
-&&                          T_AND
-b                           T_IDENTIFIER
->                           T_GT
-0                           T_INT_CONST
-)                           T_RPAREN
-||                          T_OR
-!                           T_NOT
-(                           T_LPAREN
-a                           T_IDENTIFIER
-==                          T_EQ
-b                           T_IDENTIFIER
-)                           T_RPAREN
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-a                           T_IDENTIFIER
-&                           T_BIT_AND
-b                           T_IDENTIFIER
-)                           T_RPAREN
-|                           T_BIT_OR
-(                           T_LPAREN
-a                           T_IDENTIFIER
-^                           T_BIT_XOR
-b                           T_IDENTIFIER
-)                           T_RPAREN
-&                           T_BIT_AND
-~                           T_BIT_NOT
-b                           T_IDENTIFIER
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-a                           T_IDENTIFIER
-<<                          T_LSHIFT
-2                           T_INT_CONST
-)                           T_RPAREN
->>                          T_RSHIFT
-1                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-a                           T_IDENTIFIER
->                           T_GT
-b                           T_IDENTIFIER
-)                           T_RPAREN
-?                           T_QUESTION
-(                           T_LPAREN
-a                           T_IDENTIFIER
-+                           T_PLUS
-1                           T_INT_CONST
-)                           T_RPAREN
-:                           T_COLON
-(                           T_LPAREN
-b                           T_IDENTIFIER
--                           T_MINUS
-1                           T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-(                           T_LPAREN
-a                           T_IDENTIFIER
-==                          T_EQ
-0                           T_INT_CONST
-)                           T_RPAREN
-?                           T_QUESTION
-0                           T_INT_CONST
-:                           T_COLON
-(                           T_LPAREN
-a                           T_IDENTIFIER
->                           T_GT
-0                           T_INT_CONST
-?                           T_QUESTION
-1                           T_INT_CONST
-:                           T_COLON
--                           T_MINUS
-1                           T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-=                           T_ASSIGN
-a                           T_IDENTIFIER
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-+=                          T_PLUS_ASSIGN
-b                           T_IDENTIFIER
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
--=                          T_MINUS_ASSIGN
-2                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-*=                          T_MUL_ASSIGN
-3                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-/=                          T_DIV_ASSIGN
-2                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-%=                          T_MOD_ASSIGN
-5                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-&=                          T_AND_ASSIGN
-0xFF                        T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-|=                          T_OR_ASSIGN
-0x10                        T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-^=                          T_XOR_ASSIGN
-0x0F                        T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
-<<=                         T_LSHIFT_ASSIGN
-2                           T_INT_CONST
-;                           T_SEMICOLON
-result                      T_IDENTIFIER
->>=                         T_RSHIFT_ASSIGN
-1                           T_INT_CONST
-;                           T_SEMICOLON
-return                      T_RETURN
-result                      T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-res                         T_IDENTIFIER
-=                           T_ASSIGN
-test_operators              T_IDENTIFIER
-(                           T_LPAREN
-40                          T_INT_CONST
-,                           T_COMMA
-6                           T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-return                      T_RETURN
-res                         T_IDENTIFIER
-;                           T_SEMICOLON
-}                           T_RBRACE
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+int                 T_INT               T_INT                                   global
+test_operators      T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+,                   T_COMMA             T_COMMA                                 test_operators
+int                 T_INT               T_INT                                   test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+{                   T_LBRACE            T_LBRACE                                test_operators
+int                 T_INT               T_INT                                   test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+0                   T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+int                 T_INT               T_INT                                   test_operators
+x                   T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+10                  T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+int                 T_INT               T_INT                                   test_operators
+y                   T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+20                  T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
++                   T_PLUS              T_PLUS                                  test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+-                   T_MINUS             T_MINUS                                 test_operators
+5                   T_INT_CONST         T_INT_CONST                             test_operators
+*                   T_MUL               T_MUL                                   test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+/                   T_DIV               T_DIV                                   test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
++                   T_PLUS              T_PLUS                                  test_operators
+1                   T_INT_CONST         T_INT_CONST                             test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+%                   T_MOD               T_MOD                                   test_operators
+3                   T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
++                   T_PLUS              T_PLUS                                  test_operators
+x                   T_IDENTIFIER        INT_VARIABLE                            test_operators
+-                   T_MINUS             T_MINUS                                 test_operators
+-                   T_MINUS             T_MINUS                                 test_operators
+y                   T_IDENTIFIER        INT_VARIABLE                            test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+x                   T_IDENTIFIER        INT_VARIABLE                            test_operators
+++                  T_INCR              T_INCR                                  test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+x                   T_IDENTIFIER        INT_VARIABLE                            test_operators
+--                  T_DECR              T_DECR                                  test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+++                  T_INCR              T_INCR                                  test_operators
+x                   T_IDENTIFIER        INT_VARIABLE                            test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+--                  T_DECR              T_DECR                                  test_operators
+x                   T_IDENTIFIER        INT_VARIABLE                            test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+++                  T_INCR              T_INCR                                  test_operators
+x                   T_IDENTIFIER        INT_VARIABLE                            test_operators
++                   T_PLUS              T_PLUS                                  test_operators
+y                   T_IDENTIFIER        INT_VARIABLE                            test_operators
+--                  T_DECR              T_DECR                                  test_operators
+*                   T_MUL               T_MUL                                   test_operators
+--                  T_DECR              T_DECR                                  test_operators
+x                   T_IDENTIFIER        INT_VARIABLE                            test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+<                   T_LT                T_LT                                    test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
++                   T_PLUS              T_PLUS                                  test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+>                   T_GT                T_GT                                    test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
++                   T_PLUS              T_PLUS                                  test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+<=                  T_LE                T_LE                                    test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
++                   T_PLUS              T_PLUS                                  test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+>=                  T_GE                T_GE                                    test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
++                   T_PLUS              T_PLUS                                  test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+==                  T_EQ                T_EQ                                    test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
++                   T_PLUS              T_PLUS                                  test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+!=                  T_NE                T_NE                                    test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+>                   T_GT                T_GT                                    test_operators
+0                   T_INT_CONST         T_INT_CONST                             test_operators
+&&                  T_AND               T_AND                                   test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+>                   T_GT                T_GT                                    test_operators
+0                   T_INT_CONST         T_INT_CONST                             test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+||                  T_OR                T_OR                                    test_operators
+!                   T_NOT               T_NOT                                   test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+==                  T_EQ                T_EQ                                    test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+&                   T_BIT_AND           T_BIT_AND                               test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+|                   T_BIT_OR            T_BIT_OR                                test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+^                   T_BIT_XOR           T_BIT_XOR                               test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+&                   T_BIT_AND           T_BIT_AND                               test_operators
+~                   T_BIT_NOT           T_BIT_NOT                               test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+<<                  T_LSHIFT            T_LSHIFT                                test_operators
+2                   T_INT_CONST         T_INT_CONST                             test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+>>                  T_RSHIFT            T_RSHIFT                                test_operators
+1                   T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+>                   T_GT                T_GT                                    test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+?                   T_QUESTION          T_QUESTION                              test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
++                   T_PLUS              T_PLUS                                  test_operators
+1                   T_INT_CONST         T_INT_CONST                             test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+:                   T_COLON             T_COLON                                 test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+-                   T_MINUS             T_MINUS                                 test_operators
+1                   T_INT_CONST         T_INT_CONST                             test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+==                  T_EQ                T_EQ                                    test_operators
+0                   T_INT_CONST         T_INT_CONST                             test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+?                   T_QUESTION          T_QUESTION                              test_operators
+0                   T_INT_CONST         T_INT_CONST                             test_operators
+:                   T_COLON             T_COLON                                 test_operators
+(                   T_LPAREN            T_LPAREN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+>                   T_GT                T_GT                                    test_operators
+0                   T_INT_CONST         T_INT_CONST                             test_operators
+?                   T_QUESTION          T_QUESTION                              test_operators
+1                   T_INT_CONST         T_INT_CONST                             test_operators
+:                   T_COLON             T_COLON                                 test_operators
+-                   T_MINUS             T_MINUS                                 test_operators
+1                   T_INT_CONST         T_INT_CONST                             test_operators
+)                   T_RPAREN            T_RPAREN                                test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+=                   T_ASSIGN            T_ASSIGN                                test_operators
+a                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
++=                  T_PLUS_ASSIGN       T_PLUS_ASSIGN                           test_operators
+b                   T_IDENTIFIER        INT_PARAMETER                           test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+-=                  T_MINUS_ASSIGN      T_MINUS_ASSIGN                          test_operators
+2                   T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+*=                  T_MUL_ASSIGN        T_MUL_ASSIGN                            test_operators
+3                   T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+/=                  T_DIV_ASSIGN        T_DIV_ASSIGN                            test_operators
+2                   T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+%=                  T_MOD_ASSIGN        T_MOD_ASSIGN                            test_operators
+5                   T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+&=                  T_AND_ASSIGN        T_AND_ASSIGN                            test_operators
+0xFF                T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+|=                  T_OR_ASSIGN         T_OR_ASSIGN                             test_operators
+0x10                T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+^=                  T_XOR_ASSIGN        T_XOR_ASSIGN                            test_operators
+0x0F                T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+<<=                 T_LSHIFT_ASSIGN     T_LSHIFT_ASSIGN                         test_operators
+2                   T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+>>=                 T_RSHIFT_ASSIGN     T_RSHIFT_ASSIGN                         test_operators
+1                   T_INT_CONST         T_INT_CONST                             test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+return              T_RETURN            T_RETURN                                test_operators
+result              T_IDENTIFIER        INT_VARIABLE                            test_operators
+;                   T_SEMICOLON         T_SEMICOLON                             test_operators
+}                   T_RBRACE            T_RBRACE                                test_operators
+int                 T_INT               T_INT                                   global
+main                T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+)                   T_RPAREN            T_RPAREN                                global
+{                   T_LBRACE            T_LBRACE                                main
+int                 T_INT               T_INT                                   main
+res                 T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+test_operators      T_IDENTIFIER        FUNCTION_CALL(returns:INT)              main
+(                   T_LPAREN            T_LPAREN                                main
+40                  T_INT_CONST         T_INT_CONST                             main
+,                   T_COMMA             T_COMMA                                 main
+6                   T_INT_CONST         T_INT_CONST                             main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+return              T_RETURN            T_RETURN                                main
+res                 T_IDENTIFIER        INT_VARIABLE                            main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+}                   T_RBRACE            T_RBRACE                                main
 
 268 token(s). No syntax errors found in 'tests/syntax_valid_operators_expressions.c'.

@@ -1,179 +1,179 @@
-Token                       Token_Type
-------------------------------------------------
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-)                           T_RPAREN
-{                           T_LBRACE
-int                         T_INT
-numbers                     T_IDENTIFIER
-[                           T_LBRACKET
-5                           T_INT_CONST
-]                           T_RBRACKET
-=                           T_ASSIGN
-{                           T_LBRACE
-10                          T_INT_CONST
-,                           T_COMMA
-20                          T_INT_CONST
-,                           T_COMMA
-30                          T_INT_CONST
-,                           T_COMMA
-40                          T_INT_CONST
-,                           T_COMMA
-50                          T_INT_CONST
-}                           T_RBRACE
-;                           T_SEMICOLON
-char                        T_CHAR
-message                     T_IDENTIFIER
-[                           T_LBRACKET
-]                           T_RBRACKET
-=                           T_ASSIGN
-"Compiler Design"           T_STRING_LITERAL
-;                           T_SEMICOLON
-char                        T_CHAR
-letters                     T_IDENTIFIER
-[                           T_LBRACKET
-4                           T_INT_CONST
-]                           T_RBRACKET
-=                           T_ASSIGN
-{                           T_LBRACE
-'a'                         T_CHAR_CONST
-,                           T_COMMA
-'b'                         T_CHAR_CONST
-,                           T_COMMA
-'c'                         T_CHAR_CONST
-,                           T_COMMA
-'\0'                        T_CHAR_CONST
-}                           T_RBRACE
-;                           T_SEMICOLON
-int                         T_INT
-matrix                      T_IDENTIFIER
-[                           T_LBRACKET
-3                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-4                           T_INT_CONST
-]                           T_RBRACKET
-;                           T_SEMICOLON
-int                         T_INT
-tensor                      T_IDENTIFIER
-[                           T_LBRACKET
-2                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-3                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-4                           T_INT_CONST
-]                           T_RBRACKET
-;                           T_SEMICOLON
-matrix                      T_IDENTIFIER
-[                           T_LBRACKET
-0                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-0                           T_INT_CONST
-]                           T_RBRACKET
-=                           T_ASSIGN
-1                           T_INT_CONST
-;                           T_SEMICOLON
-matrix                      T_IDENTIFIER
-[                           T_LBRACKET
-1                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-2                           T_INT_CONST
-]                           T_RBRACKET
-=                           T_ASSIGN
-42                          T_INT_CONST
-;                           T_SEMICOLON
-tensor                      T_IDENTIFIER
-[                           T_LBRACKET
-1                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-2                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-3                           T_INT_CONST
-]                           T_RBRACKET
-=                           T_ASSIGN
-matrix                      T_IDENTIFIER
-[                           T_LBRACKET
-1                           T_INT_CONST
-]                           T_RBRACKET
-[                           T_LBRACKET
-2                           T_INT_CONST
-]                           T_RBRACKET
-+                           T_PLUS
-numbers                     T_IDENTIFIER
-[                           T_LBRACKET
-0                           T_INT_CONST
-]                           T_RBRACKET
-;                           T_SEMICOLON
-int                         T_INT
-val                         T_IDENTIFIER
-=                           T_ASSIGN
-100                         T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-ptr                         T_IDENTIFIER
-=                           T_ASSIGN
-&                           T_BIT_AND
-val                         T_IDENTIFIER
-;                           T_SEMICOLON
-*                           T_MUL
-ptr                         T_IDENTIFIER
-=                           T_ASSIGN
-200                         T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-*                           T_MUL
-double_ptr                  T_IDENTIFIER
-=                           T_ASSIGN
-&                           T_BIT_AND
-ptr                         T_IDENTIFIER
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-*                           T_MUL
-*                           T_MUL
-triple_ptr                  T_IDENTIFIER
-=                           T_ASSIGN
-&                           T_BIT_AND
-double_ptr                  T_IDENTIFIER
-;                           T_SEMICOLON
-*                           T_MUL
-*                           T_MUL
-*                           T_MUL
-triple_ptr                  T_IDENTIFIER
-=                           T_ASSIGN
-300                         T_INT_CONST
-;                           T_SEMICOLON
-int                         T_INT
-*                           T_MUL
-row_ptr                     T_IDENTIFIER
-=                           T_ASSIGN
-matrix                      T_IDENTIFIER
-[                           T_LBRACKET
-0                           T_INT_CONST
-]                           T_RBRACKET
-;                           T_SEMICOLON
-int                         T_INT
-first_elem                  T_IDENTIFIER
-=                           T_ASSIGN
-*                           T_MUL
-(                           T_LPAREN
-row_ptr                     T_IDENTIFIER
-+                           T_PLUS
-1                           T_INT_CONST
-)                           T_RPAREN
-;                           T_SEMICOLON
-return                      T_RETURN
-0                           T_INT_CONST
-;                           T_SEMICOLON
-}                           T_RBRACE
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+int                 T_INT               T_INT                                   global
+main                T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+)                   T_RPAREN            T_RPAREN                                global
+{                   T_LBRACE            T_LBRACE                                main
+int                 T_INT               T_INT                                   main
+numbers             T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+5                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+=                   T_ASSIGN            T_ASSIGN                                main
+{                   T_LBRACE            T_LBRACE                                main
+10                  T_INT_CONST         T_INT_CONST                             main
+,                   T_COMMA             T_COMMA                                 main
+20                  T_INT_CONST         T_INT_CONST                             main
+,                   T_COMMA             T_COMMA                                 main
+30                  T_INT_CONST         T_INT_CONST                             main
+,                   T_COMMA             T_COMMA                                 main
+40                  T_INT_CONST         T_INT_CONST                             main
+,                   T_COMMA             T_COMMA                                 main
+50                  T_INT_CONST         T_INT_CONST                             main
+}                   T_RBRACE            T_RBRACE                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+char                T_CHAR              T_CHAR                                  main
+message             T_IDENTIFIER        CHAR_ARRAY                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+]                   T_RBRACKET          T_RBRACKET                              main
+=                   T_ASSIGN            T_ASSIGN                                main
+"Compiler Design"   T_STRING_LITERAL    T_STRING_LITERAL                        main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+char                T_CHAR              T_CHAR                                  main
+letters             T_IDENTIFIER        CHAR_ARRAY                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+4                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+=                   T_ASSIGN            T_ASSIGN                                main
+{                   T_LBRACE            T_LBRACE                                main
+'a'                 T_CHAR_CONST        T_CHAR_CONST                            main
+,                   T_COMMA             T_COMMA                                 main
+'b'                 T_CHAR_CONST        T_CHAR_CONST                            main
+,                   T_COMMA             T_COMMA                                 main
+'c'                 T_CHAR_CONST        T_CHAR_CONST                            main
+,                   T_COMMA             T_COMMA                                 main
+'\0'                T_CHAR_CONST        T_CHAR_CONST                            main
+}                   T_RBRACE            T_RBRACE                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+matrix              T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+3                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+4                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+tensor              T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+2                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+3                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+4                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+matrix              T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+0                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+0                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+=                   T_ASSIGN            T_ASSIGN                                main
+1                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+matrix              T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+1                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+2                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+=                   T_ASSIGN            T_ASSIGN                                main
+42                  T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+tensor              T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+1                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+2                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+3                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+=                   T_ASSIGN            T_ASSIGN                                main
+matrix              T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+1                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+[                   T_LBRACKET          T_LBRACKET                              main
+2                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
++                   T_PLUS              T_PLUS                                  main
+numbers             T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+0                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+val                 T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+100                 T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+ptr                 T_IDENTIFIER        INT_POINTER                             main
+=                   T_ASSIGN            T_ASSIGN                                main
+&                   T_BIT_AND           T_BIT_AND                               main
+val                 T_IDENTIFIER        INT_VARIABLE                            main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+*                   T_MUL               T_MUL                                   main
+ptr                 T_IDENTIFIER        INT_POINTER                             main
+=                   T_ASSIGN            T_ASSIGN                                main
+200                 T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+*                   T_MUL               T_MUL                                   main
+double_ptr          T_IDENTIFIER        INT_POINTER_POINTER                     main
+=                   T_ASSIGN            T_ASSIGN                                main
+&                   T_BIT_AND           T_BIT_AND                               main
+ptr                 T_IDENTIFIER        INT_POINTER                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+*                   T_MUL               T_MUL                                   main
+*                   T_MUL               T_MUL                                   main
+triple_ptr          T_IDENTIFIER        INT_POINTER_POINTER                     main
+=                   T_ASSIGN            T_ASSIGN                                main
+&                   T_BIT_AND           T_BIT_AND                               main
+double_ptr          T_IDENTIFIER        INT_POINTER_POINTER                     main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+*                   T_MUL               T_MUL                                   main
+*                   T_MUL               T_MUL                                   main
+*                   T_MUL               T_MUL                                   main
+triple_ptr          T_IDENTIFIER        INT_POINTER_POINTER                     main
+=                   T_ASSIGN            T_ASSIGN                                main
+300                 T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+*                   T_MUL               T_MUL                                   main
+row_ptr             T_IDENTIFIER        INT_POINTER                             main
+=                   T_ASSIGN            T_ASSIGN                                main
+matrix              T_IDENTIFIER        INT_ARRAY                               main
+[                   T_LBRACKET          T_LBRACKET                              main
+0                   T_INT_CONST         T_INT_CONST                             main
+]                   T_RBRACKET          T_RBRACKET                              main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+int                 T_INT               T_INT                                   main
+first_elem          T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+*                   T_MUL               T_MUL                                   main
+(                   T_LPAREN            T_LPAREN                                main
+row_ptr             T_IDENTIFIER        INT_POINTER                             main
++                   T_PLUS              T_PLUS                                  main
+1                   T_INT_CONST         T_INT_CONST                             main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+return              T_RETURN            T_RETURN                                main
+0                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+}                   T_RBRACE            T_RBRACE                                main
 
 175 token(s). No syntax errors found in 'tests/syntax_valid_pointers_arrays.c'.

@@ -27,14 +27,23 @@ static void log_lex_error(const char* format, ...) {
     g_had_lex_error = true;
 }
 
-/* Records the current lexeme/type pair and returns the given token code. */
+/* Records the current token (lexeme, token_name, token_type==token_name,
+ * scope=="" until the parser's ScopedSymbolTable back-fills it) and returns
+ * the given token code. yylval.token_index is set for every token so the
+ * grammar can look a token record back up by index (only T_IDENTIFIER's
+ * value is actually declared with a %union type, but setting it
+ * unconditionally here keeps the macros simple). */
 #define RET(tokcode) \
-    do { g_tokens.push_back({std::string(yytext), #tokcode}); return tokcode; } while (0)
+    do { g_tokens.push_back({std::string(yytext), #tokcode, #tokcode, ""}); \
+         yylval.token_index = (int)g_tokens.size() - 1; \
+         return tokcode; } while (0)
 
 /* Same as RET but with an explicitly supplied lexeme (used for strings,
  * whose reconstructed value differs from yytext). */
 #define RET_LEXEME(tokcode, lex) \
-    do { g_tokens.push_back({(lex), #tokcode}); return tokcode; } while (0)
+    do { g_tokens.push_back({(lex), #tokcode, #tokcode, ""}); \
+         yylval.token_index = (int)g_tokens.size() - 1; \
+         return tokcode; } while (0)
 
 static const std::unordered_map<std::string, int> keywords_ = {
     {"if", T_IF}, {"else", T_ELSE}, {"for", T_FOR}, {"while", T_WHILE},
@@ -194,7 +203,9 @@ BAD_EXP     [eE][+-]?
 {IDENTIFIER}      {
     auto it = keywords_.find(yytext);
     if (it != keywords_.end()) {
-        g_tokens.push_back({std::string(yytext), keyword_names_.at(it->second)});
+        const std::string& name = keyword_names_.at(it->second);
+        g_tokens.push_back({std::string(yytext), name, name, ""});
+        yylval.token_index = (int)g_tokens.size() - 1;
         return it->second;
     }
     RET(T_IDENTIFIER);
