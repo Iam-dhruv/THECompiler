@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Makefile.lexer — THECompiler: Lexical Analyzer (Assignment 1)
+#
+# Usage:
+#   make -f Makefile.lexer           — build lexer_app[.exe]
+#   make -f Makefile.lexer clean     — remove generated files
+# ─────────────────────────────────────────────────────────────────────────────
+
+CC       = g++
+CFLAGS   = -std=c++17 -Wno-register
+FLEX     = flex
+SRC_DIR  = src/lexer
+LEXER    = lexer_app
+
+.PHONY: all clean test
+
+all: $(LEXER)
+
+# ── Step 1: Run Flex on the lexer spec to produce lex.yy.c ──────────────────
+$(SRC_DIR)/lex.yy.c: $(SRC_DIR)/lexer.l $(SRC_DIR)/tokens.h $(SRC_DIR)/symbol_table.h
+	cd $(SRC_DIR) && $(FLEX) lexer.l
+
+# ── Step 2: Compile lex.yy.c → lexer_app (placed in project root) ───────────
+$(LEXER): $(SRC_DIR)/lex.yy.c
+	$(CC) $(CFLAGS) $(SRC_DIR)/lex.yy.c -o $(LEXER)
+
+# ── Run Lexer Tests ─────────────────────────────────────────────────────────
+test: $(LEXER)
+	bash ./scripts/run_lexer_tests.sh || powershell -ExecutionPolicy Bypass -File ./scripts/run_lexer_tests.ps1
+
+# ── Cleanup ─────────────────────────────────────────────────────────────────
+clean:
+	-rm -f $(SRC_DIR)/lex.yy.c $(LEXER) $(LEXER).exe *.o $(SRC_DIR)/*.o 2>/dev/null || \
+	 (del /Q /F $(SRC_DIR)\lex.yy.c $(LEXER).exe *.o 2>NUL) || echo Cleaned
+	-rm -rf out/ 2>/dev/null || (rd /S /Q out 2>NUL) || echo Cleaned

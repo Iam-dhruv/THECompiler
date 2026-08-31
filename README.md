@@ -1,316 +1,162 @@
-﻿# THECompiler
+# THECompiler — Syntax Analyzer
 
-## Students
+## Team
 
-- Anjan - 24114012
-- Dhruv - 24115057
-- Keshav - 24114048
-- Mayank - 24115101
-
-A compiler front-end for a small source language inspired by C and C++,
-built in two stages:
-
-- **Assignment 1 — Lexical Analyzer** (Flex/C++): tokenizes source code and
-  produces a token stream table, a symbol table, and a lexical error log.
-- **Assignment 2 — Syntax Analyzer** (Bison/YACC + Flex): parses the token
-  stream against a formal grammar and either confirms the program is
-  syntactically valid or reports syntax errors.
-
-Both stages operate on the same source language and share the same token
-set. Each is a separate, independently buildable component (`lexer_app` and
-`syntax_analyzer`).
+- Anjan — 24114012
+- Dhruv — 24115057
+- Keshav — 24114048
+- Mayank — 24115101
 
 ---
 
-## Assignment 1 — Lexical Analyzer
+## Overview
 
-A simple lexical analyzer built with Flex/C++. It reads a source file,
-tokenizes it, and produces a token stream table with lexemes and token
-names. It also detects lexical errors and writes them to an error log.
+A syntax analyzer and semantic classifier for a C/C++ inspired source
+language, built with **Bison/YACC** (parser) and **Flex** (lexer) in C++17.
 
-### What this analyzer does
+Given a source file, the analyzer:
 
-The lexer scans source code and groups characters into meaningful tokens
-such as:
+1. **Tokenizes** the input via a Flex-generated lexer.
+2. **Parses** the token stream against an LALR(1) grammar (zero
+   shift/reduce conflicts).
+3. **Classifies** every identifier semantically — type, modifier, role,
+   and scope — in a single pass using a **scoped symbol table**.
+4. **Outputs** a four-column report table (`Lexeme | Token_Name |
+   Token_Type | Scope`) if the program is valid, or a list of syntax
+   errors with line numbers if it isn't.
 
-- Keywords: if, else, for, while, do, return, int, float, char, etc.
-- Identifiers
-- Integer literals and floating-point literals
-- Character and string literals
-- Operators and punctuation
-- Comments and whitespace handling
-
-If the source is valid, the analyzer prints a two-column table:
-
-```
-Lexeme                      Token
-
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-```
-
-If the source contains lexical errors, it records and reports the issues
-instead of producing a complete valid token stream.
-
-### Project structure
-
-- `src/lexer.l` — Flex lexer specification
-- `src/lex.yy.c` — generated C source from Flex
-- `src/tokens.h` — token definitions
-- `src/symbol_table.h` — symbol table implementation
-- `tests/` — valid and invalid programs used for checking the lexer
-- `Makefile` — builds the lexer executable (and, as of Assignment 2, the
-  syntax analyzer executable — see below)
-- `run.sh` — runs the lexer across all test files
-- `run_tests.ps1` — Windows PowerShell test runner
-- `out/` — output directory for generated token streams and error logs
-
-### Supported language features
-
-This analyzer is intentionally a subset of C/C++ and is designed for
-coursework. It supports:
-
-- Arithmetic, relational, logical, bitwise, and assignment operators
-- Control-flow keywords such as if, else, for, while, switch, case,
-  default, break, continue
-- Type keywords such as int, char, float, double, void, static, struct,
-  enum, class, etc.
-- String and character literals with escape handling
-- Block comments and line comments
-- Basic identifier rules and symbol table tracking
-
-### How to build
-
-**Linux/macOS**
-
-```bash
-git clone https://github.com/Iam-dhruv/THECompiler
-cd THECompiler
-make
-```
-
-**Windows**
-
-Use a terminal with Flex and g++ available, then run:
-
-```powershell
-g++ -std=c++17 -Wno-register .\src\lex.yy.c -o .\lexer_app.exe
-```
-
-Or simply use the existing project setup if Flex is installed and the
-binary is already generated.
-
-### How to run
-
-**Run a single file**
-
-```bash
-./lexer_app tests/valid_basic.c
-```
-
-This generates output files in the `out/` directory such as:
-
-- `out/token_stream_valid_basic.txt`
-- `out/symbol_table_valid_basic.txt`
-- `out/error_log_valid_basic.txt`
-
-**Run all test files**
-
-```bash
-./run.sh ./lexer_app
-```
-
-On Windows PowerShell:
-
-```powershell
-.\run_tests.ps1
-```
-
-### Important differences from standard C/C++
-
-This lexer is not a full C or C++ compiler. It is a simplified lexical
-analyzer designed for learning and coursework. Some key differences are:
-
-1. It is a lexical subset, not a full parser.
-   - It recognizes many common tokens but does not implement all of
-     C/C++ grammar.
-2. It rejects some invalid numeric forms as lexical errors.
-   - Leading-zero octal literals like `0123` are flagged as invalid.
-   - Malformed scientific notation is rejected.
-3. It is stricter with strings and chars.
-   - Unterminated strings and char literals are reported as lexical
-     errors.
-   - Unknown escape sequences inside strings are warned about and
-     handled.
-4. It supports a custom mix of keywords.
-   - Some entries are included because they are useful in the course
-     project, even if they are not part of a minimal C subset.
-   - Example: tokens like `until`, `friend`, or other extended
-     educational constructs are included in this project.
-5. It does not implement preprocessing, macros, include handling, or full
-   type-checking.
-6. The output format is intentionally simplified — it prints a token
-   table and logs lexical errors rather than producing a full
-   compiler-style AST or symbol analysis.
-
-### Example output
-
-Valid input:
-
-```c
-int main() {
-    int x = 10;
-    return x;
-}
-```
-
-Output (simplified):
-
-```text
-Lexeme                      Token
-
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
-)
-```
-
-Invalid input example:
-
-```c
-char s[] = "hello;
-```
-
-Output:
-
-```text
-Error: unterminated string literal starting at line 1
-```
+Exit code `0` = valid program; `1` = syntax or lexical error.
 
 ---
 
-## Assignment 2 — Syntax Analyzer
+## Architecture
 
-A Bison/YACC syntax analyzer for the same source language tokenized by
-Assignment 1. It reads a source file, parses it against a hand-written
-LALR(1) grammar, and either:
-
-- prints a two-column **Token | Token_Type** table for the whole program,
-  if every token in the input forms a syntactically valid program, or
-- reports every syntax error found (with line numbers) if it doesn't.
-
-Exit code is `0` on a fully valid program and `1` otherwise (lexical error
-or syntax error).
-
-### Project structure (additions over Assignment 1)
-
-- `src/parser.y` — Bison grammar: the syntax rules for the language, plus
-  the `main()` driver that prints the token table or the error report.
-- `src/parser_lexer.l` — Flex scanner that feeds tokens to the Bison
-  parser. A re-implementation of `src/lexer.l`, adapted to return
-  Bison-generated token codes and to record every `(lexeme, token_type)`
-  pair for the final report table.
-- `src/common.h` — shared `TokenRecord` struct used by `parser.y` and
-  `parser_lexer.l`.
-- `tests/syntax_valid_*.c`, `tests/syntax_invalid_*.c` — syntax-analyzer
-  test programs (see below). Kept separate from the Assignment 1
-  `tests/valid_*.c` / `tests/invalid_*.c` files, which test lexical
-  features only and are not all syntactically valid programs.
-- `run_syntax.sh` — runs the syntax analyzer across all
-  `tests/syntax_*.c` files.
-- `Makefile` — extended with a `syntax_analyzer` build target alongside
-  the existing `lexer_app` target.
-
-### How to build
-
-Requires `bison`, `flex`, and a C++17 compiler (`g++`).
-
-```bash
-sudo apt-get install bison flex g++   # if not already installed
-make
+```
+┌──────────────┐    tokens    ┌──────────────────┐   classified   ┌──────────────┐
+│  Flex Lexer  │ ──────────►  │   Bison Parser   │ ────────────►  │  4-Column    │
+│ parser_lexer │   + record   │    parser.y       │    output      │  Report      │
+│     .l       │   TokenRecord│  (LALR(1) grammar)│                │  Table       │
+└──────────────┘              └────────┬─────────┘                └──────────────┘
+                                       │
+                                       ▼
+                              ┌──────────────────┐
+                              │ ScopedSymbolTable │
+                              │  (nested scopes,  │
+                              │   shadowing,       │
+                              │   classification)  │
+                              └──────────────────┘
 ```
 
-`make` now builds both `lexer_app` and `syntax_analyzer` in the project
-root.
+### Source Files
 
-### How to run
-
-```bash
-./syntax_analyzer tests/syntax_valid_basic.c
+```
+src/parser/
+├── parser.y                 Bison grammar + semantic actions + main()
+├── parser_lexer.l           Flex scanner feeding Bison token codes
+├── common.h                 TokenRecord struct (lexeme, token_name, token_type, scope)
+├── scoped_symbol_table.h    Scope stack with push/pop, insert, lookup, scope labeling
+└── semantic_types.h         BaseKind, Role, TypeInfo enums + format_semantic_type()
 ```
 
-Run the whole syntax-analyzer test suite:
+### Key Design Decisions
 
-```bash
-./run_syntax.sh ./syntax_analyzer
-```
+- **Single-pass classification** — no AST is built. The parser's semantic
+  actions classify identifiers inline as they're reduced, using a scoped
+  symbol table.
+- **Scope labeling** — each scope is named hierarchically
+  (e.g. `main`, `main.block1`, `struct:Point`, `class:Shape.getArea`).
+  On `pop_scope()`, all tokens in the scope's range are bulk-labeled.
+- **Identifier reclassification** — an identifier's `Token_Type` starts as
+  `T_IDENTIFIER` and is reclassified based on context:
+  `INT_VARIABLE`, `FLOAT_PARAMETER`, `FUNCTION_DEFINITION(returns:INT)`,
+  `STRUCT_TAG`, `ENUM_CONSTANT`, `LABEL`, etc.
+- **Error recovery** — `error ';'` and `error '}'` productions at both
+  statement and top-level scope, allowing multiple syntax errors to be
+  reported in one run.
+- **Zero conflicts** — the grammar builds with no shift/reduce or
+  reduce/reduce conflicts. Dangling `else` is resolved via Bison
+  precedence declarations.
 
-### Test cases (`tests/syntax_*.c`)
+---
 
-| File                                    | Purpose                                                         |
-|-------------------------------------------|------------------------------------------------------------------|
-| `syntax_valid_basic.c`                    | Functions, parameters, declarations, calls, `return`              |
-| `syntax_valid_control_flow.c`              | `if`/`else`, `for`, `while`, `do-while`, `do-until`, `switch`/`case`/`default`, `break`, `continue`, `goto`, labels |
-| `syntax_valid_oop_features.c`              | `struct`, `enum`, `typedef`, `class` with `public`/`private`, `this`, `new`, `delete` |
-| `syntax_valid_expressions.c`               | Full operator precedence chain: arithmetic, relational, logical, bitwise, ternary, all compound-assignment operators, pointers, arrays |
-| `syntax_invalid_missing_semicolon.c`       | Missing `;` after a declaration                                   |
-| `syntax_invalid_unbalanced_braces.c`       | Missing closing `}`                                                |
-| `syntax_invalid_bad_expression.c`          | Empty right-hand side of an assignment (`x = ;`)                   |
-| `syntax_invalid_bad_control_flow.c`        | Missing closing `)` in an `if` condition                           |
+## Features Implemented
 
-### Grammar design notes / simplifications
+### Basic Features
 
-The grammar is a trimmed-down version of the classic ANSI C yacc grammar,
-adapted to this project's token set. Some deliberate simplifications,
-consistent with the lexer's own stated scope limitations:
+| Feature | Status | Notes |
+|:--------|:------:|:------|
+| Arithmetic, relational, logical, bitwise operators | ✅ | Full precedence chain with all compound assignments (`+=`, `<<=`, etc.) |
+| `if`/`else` conditionals | ✅ | Braced bodies get nested block scopes |
+| `for` / `while` / `do-while` loops | ✅ | Includes `for(;;)` infinite form |
+| `switch`/`case`/`default` | ✅ | Braced case bodies are scoped; switch body follows C fallthrough |
+| Arrays (`int[]`, `char[]`, multi-dimensional) | ✅ | Classified as `INT_ARRAY`, `CHAR_ARRAY`, etc. |
+| Pointers (single and multi-level) | ✅ | `INT_POINTER`, `INT_POINTER_POINTER` |
+| Structures (`struct`) | ✅ | `STRUCT_TAG` / `STRUCT_VARIABLE` / `STRUCT_POINTER`; body gets `struct:Name` scope |
+| Function definitions, prototypes, and calls | ✅ | `FUNCTION_DEFINITION(returns:INT)`, `FUNCTION_CALL(returns:UNKNOWN)` for undeclared calls |
+| `goto`, `break`, `continue`, labels | ✅ | Labels classified as `LABEL` (forward + backward) |
+| `static` keyword | ✅ | Parses as storage-class specifier |
+| `printf` / `scanf` | ✅ | Resolved as undeclared function calls |
 
-- **No C-style casts and no `sizeof`.** Supporting these without ambiguity
-  requires knowing whether an identifier inside parentheses names a type —
-  the classic "typedef-name problem" — which needs a symbol table wired
-  into the lexer (lexer feedback). Out of scope for a syntax-only
-  analyzer.
-- **`typedef`'d names can't be reused as types.** `typedef int Integer;`
-  parses fine as a declaration, but `Integer x;` does not, for the same
-  reason as above. Existing keyword-based types (`struct Point p;`,
-  `enum Color c;`, `class Shape s;`) work because the leading keyword
-  makes them unambiguous.
-- **No function pointers, comma operator, or varargs (`...`).**
-- **Dangling `else`** is resolved the standard way (attaches to the
-  nearest unmatched `if`) using Bison's precedence-based conflict
-  resolution — the grammar builds with **zero** shift/reduce or
-  reduce/reduce conflicts (verified with `bison -v`).
-- **Syntax error recovery**: the grammar includes `error ';'` /
-  `error '}'` productions at both the statement and top-level scope, so a
-  single malformed statement doesn't necessarily abort analysis of the
-  rest of the file — multiple syntax errors can be reported in one run.
-- A **lexical** error (illegal character, unterminated string/comment,
-  malformed number, etc.) is treated as fatal: analysis stops immediately
-  and the lexical error is reported instead of attempting syntax analysis
-  on an unreliable token stream.
+### Advanced Features
 
-### Example output
+| Feature | Status | Notes |
+|:--------|:------:|:------|
+| Recursive functions | ✅ | Self-calls resolve correctly; mutual recursion via prototypes |
+| Dynamic memory (`new`/`delete`) | ✅ | `new int`, `new int[100]`, `delete p`, `delete[] arr` |
+| Function pointers | ✅ | `int (*fp)(int,int)` and calls `fp(x,y)` / `(*fp)(x,y)` parse |
+| Command-line args (`argc`, `argv`) | ✅ | Parses `int main(int argc, char *argv[])` |
+| `typedef` | ✅ | Declarations classified as `TYPEDEF_NAME` |
+| References (`&`) | ✅ | `int &ref = x;` and pass-by-reference parameters parse |
+| `enum` and `union` | ✅ | `ENUM_TAG`/`UNION_TAG`, `ENUM_CONSTANT`; body scopes `enum:Name` / `union:Name` |
+| `until` loop | ✅ | Both forms: `do { } until (c);` and standalone `until (c) { }` |
+| Multi-level pointers | ✅ | Parses `**`, `***` to any depth |
+| Multi-dimensional arrays | ✅ | Declaration and indexing to any depth |
+| Function overloading | ✅ | Multiple declarations with same name parse correctly |
 
-Valid input (`syntax_valid_basic.c`):
+### OOP Features (Optional)
+
+| Feature | Status | Notes |
+|:--------|:------:|:------|
+| Classes (`class Name { ... }`) | ✅ | `CLASS_TAG`, methods scoped `class:Shape.getArea` |
+| Access specifiers (`public`, `private`, `protected`) | ✅ | Labels parse inside class bodies |
+| `this`, `new`, `delete` | ✅ | Keywords recognized and parsed |
+
+---
+
+## Example Output
+
+**Valid program:**
 
 ```c
+int add(int a, int b) {
+    int result;
+    result = a + b;
+    return result;
+}
 int main() {
-    int x = 10;
-    return x;
+    int x = add(3, 4);
+    return 0;
 }
 ```
 
-Output (simplified):
-
-```text
-Token                       Token_Type
-------------------------------------------------
-int                         T_INT
-main                        T_IDENTIFIER
-(                           T_LPAREN
+```
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+int                 T_INT               T_INT                                   global
+add                 T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+a                   T_IDENTIFIER        INT_PARAMETER                           add
+,                   T_COMMA             T_COMMA                                 add
+int                 T_INT               T_INT                                   add
+b                   T_IDENTIFIER        INT_PARAMETER                           add
+...
+x                   T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+add                 T_IDENTIFIER        FUNCTION_CALL(returns:INT)              main
 ```
 
-Invalid input:
+**Invalid program:**
 
 ```c
 int main() {
@@ -319,55 +165,154 @@ int main() {
 }
 ```
 
-Output:
-
-```text
-Syntax errors were found in 'tests/syntax_invalid_missing_semicolon.c':
+```
+Syntax errors were found in 'tests/parser/invalid/syntax_invalid_missing_semicolon.c':
 Syntax Error at line 3: syntax error, unexpected T_RETURN, expecting T_SEMICOLON or T_COMMA
 1 syntax error(s) found.
 ```
 
 ---
 
-## How to run on another device
+## Test Suite
 
-1. Install the required tools:
-   - Flex
-   - Bison
-   - g++ or a C++ compiler
-   - Git
-2. Clone the repository:
+**All 26 parser tests pass** — 12 valid + 14 invalid.
+
+### Valid Syntax Tests
+
+| Test File | What It Covers |
+|:----------|:---------------|
+| `syntax_valid_basic.c` | Functions, parameters, declarations, calls, `return` |
+| `syntax_valid_control_flow.c` | `if`/`else`, `for`, `while`, `do-while`, `do-until`, `switch`, `break`, `continue`, `goto` |
+| `syntax_valid_expressions.c` | Full operator precedence: arithmetic, relational, logical, bitwise, ternary, compound-assignment |
+| `syntax_valid_operators_expressions.c` | All operators, pointer arithmetic, cast-style expressions |
+| `syntax_valid_composite_types.c` | `struct`, `enum`, `union`, `static`, nested structs, `printf`/`scanf` |
+| `syntax_valid_oop_features.c` | `class`, `typedef`, access specifiers, `this`, `new`, `delete` |
+| `syntax_valid_pointers_arrays.c` | Single/multi-level pointers, multi-dimensional arrays, pointer-to-pointer |
+| `syntax_valid_functions_recursion.c` | Recursive calls, mutual recursion, overloaded declarations, `argc`/`argv` |
+| `syntax_valid_advanced.c` | Complex nested scoping, multiple functions, mixed types |
+| `syntax_valid_advanced_features.c` | `until` loop (both forms), `new int[n]`, `delete[]`, dynamic allocation |
+| `syntax_valid_scoping_edge_cases.c` | Variable shadowing, nested blocks, forward/backward `goto` |
+| `syntax_valid_type_classification_matrix.c` | Exhaustive type × modifier × role classification coverage |
+
+### Invalid Syntax Tests
+
+| Test File | Error Exercised |
+|:----------|:----------------|
+| `syntax_invalid_missing_semicolon.c` | Missing `;` after declaration |
+| `syntax_invalid_unbalanced_braces.c` | Missing closing `}` |
+| `syntax_invalid_unbalanced_parens.c` | Missing closing `)` |
+| `syntax_invalid_bad_expression.c` | Empty RHS (`x = ;`) |
+| `syntax_invalid_bad_control_flow.c` | Missing `)` in `if` condition |
+| `syntax_invalid_bad_struct_decl.c` | Malformed struct body |
+| `syntax_invalid_bad_enum_decl.c` | Malformed enum body |
+| `syntax_invalid_bad_array_decl.c` | Bad array declaration |
+| `syntax_invalid_bad_class_access.c` | Invalid class member access |
+| `syntax_invalid_bad_function_ptr.c` | Malformed function pointer |
+| `syntax_invalid_bad_reference.c` | Invalid reference usage |
+| `syntax_invalid_bad_switch.c` | Malformed switch statement |
+| `syntax_invalid_bad_until.c` | `until` without parenthesized condition |
+| `syntax_invalid_two_errors.c` | Multiple errors reported in one run (error recovery) |
+
+---
+
+## How to Build & Run
+
+### Prerequisites
+
+- **Bison** (≥ 2.4, ideally 3.x)
+- **Flex**
+- **g++** (C++17 support)
+
+### Build
 
 ```bash
-git clone https://github.com/Iam-dhruv/THECompiler.git
-cd THECompiler
+make parser          # build syntax_analyzer only
+make                 # build everything
 ```
 
-3. Build both stages:
+### Run
 
 ```bash
-make
+./syntax_analyzer tests/parser/valid/syntax_valid_basic.c
 ```
 
-4. Run a sample file through each stage:
+### Run Tests
 
 ```bash
-./lexer_app tests/valid_basic.c
-./syntax_analyzer tests/syntax_valid_basic.c
+# Parser tests only
+make test-parser
+bash scripts/run_parser_tests.sh
+
+# All tests
+make test
+bash run.sh
 ```
 
-5. Optionally run the full test suites:
+**Windows (PowerShell):**
+
+```powershell
+.\scripts\run_parser_tests.ps1
+.\run_tests.ps1 -Parser
+```
+
+### Clean
 
 ```bash
-./run.sh ./lexer_app
-./run_syntax.sh ./syntax_analyzer
+make clean
 ```
 
-## Summary
+---
 
-This project gives a practical introduction to the front end of a
-compiler: Assignment 1 demonstrates lexical analysis with Flex (scanning
-source code into tokens, tracking a symbol table, and reporting lexical
-errors), and Assignment 2 builds on it with a Bison/YACC syntax analyzer
-that validates the token stream against a formal grammar and reports
-syntax errors with line numbers.
+## Project Structure
+
+```
+THECompiler/
+├── Makefile                    Root orchestrator
+├── Makefile.parser             Builds syntax_analyzer
+├── Makefile.lexer              Builds lexer_app
+├── run.sh                      Unified test wrapper (bash)
+├── run_tests.ps1               Unified test wrapper (PowerShell)
+├── scripts/
+│   ├── run_parser_tests.sh     Parser test runner (bash)
+│   ├── run_parser_tests.ps1    Parser test runner (PowerShell)
+│   ├── run_lexer_tests.sh      Lexer test runner (bash)
+│   └── run_lexer_tests.ps1     Lexer test runner (PowerShell)
+├── src/
+│   ├── parser/                 Syntax analyzer sources
+│   │   ├── parser.y
+│   │   ├── parser_lexer.l
+│   │   ├── common.h
+│   │   ├── scoped_symbol_table.h
+│   │   └── semantic_types.h
+│   └── lexer/                  Standalone lexer sources
+│       ├── lexer.l
+│       ├── tokens.h
+│       └── symbol_table.h
+└── tests/
+    ├── parser/
+    │   ├── valid/               12 syntax_valid_*.c files
+    │   ├── invalid/             14 syntax_invalid_*.c files
+    │   └── expected/
+    │       ├── valid/           Expected outputs for valid tests
+    │       └── invalid/         Expected outputs for invalid tests
+    └── lexer/
+        ├── valid/               18 valid_*.c files
+        ├── invalid/             13 invalid_*.c files
+        └── expected/
+            ├── valid/
+            └── invalid/
+```
+
+---
+
+## Grammar Design Notes
+
+- Trimmed-down ANSI C grammar adapted for this project's token set.
+- **No C-style casts or `sizeof`** — avoiding the typedef-name problem
+  (would require symbol table feedback into the lexer).
+- **`typedef`'d names can't be reused as type specifiers** — `typedef int
+  Integer;` parses, but `Integer x;` does not (documented non-goal).
+- **Dangling `else`** resolved via Bison precedence (standard approach).
+- **Lexical errors are fatal** — unterminated strings, invalid characters,
+  etc. immediately abort analysis rather than feeding bad tokens to the
+  parser.

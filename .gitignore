@@ -3,12 +3,12 @@
 lexer_app
 syntax_analyzer
 parser_app
-src/*.exe
-src/a.exe
-src/parser
-src/lexer_app
-src/syntax_analyzer
-src/out
+src/**/*.exe
+src/**/a.exe
+src/**/parser
+src/**/lexer_app
+src/**/syntax_analyzer
+src/**/out
 
 # Build objects
 *.o
@@ -16,14 +16,15 @@ src/out
 *.obj
 
 # Flex & Bison generated files
-src/lex.yy.c
-src/lex.yy.*.c
-src/parser.tab.c
-src/parser.tab.h
-src/parser.output
-src/location.hh
-src/position.hh
-src/stack.hh
+src/lexer/lex.yy.c
+src/parser/lex.yy.c
+src/parser/lex.yy.*.c
+src/parser/parser.tab.c
+src/parser/parser.tab.h
+src/parser/parser.output
+src/parser/location.hh
+src/parser/position.hh
+src/parser/stack.hh
 
 # Test outputs
 out/

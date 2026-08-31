@@ -1,0 +1,39 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Makefile.parser — THECompiler: Syntax Analyzer (Assignment 2)
+#
+# Usage:
+#   make -f Makefile.parser           — build syntax_analyzer[.exe]
+#   make -f Makefile.parser clean     — remove generated files
+# ─────────────────────────────────────────────────────────────────────────────
+
+CC       = g++
+CFLAGS   = -std=c++17 -Wno-register
+BISON    = bison
+FLEX     = flex
+SRC_DIR  = src/parser
+PARSER   = syntax_analyzer
+
+.PHONY: all clean test
+
+all: $(PARSER)
+
+# ── Step 1: Run Bison on the grammar file to produce parser.tab.c/.h ────────
+$(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h: $(SRC_DIR)/parser.y $(SRC_DIR)/common.h $(SRC_DIR)/scoped_symbol_table.h $(SRC_DIR)/semantic_types.h
+	cd $(SRC_DIR) && (set BISON_PKGDATADIR=C:/PROGRA~2/GnuWin32/share/bison& set M4=C:/PROGRA~2/GnuWin32/bin/m4.exe& $(BISON) -d -o parser.tab.c parser.y) || $(BISON) -d -o parser.tab.c parser.y
+
+# ── Step 2: Run Flex on the Bison-driving lexer spec ─────────────────────────
+$(SRC_DIR)/lex.yy.parser.c: $(SRC_DIR)/parser_lexer.l $(SRC_DIR)/parser.tab.h $(SRC_DIR)/common.h
+	cd $(SRC_DIR) && $(FLEX) parser_lexer.l && (move /Y lex.yy.c lex.yy.parser.c 2>NUL || mv -f lex.yy.c lex.yy.parser.c)
+
+# ── Step 3: Compile + link into syntax_analyzer (placed in project root) ───
+$(PARSER): $(SRC_DIR)/parser.tab.c $(SRC_DIR)/lex.yy.parser.c
+	$(CC) $(CFLAGS) $(SRC_DIR)/parser.tab.c $(SRC_DIR)/lex.yy.parser.c -o $(PARSER)
+
+# ── Run Parser Tests ────────────────────────────────────────────────────────
+test: $(PARSER)
+	bash ./scripts/run_parser_tests.sh || powershell -ExecutionPolicy Bypass -File ./scripts/run_parser_tests.ps1
+
+# ── Cleanup ─────────────────────────────────────────────────────────────────
+clean:
+	-rm -f $(SRC_DIR)/lex.yy.c $(SRC_DIR)/lex.yy.*.c $(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h $(SRC_DIR)/parser.output $(PARSER) $(PARSER).exe *.o $(SRC_DIR)/*.o 2>/dev/null || \
+	 (del /Q /F $(SRC_DIR)\lex.yy.c $(SRC_DIR)\parser.tab.c $(SRC_DIR)\parser.tab.h $(SRC_DIR)\lex.yy.parser.c $(SRC_DIR)\parser.output $(PARSER).exe *.o 2>NUL) || echo Cleaned
