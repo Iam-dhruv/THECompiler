@@ -1,0 +1,23 @@
+NOTE: Lexical errors were found. Token stream may be incomplete.
+      See: out/error_log_invalid_decimal_points.txt
+
+Lexeme                      Token
+------------------------------------------------
+float                       T_FLOAT
+a                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON
+float                       T_FLOAT
+b                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON
+float                       T_FLOAT
+c                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON
+float                       T_FLOAT
+d                           T_IDENTIFIER
+=                           T_ASSIGN
+.                           T_DOT
+.                           T_DOT
+;                           T_SEMICOLON

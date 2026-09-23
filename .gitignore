@@ -1,40 +1,54 @@
-# Binaries and executables
+# ── Binaries and executables ────────────────────────────────────────────────
 *.exe
 lexer_app
 syntax_analyzer
 parser_app
 src/**/*.exe
 src/**/a.exe
-src/**/parser
 src/**/lexer_app
 src/**/syntax_analyzer
-src/**/out
 
-# Build objects
+# NOTE: do not add a bare `src/**/parser` rule here. Git applies such a
+# pattern to directories as well as files, so it matches the src/parser/
+# SOURCE directory and silently hides parser.y, parser_lexer.l and their
+# headers from version control. The only binaries this project builds are
+# syntax_analyzer and lexer_app, both emitted to the project root and
+# already covered above.
+
+# ── Build objects ───────────────────────────────────────────────────────────
 *.o
 *.d
 *.obj
 
-# Flex & Bison generated files
-src/lexer/lex.yy.c
-src/parser/lex.yy.c
-src/parser/lex.yy.*.c
-src/parser/parser.tab.c
-src/parser/parser.tab.h
-src/parser/parser.output
-src/parser/location.hh
-src/parser/position.hh
-src/parser/stack.hh
+# ── Flex & Bison generated files ────────────────────────────────────────────
+# Matched by filename at any depth rather than by full path, so they stay
+# ignored regardless of which directory layout the Makefiles use (these
+# currently appear in src/parser/, and stale copies also exist in src/).
+lex.yy.c
+lex.yy.*.c
+parser.tab.c
+parser.tab.h
+parser.output
+location.hh
+position.hh
+stack.hh
 
-# Test outputs
+# ── Test outputs ────────────────────────────────────────────────────────────
 out/
 
-# System / Editor files
+# ── Shell artifacts ─────────────────────────────────────────────────────────
+# The Makefiles use Windows-style `2>NUL` redirects. Under a POSIX shell that
+# creates a file literally named NUL (containing the failed `move` message),
+# regenerated on every build. It has been committed by accident before
+# (see commit 6c001c5, "Delete src/NUL").
+NUL
+
+# ── System / Editor files ───────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
 
-# Phase Notes & Requirements Tracking (user configured)
+# ── Phase Notes & Requirements Tracking (user configured) ───────────────────
 implementation_plan.md
 REQUIREMENTS.md

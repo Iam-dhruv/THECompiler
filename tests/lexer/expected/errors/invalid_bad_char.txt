@@ -1,0 +1,4 @@
+Error: unexpected character '@' at line 1
+Error: unexpected character '$' at line 2
+Error: unexpected character '`' at line 3
+Error: unexpected character '`' at line 3

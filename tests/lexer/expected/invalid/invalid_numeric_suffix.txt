@@ -1,0 +1,33 @@
+NOTE: Lexical errors were found. Token stream may be incomplete.
+      See: out/error_log_invalid_numeric_suffix.txt
+
+Lexeme                      Token
+------------------------------------------------
+int                         T_INT
+a                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON
+int                         T_INT
+b                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON
+int                         T_INT
+c                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON
+int                         T_INT
+d                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON
+float                       T_FLOAT
+e                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON
+int                         T_INT
+f                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON
+float                       T_FLOAT
+g                           T_IDENTIFIER
+=                           T_ASSIGN
+;                           T_SEMICOLON

@@ -49,6 +49,92 @@ void log_error(const char* format, ...) {
     had_error = true;
 }
 
+/* ---------------------------------------------------------------------------
+ * classify_ppnumber — validate a C "preprocessing number" (C11 §6.4.8).
+ *
+ * The numeric rules below deliberately OVER-match, using one greedy {PPNUM}
+ * pattern, exactly as a real C compiler does: maximal munch first, validate
+ * second. That way a malformed literal such as 123abc, 1.2.3.4 or 0x arrives
+ * here as a SINGLE token and can be reported as one precise lexical error,
+ * instead of silently splitting into several individually-valid tokens
+ * (123 + abc) that only surface later as a confusing *syntax* error. The
+ * split cannot be undone by the parser, because whitespace is discarded —
+ * "123abc" and "123 abc" would be indistinguishable downstream.
+ *
+ * Returns PPNUM_INT / PPNUM_FLOAT, or PPNUM_BAD after logging a diagnostic.
+ * ------------------------------------------------------------------------ */
+enum { PPNUM_BAD = 0, PPNUM_INT = 1, PPNUM_FLOAT = 2 };
+
+static bool ppnum_is_digit(char c) { return c >= '0' && c <= '9'; }
+static bool ppnum_is_hex(char c) {
+    return ppnum_is_digit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+}
+
+static int classify_ppnumber(const char* text, int line) {
+    const std::string s(text);
+
+    /* ---- Hexadecimal: 0[xX] then one-or-more hex digits, and nothing else.
+       C99 hex floats (0x1p-3) are not supported by this language, so they
+       fall through to the invalid-suffix branch. ---------------------------*/
+    if (s.size() >= 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
+        if (s.size() == 2) {                       /* "0x" with no digits */
+            log_error("Error: invalid suffix on numeric constant '%s' at line %d", text, line);
+            return PPNUM_BAD;
+        }
+        for (size_t i = 2; i < s.size(); i++) {
+            if (!ppnum_is_hex(s[i])) {
+                log_error("Error: invalid suffix on numeric constant '%s' at line %d", text, line);
+                return PPNUM_BAD;
+            }
+        }
+        return PPNUM_INT;
+    }
+
+    /* ---- More than one '.' can never be a single constant (1.2.3.4). -----*/
+    int dots = 0;
+    for (size_t i = 0; i < s.size(); i++) if (s[i] == '.') dots++;
+    if (dots > 1) {
+        log_error("Error: too many decimal points in number '%s' at line %d", text, line);
+        return PPNUM_BAD;
+    }
+
+    /* ---- Decimal form: digits [ '.' digits ] [ [eE][+-]? digits ] -------*/
+    size_t i = 0;
+    bool has_dot = false, has_exp = false;
+
+    while (i < s.size() && ppnum_is_digit(s[i])) i++;
+    if (i < s.size() && s[i] == '.') {
+        has_dot = true; i++;
+        while (i < s.size() && ppnum_is_digit(s[i])) i++;
+    }
+    if (i < s.size() && (s[i] == 'e' || s[i] == 'E')) {
+        has_exp = true; i++;
+        if (i < s.size() && (s[i] == '+' || s[i] == '-')) i++;
+        size_t exp_digits = 0;
+        while (i < s.size() && ppnum_is_digit(s[i])) { i++; exp_digits++; }
+        if (exp_digits == 0) {                     /* 1e, 1e+, .5e, 1.5e */
+            log_error("Error: malformed scientific notation at line %d", line);
+            return PPNUM_BAD;
+        }
+    }
+
+    /* ---- Anything unconsumed is a stray suffix: 123abc, 1_000, 1e5e5. ---*/
+    if (i != s.size()) {
+        log_error("Error: invalid suffix on numeric constant '%s' at line %d", text, line);
+        return PPNUM_BAD;
+    }
+
+    if (has_dot || has_exp) return PPNUM_FLOAT;
+
+    /* ---- Plain integer. A leading 0 with more digits is an octal literal,
+       which this language does not support (0123, 08, 0777). --------------*/
+    if (s.size() > 1 && s[0] == '0') {
+        log_error("Error: Invalid Octal literal at line %d", line);
+        return PPNUM_BAD;
+    }
+    return PPNUM_INT;
+}
+
 /* Symbol table */
 SymbolTable symtab;
 static const std::unordered_map<std::string, int> keywords = {
@@ -80,8 +166,12 @@ DIGIT       [0-9]
 LETTER      [a-zA-Z_]
 WHITESPACE  [ \t\r]+
 IDENTIFIER  {LETTER}({LETTER}|{DIGIT})*
-EXP         [eE][+-]?{DIGIT}+
-BAD_EXP     [eE][+-]?
+
+    /* A C "preprocessing number" (C11 6.4.8): starts with a digit, or a '.'
+       followed by a digit, then greedily absorbs digits, identifier chars,
+       '.', and exponent sign pairs. Deliberately over-broad — every numeric
+       form, valid or not, matches here and classify_ppnumber() decides. */
+PPNUM       ("."?{DIGIT})({DIGIT}|{LETTER}|"."|[eEpP][+-])*
 
 %x COMMENT
 %x STRING
@@ -151,24 +241,16 @@ BAD_EXP     [eE][+-]?
 "?"             { return T_QUESTION; }
 ":"             { return T_COLON; }
 
-    /* Integer literals */
-    /* Hex first (distinct 0x prefix); bare 0 accepted; multi-digit
-       leading-zero is rejected as invalid/unsupported octal. */
-0[xX][0-9a-fA-F]+   { return T_INT_CONST; }
-0[0-9]+             { log_error("Error: Invalid Octal literal at line %d", yylineno); return T_ERROR; }
-0                    { return T_INT_CONST; }
-[1-9][0-9]*          { return T_INT_CONST; }
-
-    /* ── Float literals ─────────────────────────────────────────────────── */
-    /* Valid forms: 1.0  1.  .1  1e10  2.5e-3  .5e+2
-       BAD_EXP rules fire only when no digits follow [eE][+-]? */
-{DIGIT}+"."{DIGIT}*{EXP}?          { return T_FLOAT_CONST; }  /* 1., 1.0, 1.0e10 */
-"."{DIGIT}+{EXP}?                  { return T_FLOAT_CONST; }  /* .1, .1e10 */
-{DIGIT}+{EXP}                      { return T_FLOAT_CONST; }  /* 1e10 */
-
-{DIGIT}+"."{DIGIT}*{BAD_EXP}       { log_error("Error: malformed scientific notation at line %d", yylineno); return T_ERROR; }
-"."{DIGIT}+{BAD_EXP}               { log_error("Error: malformed scientific notation at line %d", yylineno); return T_ERROR; }
-{DIGIT}+{BAD_EXP}                  { log_error("Error: malformed scientific notation at line %d", yylineno); return T_ERROR; }
+    /* ── Numeric literals ────────────────────────────────────────────────── */
+    /* One greedy "preprocessing number" rule (C11 6.4.8), validated by
+       classify_ppnumber() above — see that comment for why over-matching
+       is deliberate. */
+{PPNUM}             {
+        int k = classify_ppnumber(yytext, yylineno);
+        if (k == PPNUM_INT)   return T_INT_CONST;
+        if (k == PPNUM_FLOAT) return T_FLOAT_CONST;
+        return T_ERROR;   /* invalid — diagnostic already logged */
+    }
 
     /* ── Char literals ──────────────────────────────────────────────────── */
     /* Supported escapes: \n \t \r \\ \' \" \a \b \f \v \0               */

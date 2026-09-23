@@ -1,0 +1,2 @@
+Lexical errors were found; syntax analysis aborted.
+Error: too many decimal points in number '1.2.3.4' at line 5

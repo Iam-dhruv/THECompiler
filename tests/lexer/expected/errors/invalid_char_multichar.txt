@@ -1,0 +1,1 @@
+Error: multi-character char literal at line 1

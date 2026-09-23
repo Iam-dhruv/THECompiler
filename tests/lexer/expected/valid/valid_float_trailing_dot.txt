@@ -10,6 +10,16 @@ x                           T_IDENTIFIER
 =                           T_ASSIGN
 1.                          T_FLOAT_CONST
 ;                           T_SEMICOLON
+float                       T_FLOAT
+y                           T_IDENTIFIER
+=                           T_ASSIGN
+.5                          T_FLOAT_CONST
+;                           T_SEMICOLON
+float                       T_FLOAT
+z                           T_IDENTIFIER
+=                           T_ASSIGN
+1.e3                        T_FLOAT_CONST
+;                           T_SEMICOLON
 return                      T_RETURN
 0                           T_INT_CONST
 ;                           T_SEMICOLON

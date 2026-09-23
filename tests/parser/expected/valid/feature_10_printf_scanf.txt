@@ -1,0 +1,95 @@
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+int                 T_INT               T_INT                                   global
+main                T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+)                   T_RPAREN            T_RPAREN                                global
+{                   T_LBRACE            T_LBRACE                                main
+int                 T_INT               T_INT                                   main
+n                   T_IDENTIFIER        INT_VARIABLE                            main
+=                   T_ASSIGN            T_ASSIGN                                main
+5                   T_INT_CONST         T_INT_CONST                             main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+float               T_FLOAT             T_FLOAT                                 main
+f                   T_IDENTIFIER        FLOAT_VARIABLE                          main
+=                   T_ASSIGN            T_ASSIGN                                main
+1.5                 T_FLOAT_CONST       T_FLOAT_CONST                           main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+char                T_CHAR              T_CHAR                                  main
+c                   T_IDENTIFIER        CHAR_VARIABLE                           main
+=                   T_ASSIGN            T_ASSIGN                                main
+'x'                 T_CHAR_CONST        T_CHAR_CONST                            main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+printf              T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
+"hello
+"            T_STRING_LITERAL    T_STRING_LITERAL                        main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+printf              T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
+"%d
+"               T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+n                   T_IDENTIFIER        INT_VARIABLE                            main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+printf              T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
+"%d %f %c
+"         T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+n                   T_IDENTIFIER        INT_VARIABLE                            main
+,                   T_COMMA             T_COMMA                                 main
+f                   T_IDENTIFIER        FLOAT_VARIABLE                          main
+,                   T_COMMA             T_COMMA                                 main
+c                   T_IDENTIFIER        CHAR_VARIABLE                           main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+printf              T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
+"%s and %d
+"        T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+"text"              T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+n                   T_IDENTIFIER        INT_VARIABLE                            main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+printf              T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
+"%d
+"               T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+n                   T_IDENTIFIER        INT_VARIABLE                            main
+*                   T_MUL               T_MUL                                   main
+2                   T_INT_CONST         T_INT_CONST                             main
++                   T_PLUS              T_PLUS                                  main
+1                   T_INT_CONST         T_INT_CONST                             main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+scanf               T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
+"%d"                T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+&                   T_BIT_AND           T_BIT_AND                               main
+n                   T_IDENTIFIER        INT_VARIABLE                            main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+scanf               T_IDENTIFIER        FUNCTION_CALL(returns:UNKNOWN)          main
+(                   T_LPAREN            T_LPAREN                                main
+"%d %f"             T_STRING_LITERAL    T_STRING_LITERAL                        main
+,                   T_COMMA             T_COMMA                                 main
+&                   T_BIT_AND           T_BIT_AND                               main
+n                   T_IDENTIFIER        INT_VARIABLE                            main
+,                   T_COMMA             T_COMMA                                 main
+&                   T_BIT_AND           T_BIT_AND                               main
+f                   T_IDENTIFIER        FLOAT_VARIABLE                          main
+)                   T_RPAREN            T_RPAREN                                main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+return              T_RETURN            T_RETURN                                main
+n                   T_IDENTIFIER        INT_VARIABLE                            main
+;                   T_SEMICOLON         T_SEMICOLON                             main
+}                   T_RBRACE            T_RBRACE                                main
+
+86 token(s). No syntax errors found in 'tests/feature_10_printf_scanf.c'.

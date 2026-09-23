@@ -155,6 +155,29 @@ for f in "${invalid_files[@]}"; do
         if [[ $rc -ne 0 ]]; then pass=true; fi
     fi
 
+    # Also compare the DIAGNOSTICS when an expected error log is provided.
+    # Without this, any lexical error looks alike: the offending token is
+    # simply absent from the token stream, so a wrong (or wrongly worded)
+    # message would still pass. Optional — tests with no expected error
+    # file keep their previous behaviour.
+    err_exp="$TESTS_DIR/expected/errors/${stem}.txt"
+    err_file="$OUT_DIR/error_log_${stem}.txt"
+    if [[ -f "$err_exp" ]]; then
+        if [[ -f "$err_file" ]]; then
+            err_exp_norm=$(normalize_text < "$err_exp")
+            err_act_norm=$(normalize_text < "$err_file")
+            if [[ "$err_exp_norm" != "$err_act_norm" ]]; then
+                pass=false
+                if [[ "$VERBOSE" == "true" ]]; then
+                    echo "  error-log mismatch for $name:"
+                    diff "$err_exp" "$err_file" | head -20
+                fi
+            fi
+        else
+            pass=false
+        fi
+    fi
+
     if [[ "$pass" == "true" ]]; then
         lex_passed=$((lex_passed + 1))
         echo "[PASS] $name"

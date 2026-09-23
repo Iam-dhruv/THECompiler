@@ -1,0 +1,7 @@
+Error: invalid suffix on numeric constant '123abc' at line 4
+Error: invalid suffix on numeric constant '0x' at line 5
+Error: invalid suffix on numeric constant '0xGG' at line 6
+Error: invalid suffix on numeric constant '1_000' at line 7
+Error: invalid suffix on numeric constant '1e5e5' at line 8
+Error: invalid suffix on numeric constant '0b101' at line 9
+Error: invalid suffix on numeric constant '0x1p-3' at line 10

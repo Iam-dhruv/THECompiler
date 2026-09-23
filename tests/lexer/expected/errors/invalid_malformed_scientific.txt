@@ -1,0 +1,5 @@
+Error: malformed scientific notation at line 1
+Error: malformed scientific notation at line 2
+Error: malformed scientific notation at line 3
+Error: malformed scientific notation at line 4
+Error: malformed scientific notation at line 5

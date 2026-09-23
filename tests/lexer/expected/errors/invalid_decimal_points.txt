@@ -1,0 +1,4 @@
+Error: too many decimal points in number '1.2.3.4' at line 3
+Error: too many decimal points in number '1.5.5' at line 4
+Error: too many decimal points in number '1..2' at line 5
+Error: too many decimal points in number '.1231.131' at line 9
