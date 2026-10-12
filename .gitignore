@@ -48,7 +48,7 @@ NUL
 Thumbs.db
 .vscode/
 .idea/
-
+.antigravityignore
 # ── Phase Notes & Requirements Tracking (user configured) ───────────────────
 implementation_plan.md
 REQUIREMENTS.md

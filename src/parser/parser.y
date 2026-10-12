@@ -1,35 +1,15 @@
-/* ============================================================================
- * parser.y — Syntax analyzer (Bison grammar) for the THECompiler source
- * language (the same C/C++-inspired language tokenized by the project's
- * lexical analyzer, https://github.com/Iam-dhruv/THECompiler).
+/* parser.y — Bison grammar for THECompiler's syntax analyzer.
  *
- * This grammar validates the *syntax* of a source program built from the
- * tokens produced by src/lexer.l (a Bison-driven re-implementation of the
- * project's Flex scanner), and additionally performs a semantic
- * classification pass: every identifier token is tagged with what it is
- * (INT_VARIABLE, FUNCTION_DEFINITION(returns:INT), ...) and which scope it
- * appears in, via a scope-stacked symbol table (ScopedSymbolTable, in
- * symbol_table.h). See implementation_plan.md for the full design.
+ * Validates syntax and performs semantic classification: each identifier token
+ * is tagged with its role (variable, parameter, function def/proto/call, etc.)
+ * and enclosing scope via ScopedSymbolTable.
  *
- * Simplifications (documented, consistent with the project's own stated
- * scope limitations for the lexer):
- *   - No C-style casts and no `sizeof` operator (would require typedef-name
- *     lookahead / lexer feedback to disambiguate from parenthesized
- *     expressions without introducing grammar ambiguity).
- *   - typedef'd names cannot be used later as type specifiers (classic
- *     "typedef-name problem" — needs a symbol table wired into the lexer).
- *     `typedef int Integer;` parses fine; `Integer x;` does not.
- *   - No function-pointer declarators, no comma operator, no varargs.
- *   - `struct`/`union`/`enum`/`class` used as *types* must be written with
- *     their keyword (e.g. `struct Point p;`), matching real C behaviour
- *     without a typedef.
- *   - Identifiers after `.`/`->` (member access) are not semantically
- *     classified — this compiler has one flat scope stack, not a per-struct
- *     member namespace, so a real lookup there would silently resolve to an
- *     unrelated same-named symbol. Left as Token_Type == Token_Name.
- *   - A method defined inside a `class`/`struct` body gets its own scope
- *     (its method name), not qualified by the enclosing class/struct name.
- * ==========================================================================*/
+ * Notable simplifications:
+ *   - No C-style casts, sizeof, or comma operator.
+ *   - typedef'd names can't be used as type specifiers (classic lexer-feedback problem).
+ *   - struct/union/enum/class used as types require their keyword prefix.
+ *   - Member-access identifiers (after ./→) are not semantically classified.
+ */
 
 %code requires {
     #include "semantic_types.h"
@@ -56,10 +36,8 @@
 #include "common.h"
 #include "scoped_symbol_table.h"
 
-/* ---- Token record collected by the lexer for the final report table ---- */
 std::vector<TokenRecord> g_tokens;
 
-/* ---- Error tracking ---- */
 std::vector<std::string> g_syntax_errors;
 bool g_had_lex_error = false;
 std::vector<std::string> g_lex_errors;
@@ -69,47 +47,29 @@ extern int yylex(void);
 extern FILE* yyin;
 void yyerror(const char* msg);
 
-/* ---- Semantic classification state ---- */
 ScopedSymbolTable g_symtab;
-TypeInfo* g_current_decl_type = nullptr;  // set by declaration_specifiers, read by init_declarator
-                                           // (for the outer declaration's own type) and by
-                                           // direct_declarator's function-shaped alternatives
-                                           // (which save/restore it — see g_decl_type_save_stack)
+TypeInfo* g_current_decl_type = nullptr;
+
+// Saved/restored around function parameter lists so nested
+// declaration_specifiers reductions don't clobber the outer type.
 std::vector<TypeInfo*> g_decl_type_save_stack;
-                                           // A function-shaped declarator's own parameter list
-                                           // contains nested declaration_specifiers reductions
-                                           // (one per parameter) that reuse this SAME global, so
-                                           // without saving/restoring around the param list, the
-                                           // outer declaration's type (e.g. the VOID of
-                                           // "void log_event(char *tag);") would already be
-                                           // clobbered by the last parameter's type (CHAR) by the
-                                           // time init_declarator reads it back out for the
-                                           // prototype's role/return_type.
-bool g_pending_typedef = false;           // set by storage_class_specifier, reset per-declaration
+
+bool g_pending_typedef = false;
 std::string g_current_func_name;
 
-/* Corrects an identifier's lookup-derived FUNCTION_DEFINITION/FUNCTION_PROTOTYPE
- * classification to FUNCTION_CALL once postfix_expr discovers it was immediately
- * followed by '(' ... ')'. Functions and void-returning functions aren't
- * distinguished as separate roles — a void function is just a FUNCTION_* whose
- * return type happens to be VOID. */
+// Reclassifies a previously-looked-up function symbol as a call site.
 static void reclassify_as_call(int callee_tok_idx) {
-    if (callee_tok_idx < 0) return;                       // callee wasn't a bare identifier
+    if (callee_tok_idx < 0) return;
     SymbolInfo* sym = g_symtab.lookup(g_tokens[callee_tok_idx].lexeme);
     if (!sym) { g_tokens[callee_tok_idx].token_type = "FUNCTION_CALL(returns:UNKNOWN)"; return; }
     TypeInfo info = sym->type_info;
-    if (info.role != ROLE_FUNC_DEF && info.role != ROLE_FUNC_PROTO) return;  // not a function symbol — leave as-is
+    if (info.role != ROLE_FUNC_DEF && info.role != ROLE_FUNC_PROTO) return;
     info.role = ROLE_FUNC_CALL;
     g_tokens[callee_tok_idx].token_type = format_semantic_type(info);
 }
 
-/* YYSTYPE defaults to int since this grammar performs pure syntax
- * validation and never uses $$ / $n semantic values. Bison itself defines
- * the global `yylval` (non-reentrant mode), so nothing to declare here. */
-
 %}
 
-/* ------------------------------ Tokens ---------------------------------- */
 %union {
     int token_index;
     TypeInfo* type_info;
@@ -155,8 +115,7 @@ static void reclassify_as_call(int callee_tok_idx) {
 %type <base_kind_val> struct_or_union
 %type <token_index>  primary_expr postfix_expr
 
-/* Resolve the classic dangling-else shift/reduce conflict: prefer shift
- * (attach the else to the nearest unmatched if). */
+/* Dangling-else: prefer shift (attach else to nearest if). */
 %nonassoc IFX
 %nonassoc T_ELSE
 
@@ -165,8 +124,6 @@ static void reclassify_as_call(int callee_tok_idx) {
 %start program
 
 %%
-
-/* ----------------------------- Program ----------------------------------*/
 
 program
     : /* empty */
@@ -188,8 +145,7 @@ function_definition
         g_symtab.insert_global($2->name, info, yylineno, $2->token_index);
         g_tokens[$2->token_index].token_type = format_semantic_type(info);
         g_current_func_name = $2->name;
-        /* the function's own scope is already open — direct_declarator pushed
-           it the moment it saw '(' while parsing the parameter list */
+        // Scope already opened by direct_declarator when it saw '('
       }
       function_body {
         g_symtab.pop_scope();
@@ -201,8 +157,6 @@ function_body
     : T_LBRACE T_RBRACE
     | T_LBRACE stmt_list T_RBRACE
     ;
-
-/* ------------------------ Declarations / types ---------------------------*/
 
 declaration
     : declaration_specifiers init_declarator_list T_SEMICOLON { g_pending_typedef = false; }
@@ -252,7 +206,6 @@ struct_or_union_specifier
         $$ = new TypeInfo{}; $$->base_kind = (BaseKind)$1;
       }
     | struct_or_union T_IDENTIFIER {
-        /* reference to an already-declared tag used as a type — no body, no scope push */
         g_tokens[$2].token_type = ($1 == BK_STRUCT) ? "STRUCT_TAG" : "UNION_TAG";
         $$ = new TypeInfo{}; $$->base_kind = (BaseKind)$1; $$->composite_tag = g_tokens[$2].lexeme;
       }
@@ -338,7 +291,7 @@ access_specifier
     | T_PROTECTED
     ;
 
-/* ----------------------------- Declarators -------------------------------*/
+/* Declarators */
 
 init_declarator_list
     : init_declarator
@@ -353,7 +306,7 @@ init_declarator
             info.role = ROLE_FUNC_PROTO;
             g_symtab.insert_global($1->name, info, yylineno, $1->token_index);
             g_tokens[$1->token_index].token_type = format_semantic_type(info);
-            g_symtab.pop_scope();   // close the param scope direct_declarator opened — no body
+            g_symtab.pop_scope();   // close param scope — no body follows
         } else {
             TypeInfo info = *g_current_decl_type;
             info.pointer_depth = $1->pointer_depth;
@@ -364,9 +317,7 @@ init_declarator
         }
       }
     | declarator T_ASSIGN {
-        /* plain-variable registration only (a function-shaped declarator can't carry an
-           initializer in this grammar); done before the initializer is parsed so a
-           self-referential initializer can find the declaration */
+        // Register variable before parsing initializer (supports self-referential init)
         TypeInfo info = *g_current_decl_type;
         info.pointer_depth = $1->pointer_depth;
         info.is_array = $1->is_array;
@@ -429,7 +380,7 @@ param_decl
         g_symtab.insert($2->name, info, yylineno, $2->token_index);
         g_tokens[$2->token_index].token_type = format_semantic_type(info);
       }
-    | declaration_specifiers { /* unnamed parameter — nothing to register */ }
+    | declaration_specifiers
     ;
 
 initializer
@@ -443,7 +394,7 @@ initializer_list
     | initializer_list T_COMMA initializer
     ;
 
-/* ------------------------------ Statements -------------------------------*/
+/* Statements */
 
 compound_stmt
     : T_LBRACE { g_symtab.push_block_scope(); } T_RBRACE { g_symtab.pop_scope(); }
@@ -522,8 +473,7 @@ labeled_stmt
     : T_IDENTIFIER T_COLON stmt { g_tokens[$1].token_type = "LABEL"; }
     ;
 
-/* ------------------------------ Expressions ------------------------------*/
-/* Classic layered precedence grammar (no casts, no sizeof, no comma op). */
+/* Expressions — layered precedence (no casts, no sizeof, no comma op). */
 
 primary_expr
     : T_IDENTIFIER {
@@ -663,14 +613,6 @@ expr
 
 %%
 
-/* ------------------------------ Driver ------------------------------------
- * Reads a source file, runs the parser, and either:
- *   - prints a "Lexeme | Token_Name | Token_Type | Scope" table for the
- *     whole program (success), or
- *   - reports the lexical / syntax errors that were found.
- * Exit code: 0 on a fully valid program, 1 otherwise.
- * ==========================================================================*/
-
 void yyerror(const char* msg) {
     std::ostringstream oss;
     oss << "Syntax Error at line " << yylineno << ": " << msg;
@@ -714,7 +656,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    g_symtab.finalize();   // back-fill any leftover top-level ("global") tokens
+    g_symtab.finalize();
 
     std::cout << std::left
               << std::setw(20) << "Lexeme"

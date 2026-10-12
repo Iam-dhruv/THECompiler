@@ -27,20 +27,9 @@ static void log_lex_error(const char* format, ...) {
     g_had_lex_error = true;
 }
 
-/* ---------------------------------------------------------------------------
- * classify_ppnumber — validate a C "preprocessing number" (C11 §6.4.8).
- *
- * The numeric rules below deliberately OVER-match, using one greedy {PPNUM}
- * pattern, exactly as a real C compiler does: maximal munch first, validate
- * second. That way a malformed literal such as 123abc, 1.2.3.4 or 0x arrives
- * here as a SINGLE token and can be reported as one precise lexical error,
- * instead of silently splitting into several individually-valid tokens
- * (123 + abc) that only surface later as a confusing *syntax* error. The
- * split cannot be undone by the parser, because whitespace is discarded —
- * "123abc" and "123 abc" would be indistinguishable downstream.
- *
- * Returns PPNUM_INT / PPNUM_FLOAT, or PPNUM_BAD after logging a diagnostic.
- * ------------------------------------------------------------------------ */
+// Validates a C "preprocessing number" (C11 §6.4.8). Uses a single greedy
+// PPNUM pattern so malformed literals like 123abc arrive as one token and
+// produce one clear error, rather than silently splitting into valid pieces.
 enum { PPNUM_BAD = 0, PPNUM_INT = 1, PPNUM_FLOAT = 2 };
 
 static bool ppnum_is_digit(char c) { return c >= '0' && c <= '9'; }
@@ -51,11 +40,9 @@ static bool ppnum_is_hex(char c) {
 static int classify_ppnumber(const char* text, int line) {
     const std::string s(text);
 
-    /* ---- Hexadecimal: 0[xX] then one-or-more hex digits, and nothing else.
-       C99 hex floats (0x1p-3) are not supported by this language, so they
-       fall through to the invalid-suffix branch. ---------------------------*/
+    // Hexadecimal
     if (s.size() >= 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
-        if (s.size() == 2) {                       /* "0x" with no digits */
+        if (s.size() == 2) {
             log_lex_error("Error: invalid suffix on numeric constant '%s' at line %d", text, line);
             return PPNUM_BAD;
         }
@@ -68,7 +55,7 @@ static int classify_ppnumber(const char* text, int line) {
         return PPNUM_INT;
     }
 
-    /* ---- More than one '.' can never be a single constant (1.2.3.4). -----*/
+    // Multiple dots (e.g. 1.2.3.4)
     int dots = 0;
     for (size_t i = 0; i < s.size(); i++) if (s[i] == '.') dots++;
     if (dots > 1) {
@@ -76,7 +63,7 @@ static int classify_ppnumber(const char* text, int line) {
         return PPNUM_BAD;
     }
 
-    /* ---- Decimal form: digits [ '.' digits ] [ [eE][+-]? digits ] -------*/
+    // Decimal: digits [ '.' digits ] [ [eE][+-]? digits ]
     size_t i = 0;
     bool has_dot = false, has_exp = false;
 
@@ -90,13 +77,13 @@ static int classify_ppnumber(const char* text, int line) {
         if (i < s.size() && (s[i] == '+' || s[i] == '-')) i++;
         size_t exp_digits = 0;
         while (i < s.size() && ppnum_is_digit(s[i])) { i++; exp_digits++; }
-        if (exp_digits == 0) {                     /* 1e, 1e+, .5e, 1.5e */
+        if (exp_digits == 0) {
             log_lex_error("Error: malformed scientific notation at line %d", line);
             return PPNUM_BAD;
         }
     }
 
-    /* ---- Anything unconsumed is a stray suffix: 123abc, 1_000, 1e5e5. ---*/
+    // Stray suffix (e.g. 123abc)
     if (i != s.size()) {
         log_lex_error("Error: invalid suffix on numeric constant '%s' at line %d", text, line);
         return PPNUM_BAD;
@@ -104,8 +91,7 @@ static int classify_ppnumber(const char* text, int line) {
 
     if (has_dot || has_exp) return PPNUM_FLOAT;
 
-    /* ---- Plain integer. A leading 0 with more digits is an octal literal,
-       which this language does not support (0123, 08, 0777). --------------*/
+    // Leading-zero integers are unsupported octal literals
     if (s.size() > 1 && s[0] == '0') {
         log_lex_error("Error: Invalid Octal literal at line %d", line);
         return PPNUM_BAD;
@@ -113,19 +99,13 @@ static int classify_ppnumber(const char* text, int line) {
     return PPNUM_INT;
 }
 
-/* Records the current token (lexeme, token_name, token_type==token_name,
- * scope=="" until the parser's ScopedSymbolTable back-fills it) and returns
- * the given token code. yylval.token_index is set for every token so the
- * grammar can look a token record back up by index (only T_IDENTIFIER's
- * value is actually declared with a %union type, but setting it
- * unconditionally here keeps the macros simple). */
+// Records a token and returns its Bison token code. Sets yylval.token_index
+// for every token so grammar actions can look up the TokenRecord by index.
 #define RET(tokcode) \
     do { g_tokens.push_back({std::string(yytext), #tokcode, #tokcode, ""}); \
          yylval.token_index = (int)g_tokens.size() - 1; \
          return tokcode; } while (0)
 
-/* Same as RET but with an explicitly supplied lexeme (used for strings,
- * whose reconstructed value differs from yytext). */
 #define RET_LEXEME(tokcode, lex) \
     do { g_tokens.push_back({(lex), #tokcode, #tokcode, ""}); \
          yylval.token_index = (int)g_tokens.size() - 1; \
@@ -166,10 +146,7 @@ LETTER      [a-zA-Z_]
 WHITESPACE  [ \t\r]+
 IDENTIFIER  {LETTER}({LETTER}|{DIGIT})*
 
-    /* A C "preprocessing number" (C11 6.4.8): starts with a digit, or a '.'
-       followed by a digit, then greedily absorbs digits, identifier chars,
-       '.', and exponent sign pairs. Deliberately over-broad — every numeric
-       form, valid or not, matches here and classify_ppnumber() decides. */
+    /* Greedy preprocessing-number pattern; classify_ppnumber() validates. */
 PPNUM       ("."?{DIGIT})({DIGIT}|{LETTER}|"."|[eEpP][+-])*
 
 %x COMMENT
@@ -177,7 +154,6 @@ PPNUM       ("."?{DIGIT})({DIGIT}|{LETTER}|"."|[eEpP][+-])*
 
 %%
 
-    /* Comments */
 "/*"              { comment_start_line = yylineno; BEGIN(COMMENT); }
 <COMMENT>"*/"     { BEGIN(INITIAL); }
 <COMMENT>\n       { }
@@ -187,11 +163,10 @@ PPNUM       ("."?{DIGIT})({DIGIT}|{LETTER}|"."|[eEpP][+-])*
                       return 0;
                   }
 
-\/\/.*            { } /* single-line comment */
+\/\/.*            { }
 \n                { }
 {WHITESPACE}      { }
 
-    /* Multi-char operators */
 "<<="           { RET(T_LSHIFT_ASSIGN); }
 ">>="           { RET(T_RSHIFT_ASSIGN); }
 "+="            { RET(T_PLUS_ASSIGN); }
@@ -214,7 +189,6 @@ PPNUM       ("."?{DIGIT})({DIGIT}|{LETTER}|"."|[eEpP][+-])*
 "<<"            { RET(T_LSHIFT); }
 ">>"            { RET(T_RSHIFT); }
 
-    /* Single-char operators / punctuation */
 "+"             { RET(T_PLUS); }
 "-"             { RET(T_MINUS); }
 "*"             { RET(T_MUL); }
@@ -240,22 +214,17 @@ PPNUM       ("."?{DIGIT})({DIGIT}|{LETTER}|"."|[eEpP][+-])*
 "?"             { RET(T_QUESTION); }
 ":"             { RET(T_COLON); }
 
-    /* Numeric literals — one greedy "preprocessing number" rule (C11 6.4.8),
-       validated by classify_ppnumber() above. See that comment for why the
-       over-matching is deliberate. */
 {PPNUM}             {
         int k = classify_ppnumber(yytext, yylineno);
         if (k == PPNUM_INT)   { RET(T_INT_CONST); }
         if (k == PPNUM_FLOAT) { RET(T_FLOAT_CONST); }
-        return 0;   /* invalid — diagnostic already logged */
+        return 0;
     }
 
-    /* Char literals */
-'([^\\'\n]|\\[ntr\\'\"abfv0])'      { RET(T_CHAR_CONST); }
-'([^\\'\n]|\\[ntr\\'\"abfv0]){2,}'  { log_lex_error("Error: multi-character char literal at line %d", yylineno); return 0; }
-'([^\\'\n]|\\[ntr\\'\"abfv0])*      { log_lex_error("Error: unterminated char literal at line %d", yylineno); return 0; }
+'([^\\'\\n]|\\\\[ntr\\\\'\"abfv0])'      { RET(T_CHAR_CONST); }
+'([^\\'\\n]|\\\\[ntr\\\\'\"abfv0]){2,}'  { log_lex_error("Error: multi-character char literal at line %d", yylineno); return 0; }
+'([^\\'\\n]|\\\\[ntr\\\\'\"abfv0])*      { log_lex_error("Error: unterminated char literal at line %d", yylineno); return 0; }
 
-    /* String literals (exclusive STRING state) */
 \"                  { str_buf.clear(); str_start_line = yylineno; BEGIN(STRING); }
 
 <STRING>\"          {
@@ -284,7 +253,6 @@ PPNUM       ("."?{DIGIT})({DIGIT}|{LETTER}|"."|[eEpP][+-])*
                         return 0;
                     }
 
-    /* Identifiers and keywords */
 {IDENTIFIER}      {
     auto it = keywords_.find(yytext);
     if (it != keywords_.end()) {
@@ -296,7 +264,6 @@ PPNUM       ("."?{DIGIT})({DIGIT}|{LETTER}|"."|[eEpP][+-])*
     RET(T_IDENTIFIER);
 }
 
-    /* Catch-all for illegal characters */
 .                 {
                       log_lex_error("Error: unexpected character '%s' at line %d", yytext, yylineno);
                       return 0;

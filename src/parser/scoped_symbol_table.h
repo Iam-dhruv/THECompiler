@@ -5,17 +5,8 @@
 #include "semantic_types.h"
 #include "common.h"
 
-/* ============================================================================
- * scoped_symbol_table.h — the parser's (Assignment 2) scoped symbol table.
- *
- * Deliberately separate from symbol_table.h: symbol_table.h unconditionally
- * includes tokens.h, whose TokenType enum shares member names with Bison's
- * generated token codes (T_IDENTIFIER, T_GT, ...) in parser.tab.h — the two
- * collide if ever included in the same translation unit. lexer.l (Assignment
- * 1) needs symbol_table.h's SymbolEntry/SymbolTable + tokens.h; parser.y
- * (Assignment 2) needs ScopedSymbolTable + parser.tab.h's token codes. This
- * header gives parser.y the latter without dragging in the former.
- * ==========================================================================*/
+// Separate from symbol_table.h to avoid TokenType enum collision with Bison's
+// generated token codes — both define T_IDENTIFIER, T_GT, etc.
 
 extern std::vector<TokenRecord> g_tokens;
 
@@ -23,21 +14,18 @@ struct SymbolInfo {
     std::string lexeme;
     TypeInfo type_info;
     int declared_line;
-    int token_index;        // index into g_tokens this symbol's declaration token came from
+    int token_index;
 };
 
-// Scope stack for the syntax analyzer's semantic classification pass. Scope is
-// not back-patched onto individual tokens as they're parsed; instead each
-// pop_scope() bulk-fills every still-empty g_tokens[i].scope in the range the
-// scope owned. See "Scope stack + token-range back-fill" in implementation_plan.md
-// for why (short version: back-patching individual tokens misses every token no
-// grammar action ever touches, and is fragile against Bison's lookahead).
+// Scope back-fill: instead of tagging tokens individually during parsing
+// (fragile with Bison lookahead), pop_scope() bulk-fills all untagged tokens
+// in the range the scope owned.
 class ScopedSymbolTable {
     struct Scope {
-        std::string label;                            // this level's own label only
+        std::string label;
         std::unordered_map<std::string, SymbolInfo> symbols;
-        int child_block_counter = 0;                   // for naming nested "block1", "block2", ...
-        int token_range_start = 0;                      // g_tokens.size() when this scope was pushed
+        int child_block_counter = 0;
+        int token_range_start = 0;
     };
     std::vector<Scope> scope_stack;
 
@@ -48,7 +36,7 @@ public:
         scope_stack.push_back({label, {}, 0, (int)g_tokens.size()});
     }
 
-    std::string push_block_scope() {                    // auto-numbered nested block
+    std::string push_block_scope() {
         scope_stack.back().child_block_counter++;
         push_scope("block" + std::to_string(scope_stack.back().child_block_counter));
         return current_scope_name();
@@ -62,7 +50,7 @@ public:
         scope_stack.pop_back();
     }
 
-    void finalize() {                                    // call once, after yyparse() succeeds
+    void finalize() {
         for (auto& t : g_tokens) if (t.scope.empty()) t.scope = "global";
     }
 
@@ -81,7 +69,7 @@ public:
         scope_stack.front().symbols[lexeme] = SymbolInfo{lexeme, info, line, tok_idx};
     }
 
-    SymbolInfo* lookup(const std::string& lexeme) {      // innermost -> outermost
+    SymbolInfo* lookup(const std::string& lexeme) {
         for (auto it = scope_stack.rbegin(); it != scope_stack.rend(); ++it) {
             auto found = it->symbols.find(lexeme);
             if (found != it->symbols.end()) return &found->second;

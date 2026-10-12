@@ -1,0 +1,32 @@
+# Makefile.ir — THECompiler: IR Generator (Three-Address Code)
+#
+# Usage:
+#   make -f Makefile.ir           — build ir_generator
+#   make -f Makefile.ir clean     — remove generated files
+
+CC       = g++
+CFLAGS   = -std=c++17 -Wno-register
+BISON    = bison
+FLEX     = flex
+SRC_DIR  = src/ir
+TARGET   = ir_generator
+
+.PHONY: all clean
+
+all: $(TARGET)
+
+# Step 1: Bison — ir.y → parser.tab.c / parser.tab.h
+$(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h: $(SRC_DIR)/ir.y $(SRC_DIR)/common.h $(SRC_DIR)/scoped_symbol_table.h $(SRC_DIR)/semantic_types.h
+	cd $(SRC_DIR) && (set BISON_PKGDATADIR=C:/PROGRA~2/GnuWin32/share/bison& set M4=C:/PROGRA~2/GnuWin32/bin/m4.exe& $(BISON) -d -o parser.tab.c ir.y) || $(BISON) -d -o parser.tab.c ir.y
+
+# Step 2: Flex — ir_lexer.l → lex.yy.ir.c
+$(SRC_DIR)/lex.yy.ir.c: $(SRC_DIR)/ir_lexer.l $(SRC_DIR)/parser.tab.h $(SRC_DIR)/common.h
+	cd $(SRC_DIR) && $(FLEX) ir_lexer.l && (move /Y lex.yy.c lex.yy.ir.c 2>NUL || mv -f lex.yy.c lex.yy.ir.c)
+
+# Step 3: Compile + link
+$(TARGET): $(SRC_DIR)/parser.tab.c $(SRC_DIR)/lex.yy.ir.c
+	$(CC) $(CFLAGS) $(SRC_DIR)/parser.tab.c $(SRC_DIR)/lex.yy.ir.c -o $(TARGET)
+
+clean:
+	-rm -f $(SRC_DIR)/lex.yy.c $(SRC_DIR)/lex.yy.*.c $(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h $(SRC_DIR)/parser.output $(TARGET) $(TARGET).exe *.o $(SRC_DIR)/*.o 2>/dev/null || \
+	 (del /Q /F $(SRC_DIR)\lex.yy.c $(SRC_DIR)\parser.tab.c $(SRC_DIR)\parser.tab.h $(SRC_DIR)\lex.yy.ir.c $(SRC_DIR)\parser.output $(TARGET).exe *.o 2>NUL) || echo Cleaned

@@ -1,15 +1,7 @@
 #pragma once
 #include <string>
 
-/* ============================================================================
- * semantic_types.h — the parser's semantic classification vocabulary.
- *
- * BaseKind/Role/TypeInfo describe what an identifier *is* (its declared type
- * and the role it plays: a variable, a parameter, a function definition/
- * prototype/call, ...). format_semantic_type() renders a TypeInfo the same
- * way the four-column token table does, e.g. "INT_VARIABLE",
- * "STRUCT_POINTER_PARAMETER", "FUNCTION_DEFINITION(returns:INT)".
- * ==========================================================================*/
+// Semantic classification vocabulary for identifier tokens.
 
 enum BaseKind { BK_INT, BK_CHAR, BK_FLOAT, BK_DOUBLE, BK_VOID,
                 BK_STRUCT, BK_UNION, BK_ENUM, BK_CLASS };
@@ -20,11 +12,11 @@ enum Role { ROLE_VARIABLE, ROLE_PARAMETER,
 
 struct TypeInfo {
     BaseKind base_kind = BK_INT;
-    std::string composite_tag;      // "Point", "DataValue", ... (struct/union/enum/class only)
-    int pointer_depth = 0;          // 0 = plain, 1 = *, 2 = **
+    std::string composite_tag;
+    int pointer_depth = 0;
     bool is_array = false;
     Role role = ROLE_VARIABLE;
-    BaseKind return_type = BK_VOID; // only meaningful for FUNC roles; BK_VOID means "returns nothing"
+    BaseKind return_type = BK_VOID;   // only meaningful for FUNC roles
 };
 
 inline std::string base_kind_name(BaseKind bk) {
@@ -42,6 +34,8 @@ inline std::string base_kind_name(BaseKind bk) {
     return "UNKNOWN";
 }
 
+// Renders TypeInfo as the token table's Token_Type column, e.g.
+// "INT_VARIABLE", "CHAR_POINTER_PARAMETER", "FUNCTION_CALL(returns:INT)".
 inline std::string format_semantic_type(const TypeInfo& info) {
     switch (info.role) {
         case ROLE_FUNC_DEF:
@@ -60,11 +54,9 @@ inline std::string format_semantic_type(const TypeInfo& info) {
             if (info.is_array) modifier = "_ARRAY";
             else if (info.pointer_depth == 1) modifier = "_POINTER";
             else if (info.pointer_depth >= 2) modifier = "_POINTER_POINTER";
-            // Parameters always keep an explicit _PARAMETER suffix regardless of
-            // modifier (INT_PARAMETER, CHAR_POINTER_PARAMETER, INT_ARRAY_PARAMETER).
-            // Plain variables keep _VARIABLE only when there's no modifier — a
-            // pointer/array variable's modifier already makes it unambiguous
-            // (INT_POINTER, INT_ARRAY, not INT_POINTER_VARIABLE).
+            // Parameters always get _PARAMETER suffix; plain variables use
+            // _VARIABLE only when no modifier is present (pointer/array is
+            // already unambiguous).
             if (info.role == ROLE_PARAMETER) return base_kind_name(info.base_kind) + modifier + "_PARAMETER";
             if (modifier.empty()) return base_kind_name(info.base_kind) + "_VARIABLE";
             return base_kind_name(info.base_kind) + modifier;
