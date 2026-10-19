@@ -127,7 +127,6 @@ function_definition
         ret_type.pointer_depth = $2->pointer_depth;
         TypeInfo info;
         info.make_function(ret_type);
-        info.role = ROLE_FUNC_DEF;
         g_symtab.insert_global($2->name, info, yylineno, $2->token_index);
         g_current_func_name = $2->name;
       }
@@ -223,11 +222,11 @@ enumerator_list
 
 enumerator
     : T_IDENTIFIER {
-        TypeInfo info{}; info.role = ROLE_ENUM_CONST;
+        TypeInfo info{}; info.base_kind = BK_INT; info.is_const = true;
         g_symtab.insert_global(g_tokens[$1].lexeme, info, yylineno, $1);
       }
     | T_IDENTIFIER T_ASSIGN conditional_expr {
-        TypeInfo info{}; info.role = ROLE_ENUM_CONST;
+        TypeInfo info{}; info.base_kind = BK_INT; info.is_const = true;
         g_symtab.insert_global(g_tokens[$1].lexeme, info, yylineno, $1);
       }
     ;
@@ -280,14 +279,13 @@ init_declarator
             ret_type.pointer_depth = $1->pointer_depth;
             TypeInfo info;
             info.make_function(ret_type);
-            info.role = ROLE_FUNC_PROTO;
             g_symtab.insert_global($1->name, info, yylineno, $1->token_index);
             g_symtab.pop_scope();
         } else {
             TypeInfo info = *g_current_decl_type;
             info.pointer_depth = $1->pointer_depth;
             if ($1->is_array) info.make_array();
-            info.role = g_pending_typedef ? ROLE_TYPEDEF : ROLE_VARIABLE;
+            info.is_typedef = g_pending_typedef;
             g_symtab.insert($1->name, info, yylineno, $1->token_index);
         }
       }
@@ -295,7 +293,7 @@ init_declarator
         TypeInfo info = *g_current_decl_type;
         info.pointer_depth = $1->pointer_depth;
         if ($1->is_array) info.make_array();
-        info.role = g_pending_typedef ? ROLE_TYPEDEF : ROLE_VARIABLE;
+        info.is_typedef = g_pending_typedef;
         g_symtab.insert($1->name, info, yylineno, $1->token_index);
       } initializer
     ;
@@ -349,7 +347,6 @@ param_decl
         TypeInfo info = *$1;
         info.pointer_depth = $2->pointer_depth;
         if ($2->is_array) info.make_array();
-        info.role = ROLE_PARAMETER;
         g_symtab.insert($2->name, info, yylineno, $2->token_index);
       }
     | declaration_specifiers
@@ -454,7 +451,7 @@ primary_expr
     | T_CHAR_CONST              { $$ = -1; }
     | T_STRING_LITERAL          { $$ = -1; }
     | T_THIS                    { $$ = -1; }
-    | T_LPAREN expr T_RPAREN   { $$ = -1; }
+    | T_LPAREN expr T_RPAREN    { $$ = -1; }
     ;
 
 postfix_expr
