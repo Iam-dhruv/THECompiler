@@ -1,4 +1,4 @@
-# THECompiler — Syntax Analyzer
+# THECompiler
 
 ## Team
 
@@ -11,272 +11,71 @@
 
 ## Overview
 
-A syntax analyzer and semantic classifier for a C/C++ inspired source
-language, built with **Bison/YACC** (parser) and **Flex** (lexer) in C++17.
+A compiler front end for a C/C++-inspired source language, built with
+**Flex** (lexer) and **Bison/YACC** (parser) in C++17. It has three tools,
+one per stage:
 
-Given a source file, the analyzer:
+| Stage | Tool | Input → Output |
+|:------|:-----|:---------------|
+| 1. Lexical analysis | `lexer_app` | source → token table |
+| 2. Syntax analysis + semantic labelling | `syntax_analyzer` | source → 4-column report (lexeme, token, type, scope) or syntax errors |
+| 3. Type checking + intermediate code generation | `ir_generator` | source → **three-address code (3AC) in a `.ir` file**, or lexical/syntax/semantic errors |
 
-1. **Tokenizes** the input via a Flex-generated lexer.
-2. **Parses** the token stream against an LALR(1) grammar (zero
-   shift/reduce conflicts).
-3. **Classifies** every identifier semantically — type, modifier, role,
-   and scope — in a single pass using a **scoped symbol table**.
-4. **Outputs** a four-column report table (`Lexeme | Token_Name |
-   Token_Type | Scope`) if the program is valid, or a list of syntax
-   errors with line numbers if it isn't.
-
-Exit code `0` = valid program; `1` = syntax or lexical error.
+Every tool exits with `0` for a valid program and `1` on an error.
 
 ---
 
-## Architecture
+## Pipeline
 
 ```
-┌──────────────┐    tokens    ┌──────────────────┐   classified   ┌──────────────┐
-│  Flex Lexer  │ ──────────►  │   Bison Parser   │ ────────────►  │  4-Column    │
-│ parser_lexer │   + record   │    parser.y       │    output      │  Report      │
-│     .l       │   TokenRecord│  (LALR(1) grammar)│                │  Table       │
-└──────────────┘              └────────┬─────────┘                └──────────────┘
-                                       │
-                                       ▼
-                              ┌──────────────────┐
-                              │ ScopedSymbolTable │
-                              │  (nested scopes,  │
-                              │   shadowing,       │
-                              │   classification)  │
-                              └──────────────────┘
+                 ┌─────────────┐  tokens  ┌──────────────────────────┐
+  prog.c  ─────► │ Flex lexer  │ ───────► │ Bison parser (LALR(1),   │
+                 │ ir_lexer.l  │ ◄─────── │ 0 conflicts)  ir.y       │
+                 └─────────────┘ typedef  └────────────┬─────────────┘
+                                 lookups               │ grammar actions
+                     ┌─────────────────────────────────┼──────────────────────┐
+                     ▼                                 ▼                      ▼
+          ┌────────────────────┐         ┌──────────────────────┐  ┌────────────────────┐
+          │ ScopedSymbolTable  │         │ Type checker         │  │ 3AC generator      │
+          │ scopes, shadowing, │ ◄─────► │ type_check.h         │─►│ ir_gen.h: quads,   │
+          │ overload sets      │         │ conversions, errors  │  │ backpatching, .data│
+          └────────────────────┘         └──────────────────────┘  └─────────┬──────────┘
+                                                                             ▼
+                                                                         prog.ir
 ```
 
-### Source Files
-
-```
-src/parser/
-├── parser.y                 Bison grammar + semantic actions + main()
-├── parser_lexer.l           Flex scanner feeding Bison token codes
-├── common.h                 TokenRecord struct (lexeme, token_name, token_type, scope)
-├── scoped_symbol_table.h    Scope stack with push/pop, insert, lookup, scope labeling
-└── semantic_types.h         BaseKind, Role, TypeInfo enums + format_semantic_type()
-```
-
-### Key Design Decisions
-
-- **Single-pass classification** — no AST is built. The parser's semantic
-  actions classify identifiers inline as they're reduced, using a scoped
-  symbol table.
-- **Scope labeling** — each scope is named hierarchically
-  (e.g. `main`, `main.block1`, `struct:Point`, `class:Shape.getArea`).
-  On `pop_scope()`, all tokens in the scope's range are bulk-labeled.
-- **Identifier reclassification** — an identifier's `Token_Type` starts as
-  `T_IDENTIFIER` and is reclassified based on context:
-  `INT_VARIABLE`, `FLOAT_PARAMETER`, `FUNCTION_DEFINITION(returns:INT)`,
-  `STRUCT_TAG`, `ENUM_CONSTANT`, `LABEL`, etc.
-- **Error recovery** — `error ';'` and `error '}'` productions at both
-  statement and top-level scope, allowing multiple syntax errors to be
-  reported in one run.
-- **Zero conflicts** — the grammar builds with no shift/reduce or
-  reduce/reduce conflicts. Dangling `else` is resolved via Bison
-  precedence declarations.
-
----
-
-## Features Implemented
-
-### Basic Features
-
-| Feature | Status | Notes |
-|:--------|:------:|:------|
-| Arithmetic, relational, logical, bitwise operators | ✅ | Full precedence chain with all compound assignments (`+=`, `<<=`, etc.) |
-| `if`/`else` conditionals | ✅ | Braced bodies get nested block scopes |
-| `for` / `while` / `do-while` loops | ✅ | Includes `for(;;)` infinite form |
-| `switch`/`case`/`default` | ✅ | Braced case bodies are scoped; switch body follows C fallthrough |
-| Arrays (`int[]`, `char[]`, multi-dimensional) | ✅ | Classified as `INT_ARRAY`, `CHAR_ARRAY`, etc. |
-| Pointers (single and multi-level) | ✅ | `INT_POINTER`, `INT_POINTER_POINTER` |
-| Structures (`struct`) | ✅ | `STRUCT_TAG` / `STRUCT_VARIABLE` / `STRUCT_POINTER`; body gets `struct:Name` scope |
-| Function definitions, prototypes, and calls | ✅ | `FUNCTION_DEFINITION(returns:INT)`, `FUNCTION_CALL(returns:UNKNOWN)` for undeclared calls |
-| `goto`, `break`, `continue`, labels | ✅ | Labels classified as `LABEL` (forward + backward) |
-| `static` keyword | ✅ | Parses as storage-class specifier |
-| `printf` / `scanf` | ✅ | Resolved as undeclared function calls |
-
-### Advanced Features
-
-| Feature | Status | Notes |
-|:--------|:------:|:------|
-| Recursive functions | ✅ | Self-calls resolve correctly; mutual recursion via prototypes |
-| Dynamic memory (`new`/`delete`) | ✅ | `new int`, `new int[100]`, `delete p`, `delete[] arr` |
-| Function pointers | ✅ | `int (*fp)(int,int)` and calls `fp(x,y)` / `(*fp)(x,y)` parse |
-| Command-line args (`argc`, `argv`) | ✅ | Parses `int main(int argc, char *argv[])` |
-| `typedef` | ✅ | Declarations classified as `TYPEDEF_NAME` |
-| References (`&`) | ✅ | `int &ref = x;` and pass-by-reference parameters parse |
-| `enum` and `union` | ✅ | `ENUM_TAG`/`UNION_TAG`, `ENUM_CONSTANT`; body scopes `enum:Name` / `union:Name` |
-| `until` loop | ✅ | Both forms: `do { } until (c);` and standalone `until (c) { }` |
-| Multi-level pointers | ✅ | Parses `**`, `***` to any depth |
-| Multi-dimensional arrays | ✅ | Declaration and indexing to any depth |
-| Function overloading | ✅ | Multiple declarations with same name parse correctly |
-
-### OOP Features (Optional)
-
-| Feature | Status | Notes |
-|:--------|:------:|:------|
-| Classes (`class Name { ... }`) | ✅ | `CLASS_TAG`, methods scoped `class:Shape.getArea` |
-| Access specifiers (`public`, `private`, `protected`) | ✅ | Labels parse inside class bodies |
-| `this`, `new`, `delete` | ✅ | Keywords recognized and parsed |
-
----
-
-## Example Output
-
-**Valid program:**
-
-```c
-int add(int a, int b) {
-    int result;
-    result = a + b;
-    return result;
-}
-int main() {
-    int x = add(3, 4);
-    return 0;
-}
-```
-
-```
-Lexeme              Token_Name          Token_Type                              Scope
-------------------------------------------------------------------------------------------
-int                 T_INT               T_INT                                   global
-add                 T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
-(                   T_LPAREN            T_LPAREN                                global
-int                 T_INT               T_INT                                   global
-a                   T_IDENTIFIER        INT_PARAMETER                           add
-,                   T_COMMA             T_COMMA                                 add
-int                 T_INT               T_INT                                   add
-b                   T_IDENTIFIER        INT_PARAMETER                           add
-...
-x                   T_IDENTIFIER        INT_VARIABLE                            main
-=                   T_ASSIGN            T_ASSIGN                                main
-add                 T_IDENTIFIER        FUNCTION_CALL(returns:INT)              main
-```
-
-**Invalid program:**
-
-```c
-int main() {
-    int x = 10
-    return x;
-}
-```
-
-```
-Syntax errors were found in 'tests/parser/invalid/syntax_invalid_missing_semicolon.c':
-Syntax Error at line 3: syntax error, unexpected T_RETURN, expecting T_SEMICOLON or T_COMMA
-1 syntax error(s) found.
-```
-
----
-
-## Test Suite
-
-**All 26 parser tests pass** — 12 valid + 14 invalid.
-
-### Valid Syntax Tests
-
-| Test File | What It Covers |
-|:----------|:---------------|
-| `syntax_valid_basic.c` | Functions, parameters, declarations, calls, `return` |
-| `syntax_valid_control_flow.c` | `if`/`else`, `for`, `while`, `do-while`, `do-until`, `switch`, `break`, `continue`, `goto` |
-| `syntax_valid_expressions.c` | Full operator precedence: arithmetic, relational, logical, bitwise, ternary, compound-assignment |
-| `syntax_valid_operators_expressions.c` | All operators, pointer arithmetic, cast-style expressions |
-| `syntax_valid_composite_types.c` | `struct`, `enum`, `union`, `static`, nested structs, `printf`/`scanf` |
-| `syntax_valid_oop_features.c` | `class`, `typedef`, access specifiers, `this`, `new`, `delete` |
-| `syntax_valid_pointers_arrays.c` | Single/multi-level pointers, multi-dimensional arrays, pointer-to-pointer |
-| `syntax_valid_functions_recursion.c` | Recursive calls, mutual recursion, overloaded declarations, `argc`/`argv` |
-| `syntax_valid_advanced.c` | Complex nested scoping, multiple functions, mixed types |
-| `syntax_valid_advanced_features.c` | `until` loop (both forms), `new int[n]`, `delete[]`, dynamic allocation |
-| `syntax_valid_scoping_edge_cases.c` | Variable shadowing, nested blocks, forward/backward `goto` |
-| `syntax_valid_type_classification_matrix.c` | Exhaustive type × modifier × role classification coverage |
-
-### Invalid Syntax Tests
-
-| Test File | Error Exercised |
-|:----------|:----------------|
-| `syntax_invalid_missing_semicolon.c` | Missing `;` after declaration |
-| `syntax_invalid_unbalanced_braces.c` | Missing closing `}` |
-| `syntax_invalid_unbalanced_parens.c` | Missing closing `)` |
-| `syntax_invalid_bad_expression.c` | Empty RHS (`x = ;`) |
-| `syntax_invalid_bad_control_flow.c` | Missing `)` in `if` condition |
-| `syntax_invalid_bad_struct_decl.c` | Malformed struct body |
-| `syntax_invalid_bad_enum_decl.c` | Malformed enum body |
-| `syntax_invalid_bad_array_decl.c` | Bad array declaration |
-| `syntax_invalid_bad_class_access.c` | Invalid class member access |
-| `syntax_invalid_bad_function_ptr.c` | Malformed function pointer |
-| `syntax_invalid_bad_reference.c` | Invalid reference usage |
-| `syntax_invalid_bad_switch.c` | Malformed switch statement |
-| `syntax_invalid_bad_until.c` | `until` without parenthesized condition |
-| `syntax_invalid_two_errors.c` | Multiple errors reported in one run (error recovery) |
-
----
-
-## How to Build & Run
-
-### Prerequisites
-
-- **Bison** (≥ 2.4, ideally 3.x)
-- **Flex**
-- **g++** (C++17 support)
-
-### Build
-
-```bash
-make parser          # build syntax_analyzer only
-make                 # build everything
-```
-
-### Run
-
-```bash
-./syntax_analyzer tests/parser/valid/syntax_valid_basic.c
-```
-
-### Run Tests
-
-```bash
-# Parser tests only
-make test-parser
-bash scripts/run_parser_tests.sh
-
-# All tests
-make test
-bash run.sh
-```
-
-**Windows (PowerShell):**
-
-```powershell
-.\scripts\run_parser_tests.ps1
-.\run_tests.ps1 -Parser
-```
-
-### Clean
-
-```bash
-make clean
-```
+All three jobs happen in **one pass** over the source: there is no syntax
+tree. Each grammar action checks the types of its operands first and only
+then emits code; any semantic error stops the IR file from being written.
 
 ---
 
 ## Intermediate Code Generation (3AC)
 
-`ir_generator` type-checks a program and translates it to three-address
-code in the same single pass, writing the IR to a file.
+### Usage
 
 ```bash
-make ir                                        # build ir_generator
-./ir_generator tests/ir/valid/14_recursion.c   # writes tests/ir/valid/14_recursion.ir
-./ir_generator prog.c -o prog.ir               # choose the output path
-make test-ir                                   # or: ./run.sh --ir
+make ir                                 # build ir_generator
+./ir_generator prog.c                   # writes prog.ir next to prog.c
+./ir_generator prog.c -o out/prog.ir    # choose the output path
 ```
 
-Errors (lexical, syntax, semantic) go to stderr with exit code 1, and no
-IR file is written. For `int fact(int n) { if (n <= 1) return 1; return n * fact(n - 1); }`:
+On success it prints `IR written to <path>`. On an error it prints the
+messages to stderr, exits with `1`, and writes no file:
+
+```
+Semantic errors found:
+Semantic Error at line 4: 'b' undeclared
+```
+
+### Example
+
+```c
+int fact(int n) {
+    if (n <= 1) return 1;
+    return n * fact(n - 1);
+}
+```
 
 ```
 .data
@@ -295,11 +94,176 @@ func_begin fact@i
 func_end fact@i
 ```
 
-Control flow uses backpatching, functions are mangled `name@<param codes>`
-to support overloading, and `.types` / `.data` sections hold struct layouts,
-globals, statics and string literals. See `FEATURE_PROGRESS.md` →
-*IR generation (stage 4)* for the per-feature translation table, and
-`tests/ir/` for one hand-verified test per feature.
+### Output format
+
+An `.ir` file has up to three sections:
+
+| Section | Contents |
+|:--------|:---------|
+| `.types` | Struct/union layouts: `struct Point: size 8 { x:int @0, y:int @4 }` (only when the program has any) |
+| `.data` | Globals, `static` variables and string literals: `name: type (size) = init` |
+| `.text` | One `func_begin` … `func_end` block per function, listing its `params` and `locals`, then numbered instructions |
+
+Instructions are numbered across the whole file, and jump targets are
+instruction numbers. Temporaries `t1, t2, …` restart in each function.
+
+| Instruction | Meaning |
+|:------------|:--------|
+| `x = y op z`, `x = -y`, `x = ~y` | Arithmetic, bitwise, shift |
+| `x = (float) y` | Explicit type conversion (int ↔ float, float ↔ double) |
+| `x = &y`, `x = *p`, `*p = y` | Address-of, load through pointer, store through pointer |
+| `x = a[8]`, `a[8] = y` | Load/store the object **8 bytes** into variable `a` |
+| `goto 7`, `if x < y goto 7`, `if x goto 7` | Jumps |
+| `param x`, `t = call f@ii, 2`, `t = icall fp, 2` | Calls (direct and through a function pointer) |
+| `return x`, `t = new 16`, `delete p` | Return, allocate, free |
+
+A `.strN` operand is the address of a string literal, and `&f@ii` is the
+address of a function.
+
+### How it works
+
+- **Backpatching** (Dragon book §6.6–6.7): conditions are compiled to jumps
+  whose targets are filled in once known, giving short-circuit `&&` / `||`
+  and all loops, `switch` and `goto` without a syntax tree.
+- **Name mangling:** every function except `main` is named
+  `name@<parameter codes>` (`add@ii`, `add@ff`), which is what makes
+  overloading possible. Codes: `i` int, `c` char, `f` float, `d` double,
+  `P` pointer, `R` reference, `S5Point` struct Point, `v` no parameters.
+- **Memory layout:** structs get real offsets (each member aligned to its
+  own size); arrays are row-major; pointer arithmetic is scaled by the
+  element size.
+- **Constant folding** of integer expressions, so `2 * 3 + 4` becomes `10`.
+
+### Features
+
+All 24 features of the specification are translated, each with a test in
+`tests/ir/valid/` whose expected IR was written by hand:
+
+| Basic | Advanced |
+|:------|:---------|
+| Arithmetic & logical operators (`01`) | Recursion (`14`) |
+| `if` / `if-else` (`02`) | Dynamic memory: `new`, `delete`, `malloc`, `free` (`15`) |
+| `for` loop (`03`) | Function pointers (`16`) |
+| `while` loop (`04`) | Command-line input `argc` / `argv` (`17`) |
+| `do-while` loop (`05`) | `typedef` (`18`) |
+| `switch` / `case` / `default` (`06`) | References (`19`) |
+| Arrays, int and char (`07`) | `enum`, `union` (`20`) |
+| Pointers (`08`) | `until` loop (`21`) |
+| Structures (`09`) | Multi-level pointers (`22`) |
+| `printf` / `scanf` (`10`) | Multi-dimensional arrays (`23`) |
+| Function calls with arguments (`11`) | Function overloading (`24`) |
+| `goto`, `break`, `continue` (`12`) | Short-circuit boolean values (`25`) |
+| `static` (`13`) | Implicit type conversions (`26`) |
+
+### Type checking
+
+Reported as `Semantic Error at line N: …` (tests in `tests/ir/invalid/`):
+
+- undeclared or redeclared names
+- assignment to a non-lvalue, or with an incompatible type
+- invalid operand types (e.g. `%` on a float)
+- wrong argument count or types; ambiguous or missing overload; overloads
+  differing only in return type
+- `return` not matching the function's return type
+- function-pointer signature mismatch
+- invalid `*`, `.`, `->`, `[]`
+- non-constant array size or global initializer
+- `break` / `continue` outside a loop; non-integer `switch`; duplicate `case`
+- undefined or duplicate labels
+- invalid reference binding
+
+---
+
+## Syntax Analysis (stage 2)
+
+`syntax_analyzer` parses the program and labels every identifier with its
+type, modifier, role and scope.
+
+```c
+int add(int a, int b) { return a + b; }
+```
+
+```
+Lexeme              Token_Name          Token_Type                              Scope
+------------------------------------------------------------------------------------------
+int                 T_INT               T_INT                                   global
+add                 T_IDENTIFIER        FUNCTION_DEFINITION(returns:INT)        global
+(                   T_LPAREN            T_LPAREN                                global
+int                 T_INT               T_INT                                   global
+a                   T_IDENTIFIER        INT_PARAMETER                           add
+...
+```
+
+Design highlights:
+
+- **Scope labeling** — scopes are named hierarchically (`main`,
+  `main.block1`, `struct:Point`, `class:Shape.getArea`).
+- **Error recovery** — `error ';'` and `error '}'` productions let several
+  syntax errors be reported in one run.
+- **Zero conflicts** — dangling `else` is resolved with Bison precedence.
+
+A per-feature status of the labelling stage, including its known labelling
+defects, is in `FEATURE_PROGRESS.md`.
+
+---
+
+## How to Build & Run
+
+### Prerequisites
+
+- **Bison** (3.x)
+- **Flex**
+- **g++** with C++17 support
+
+### Build
+
+```bash
+make                 # build all three tools
+make lexer           # lexer_app only
+make parser          # syntax_analyzer only
+make ir              # ir_generator only
+```
+
+### Run
+
+```bash
+./lexer_app tests/lexer/valid/valid_basic.c
+./syntax_analyzer tests/parser/valid/syntax_valid_basic.c
+./ir_generator tests/ir/valid/14_recursion.c && cat tests/ir/valid/14_recursion.ir
+```
+
+### Run tests
+
+```bash
+make test            # all suites
+./run.sh             # all suites
+./run.sh --ir        # one suite: --lexer, --parser or --ir (flags combine)
+./run.sh --ir -v     # verbose: also print each test's output
+```
+
+**Windows (PowerShell):** `.\run_tests.ps1 -Parser`, or the scripts in
+`scripts\*.ps1` (lexer and parser suites).
+
+### Clean
+
+```bash
+make clean
+```
+
+---
+
+## Test Suite
+
+| Suite | Valid | Invalid | Checked against |
+|:------|:-----:|:-------:|:----------------|
+| Lexer (`tests/lexer/`) | 21 | 14 | expected token tables / error messages |
+| Parser (`tests/parser/`) | 38 | 17 | expected 4-column reports / syntax errors |
+| IR (`tests/ir/`) | 27 | 15 | hand-written expected `.ir` / semantic errors |
+
+For an IR test, `tests/ir/valid/<name>.c` must produce exactly
+`tests/ir/expected/valid/<name>.ir`, and `tests/ir/invalid/<name>.c` must
+fail with exactly `tests/ir/expected/invalid/<name>.txt`. To add a test,
+add both files; the runner picks them up automatically.
 
 ---
 
@@ -307,52 +271,57 @@ globals, statics and string literals. See `FEATURE_PROGRESS.md` →
 
 ```
 THECompiler/
-├── Makefile                    Root orchestrator
-├── Makefile.parser             Builds syntax_analyzer
+├── Makefile                    Root orchestrator (lexer, parser, ir, test)
 ├── Makefile.lexer              Builds lexer_app
-├── run.sh                      Unified test wrapper (bash)
-├── run_tests.ps1               Unified test wrapper (PowerShell)
+├── Makefile.parser             Builds syntax_analyzer
+├── Makefile.ir                 Builds ir_generator
+├── run.sh                      Unified test runner (bash)
+├── run_tests.ps1               Unified test runner (PowerShell)
+├── README.md
+├── FEATURE_PROGRESS.md         Per-feature status for every stage
 ├── scripts/
-│   ├── run_parser_tests.sh     Parser test runner (bash)
-│   ├── run_parser_tests.ps1    Parser test runner (PowerShell)
-│   ├── run_lexer_tests.sh      Lexer test runner (bash)
-│   └── run_lexer_tests.ps1     Lexer test runner (PowerShell)
+│   ├── run_lexer_tests.sh / .ps1
+│   ├── run_parser_tests.sh / .ps1
+│   └── run_ir_tests.sh
 ├── src/
-│   ├── parser/                 Syntax analyzer sources
+│   ├── lexer/                  Stage 1: standalone lexer
+│   │   ├── lexer.l
+│   │   ├── tokens.h
+│   │   └── symbol_table.h
+│   ├── parser/                 Stage 2: syntax analyzer
 │   │   ├── parser.y
 │   │   ├── parser_lexer.l
 │   │   ├── common.h
 │   │   ├── scoped_symbol_table.h
 │   │   └── semantic_types.h
-│   └── lexer/                  Standalone lexer sources
-│       ├── lexer.l
-│       ├── tokens.h
-│       └── symbol_table.h
+│   └── ir/                     Stage 3: type checker + IR generator
+│       ├── ir.y                    Grammar, declarations, statements, main()
+│       ├── ir_lexer.l              Lexer with typedef-name feedback
+│       ├── type_check.h            Type checking + expression translation
+│       ├── ir_gen.h                Quads, backpatching, .data, IR printer
+│       ├── semantic_types.h        Types, sizes, layouts, name mangling
+│       ├── scoped_symbol_table.h   Scopes and function overload sets
+│       ├── string_pool.h           Interned lexemes
+│       └── common.h                TokenRecord
 └── tests/
-    ├── parser/
-    │   ├── valid/               12 syntax_valid_*.c files
-    │   ├── invalid/             14 syntax_invalid_*.c files
-    │   └── expected/
-    │       ├── valid/           Expected outputs for valid tests
-    │       └── invalid/         Expected outputs for invalid tests
-    └── lexer/
-        ├── valid/               18 valid_*.c files
-        ├── invalid/             13 invalid_*.c files
-        └── expected/
-            ├── valid/
-            └── invalid/
+    ├── lexer/   { valid, invalid, expected }
+    ├── parser/  { valid, invalid, expected }
+    └── ir/      { valid, invalid, expected/{valid, invalid} }
 ```
 
 ---
 
-## Grammar Design Notes
+## Language Notes and Limitations
 
-- Trimmed-down ANSI C grammar adapted for this project's token set.
-- **No C-style casts or `sizeof`** — avoiding the typedef-name problem
-  (would require symbol table feedback into the lexer).
-- **`typedef`'d names can't be reused as type specifiers** — `typedef int
-  Integer;` parses, but `Integer x;` does not (documented non-goal).
-- **Dangling `else`** resolved via Bison precedence (standard approach).
-- **Lexical errors are fatal** — unterminated strings, invalid characters,
-  etc. immediately abort analysis rather than feeding bad tokens to the
-  parser.
+- No C-style casts, `sizeof`, comma operator or preprocessor (`#include`);
+  `printf`, `scanf`, `malloc` and `free` are built in instead.
+- Floating-point literals have type `float` (the language has no suffixes).
+- Classes are excluded by the specification: they parse in the syntax
+  analyzer, but member functions and `this` are rejected by `ir_generator`.
+- `typedef` names are usable as types in `ir_generator` (the lexer consults
+  the symbol table); the stage-2 `syntax_analyzer` still rejects them.
+- Lexical errors are fatal — unterminated strings, invalid characters, etc.
+  stop analysis immediately.
+- **Known issue (stage 2):** `src/parser/parser_lexer.l` rejects some char
+  literals (`'n'`, `'\n'`, `'\0'`), which fails one parser test
+  (`syntax_valid_pointers_arrays.c`). The IR lexer has the fix.
