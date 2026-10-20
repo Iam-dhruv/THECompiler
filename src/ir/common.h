@@ -4,4 +4,5 @@
 // StringPool, so no string data is duplicated across records.
 struct TokenRecord {
     const char* lexeme;   // interned pointer into StringPool
+    int line;             // source line the token ended on
 };

@@ -1,0 +1,6 @@
+.data
+
+.text
+func_begin main
+  0: return 0
+func_end main

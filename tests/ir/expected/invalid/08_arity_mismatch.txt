@@ -1,0 +1,4 @@
+Semantic errors found:
+Semantic Error at line 4: function 'twice' expects 1 argument(s) but 2 were given
+Semantic Error at line 6: incompatible types in argument 1 of 'twice' ('int*' to 'int')
+Semantic Error at line 7: function 'twice' expects 1 argument(s) but 0 were given

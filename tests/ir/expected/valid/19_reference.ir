@@ -1,0 +1,32 @@
+.types
+  struct Point: size 8 { x:int @0, y:int @4 }
+
+.data
+
+.text
+func_begin bump@Ri
+  params: n:int&
+  0: t1 = *n
+  1: t2 = t1 + 1
+  2: *n = t2
+  3: return
+func_end bump@Ri
+
+func_begin main
+  locals: value:int, ref:int&, origin:struct Point, alias:struct Point&
+  4: value = 10
+  5: ref = &value
+  6: *ref = 20
+  7: t1 = *ref
+  8: t2 = value + t1
+  9: value = t2
+  10: alias = &origin
+  11: t3 = alias + 4
+  12: *t3 = 1
+  13: t4 = &value
+  14: param t4
+  15: call bump@Ri, 1
+  16: param ref
+  17: call bump@Ri, 1
+  18: return value
+func_end main

@@ -1,0 +1,3 @@
+Semantic errors found:
+Semantic Error at line 7: duplicate label 'again'
+Semantic Error at line 4: label 'missing' used but not defined

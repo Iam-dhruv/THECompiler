@@ -1,0 +1,49 @@
+.data
+
+.text
+func_begin main
+  locals: a:int, b:int, c:int
+  0: a = 7
+  1: b = 3
+  2: t1 = b * 2
+  3: t2 = a + t1
+  4: c = t2
+  5: t3 = a - b
+  6: t4 = t3 / 2
+  7: t5 = t4 % 3
+  8: c = t5
+  9: t6 = a << 2
+  10: t7 = b & 1
+  11: t8 = t7 ^ 5
+  12: t9 = t6 | t8
+  13: c = t9
+  14: t10 = -a
+  15: t11 = ~b
+  16: t12 = t10 + t11
+  17: c = t12
+  18: t13 = c + a
+  19: c = t13
+  20: t14 = c << 1
+  21: c = t14
+  22: t15 = a
+  23: a = a + 1
+  24: b = b - 1
+  25: c = 10
+  26: if a > 0 goto 28
+  27: goto 32
+  28: if b < 5 goto 30
+  29: goto 32
+  30: t16 = 1
+  31: goto 33
+  32: t16 = 0
+  33: c = t16
+  34: if a == b goto 36
+  35: goto 38
+  36: if c != 0 goto 38
+  37: goto 40
+  38: t17 = 1
+  39: goto 41
+  40: t17 = 0
+  41: c = t17
+  42: return c
+func_end main

@@ -1,0 +1,2 @@
+Semantic errors found:
+Semantic Error at line 7: redeclaration of 'x'

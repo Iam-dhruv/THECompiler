@@ -7,12 +7,13 @@
 #   make lexer          — build lexer_app only
 #   make parser         — build syntax_analyzer only
 #   make ir             — build ir_generator only
-#   make test           — run all tests (lexer + parser)
+#   make test           — run all tests (lexer + parser + ir)
 #   make test-lexer     — run lexer tests only
 #   make test-parser    — run parser tests only
+#   make test-ir        — run IR generator tests only
 #   make clean          — remove all generated files
 
-.PHONY: all lexer parser syntax ir test test-lexer test-parser clean
+.PHONY: all lexer parser syntax ir test test-lexer test-parser test-ir clean
 
 all: lexer parser ir
 
@@ -27,13 +28,16 @@ syntax: parser
 ir:
 	$(MAKE) -f Makefile.ir all
 
-test: test-lexer test-parser
+test: test-lexer test-parser test-ir
 
 test-lexer: lexer
 	$(MAKE) -f Makefile.lexer test
 
 test-parser: parser
 	$(MAKE) -f Makefile.parser test
+
+test-ir: ir
+	$(MAKE) -f Makefile.ir test
 
 clean:
 	$(MAKE) -f Makefile.lexer clean

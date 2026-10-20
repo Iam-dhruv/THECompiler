@@ -1,0 +1,24 @@
+.data
+
+.text
+func_begin main
+  locals: i:int, f:float, d:double, ch:char
+  0: i = 5
+  1: f = 2.5
+  2: ch = 'A'
+  3: t1 = (float) i
+  4: t2 = t1 + f
+  5: f = t2
+  6: t3 = f * 2.0
+  7: t4 = (int) t3
+  8: i = t4
+  9: t5 = (double) f
+  10: d = t5
+  11: t6 = d + 1.0
+  12: d = t6
+  13: f = 3.0
+  14: i = 7
+  15: t7 = ch + 1
+  16: i = t7
+  17: return i
+func_end main

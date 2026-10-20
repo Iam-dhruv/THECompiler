@@ -1,0 +1,4 @@
+Semantic errors found:
+Semantic Error at line 6: invalid operands to binary '%' ('float' and 'int')
+Semantic Error at line 7: invalid operands to binary '*' ('int*' and 'int')
+Semantic Error at line 8: invalid operands to binary '<<' ('int' and 'float')

@@ -1,0 +1,21 @@
+.types
+  union Value: size 4 { i:int @0, f:float @0, bytes:char[4] @0 }
+
+.data
+
+.text
+func_begin main
+  locals: c:enum Color, v:union Value, vp:union Value*, table:int[6]
+  0: c = 6
+  1: t1 = &v
+  2: vp = t1
+  3: v[0] = 6
+  4: v[0] = 1.5
+  5: t2 = vp + 2
+  6: *t2 = 'x'
+  7: if c == 6 goto 9
+  8: goto 10
+  9: c = 0
+  10: t3 = v[0]
+  11: return t3
+func_end main

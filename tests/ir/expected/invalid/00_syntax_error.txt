@@ -1,0 +1,2 @@
+Syntax errors found:
+Syntax Error at line 4: syntax error, unexpected T_SEMICOLON

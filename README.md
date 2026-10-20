@@ -263,6 +263,46 @@ make clean
 
 ---
 
+## Intermediate Code Generation (3AC)
+
+`ir_generator` type-checks a program and translates it to three-address
+code in the same single pass, writing the IR to a file.
+
+```bash
+make ir                                        # build ir_generator
+./ir_generator tests/ir/valid/14_recursion.c   # writes tests/ir/valid/14_recursion.ir
+./ir_generator prog.c -o prog.ir               # choose the output path
+make test-ir                                   # or: ./run.sh --ir
+```
+
+Errors (lexical, syntax, semantic) go to stderr with exit code 1, and no
+IR file is written. For `int fact(int n) { if (n <= 1) return 1; return n * fact(n - 1); }`:
+
+```
+.data
+
+.text
+func_begin fact@i
+  params: n:int
+  0: if n <= 1 goto 2
+  1: goto 3
+  2: return 1
+  3: t1 = n - 1
+  4: param t1
+  5: t2 = call fact@i, 1
+  6: t3 = n * t2
+  7: return t3
+func_end fact@i
+```
+
+Control flow uses backpatching, functions are mangled `name@<param codes>`
+to support overloading, and `.types` / `.data` sections hold struct layouts,
+globals, statics and string literals. See `FEATURE_PROGRESS.md` →
+*IR generation (stage 4)* for the per-feature translation table, and
+`tests/ir/` for one hand-verified test per feature.
+
+---
+
 ## Project Structure
 
 ```

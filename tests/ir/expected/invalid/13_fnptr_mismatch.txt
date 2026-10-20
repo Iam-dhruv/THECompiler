@@ -1,0 +1,4 @@
+Semantic errors found:
+Semantic Error at line 8: no overload of 'neg' matches 'int(*)(int,int)' in assignment
+Semantic Error at line 9: incompatible function pointer types in assignment ('int(*)(int)' to 'int(*)(int,int)')
+Semantic Error at line 10: function pointer of type 'int(*)(int,int)' expects 2 argument(s) but 1 were given

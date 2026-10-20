@@ -1,0 +1,44 @@
+.data
+
+.text
+func_begin corner@PA3_ii
+  params: m:int(*)[3], r:int
+  0: t1 = r * 12
+  1: t2 = m + t1
+  2: t3 = t2 + 8
+  3: t4 = *t3
+  4: return t4
+func_end corner@PA3_ii
+
+func_begin main
+  locals: m:int[2][3], flat:int[2][2], i:int, j:int, row:int(*)[3]
+  5: m[0] = 1
+  6: m[4] = 2
+  7: m[8] = 3
+  8: m[12] = 4
+  9: m[16] = 0
+  10: m[20] = 0
+  11: flat[0] = 1
+  12: flat[4] = 2
+  13: flat[8] = 3
+  14: flat[12] = 4
+  15: i = 1
+  16: j = 2
+  17: t1 = i * 12
+  18: t2 = j * 4
+  19: t3 = t1 + t2
+  20: t4 = m[4]
+  21: t5 = flat[8]
+  22: t6 = t4 + t5
+  23: m[t3] = t6
+  24: t7 = &m
+  25: row = t7
+  26: t8 = row + 12
+  27: t9 = &m
+  28: param t9
+  29: param i
+  30: t10 = call corner@PA3_ii, 2
+  31: *t8 = t10
+  32: t11 = m[20]
+  33: return t11
+func_end main

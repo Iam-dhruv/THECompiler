@@ -1,0 +1,26 @@
+.data
+
+.text
+func_begin main
+  locals: a:int[4], b:int[3], s:char[3], i:int
+  0: a[0] = 5
+  1: a[4] = 6
+  2: a[8] = 0
+  3: a[12] = 0
+  4: b[0] = 1
+  5: b[4] = 2
+  6: b[8] = 3
+  7: s[0] = 'h'
+  8: s[1] = 'i'
+  9: s[2] = '\0'
+  10: i = 2
+  11: t1 = i * 4
+  12: t2 = a[0]
+  13: t3 = i * 4
+  14: t4 = b[t3]
+  15: t5 = t2 + t4
+  16: a[t1] = t5
+  17: s[1] = 'o'
+  18: t6 = a[12]
+  19: return t6
+func_end main

@@ -1,0 +1,28 @@
+.types
+  struct Node: size 16 { value:int @0, next:struct Node* @8 }
+
+.data
+
+.text
+func_begin main
+  locals: n:int, one:int*, many:int*, node:struct Node*, buf:char*
+  0: n = 3
+  1: t1 = new 4
+  2: one = t1
+  3: t2 = n * 4
+  4: t3 = new t2
+  5: many = t3
+  6: t4 = new 16
+  7: node = t4
+  8: t5 = node + 8
+  9: *t5 = 0
+  10: param 16
+  11: t6 = call malloc, 1
+  12: buf = t6
+  13: *one = 1
+  14: delete one
+  15: delete many
+  16: param buf
+  17: call free, 1
+  18: return n
+func_end main

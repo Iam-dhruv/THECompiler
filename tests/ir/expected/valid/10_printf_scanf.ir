@@ -1,0 +1,31 @@
+.data
+  .str0: char[7] (7) = "hello\n"
+  .str1: char[4] (4) = "%d\n"
+  .str2: char[7] (7) = "%d %f\n"
+  .str3: char[3] (3) = "%d"
+
+.text
+func_begin main
+  locals: n:int, f:float
+  0: n = 5
+  1: f = 1.5
+  2: param .str0
+  3: t1 = call printf, 1
+  4: t2 = n * 2
+  5: t3 = t2 + 1
+  6: param .str1
+  7: param t3
+  8: t4 = call printf, 2
+  9: param .str2
+  10: param n
+  11: param f
+  12: t5 = call printf, 3
+  13: t6 = &n
+  14: param .str3
+  15: param t6
+  16: t7 = call scanf, 2
+  17: param .str1
+  18: param n
+  19: t8 = call printf, 2
+  20: return n
+func_end main

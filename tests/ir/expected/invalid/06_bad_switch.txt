@@ -1,0 +1,4 @@
+Semantic errors found:
+Semantic Error at line 6: switch quantity is not an integer ('float')
+Semantic Error at line 11: duplicate case value '1'
+Semantic Error at line 12: case label does not reduce to an integer constant

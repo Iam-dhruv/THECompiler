@@ -1,0 +1,5 @@
+Semantic errors found:
+Semantic Error at line 4: size of array 'bad' must be a positive integer constant
+Semantic Error at line 5: size of array 'zero' must be a positive integer constant
+Semantic Error at line 6: initializer element for 'copy' is not constant
+Semantic Error at line 8: size of array 'local' must be a positive integer constant

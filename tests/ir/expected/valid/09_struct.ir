@@ -1,0 +1,32 @@
+.types
+  struct Point: size 8 { x:int @0, y:int @4 }
+  struct Rect: size 24 { tag:char @0, corner:struct Point @4, area:double @16 }
+
+.data
+
+.text
+func_begin sum@S5Point
+  params: p:struct Point
+  0: t1 = p[0]
+  1: t2 = p[4]
+  2: t3 = t1 + t2
+  3: return t3
+func_end sum@S5Point
+
+func_begin main
+  locals: pt:struct Point, box:struct Rect, pp:struct Point*
+  4: pt[0] = 3
+  5: pt[4] = 4
+  6: t1 = &pt
+  7: pp = t1
+  8: t2 = pp + 4
+  9: *t2 = 6
+  10: t3 = pt[0]
+  11: box[4] = t3
+  12: box[16] = 2.0
+  13: param pt
+  14: t4 = call sum@S5Point, 1
+  15: t5 = box[8]
+  16: t6 = t4 + t5
+  17: return t6
+func_end main

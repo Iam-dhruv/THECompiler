@@ -1,0 +1,45 @@
+.data
+
+.text
+func_begin main
+  locals: x:int, y:int, r:int
+  0: x = 3
+  1: y = 0
+  2: if x < y goto 4
+  3: goto 6
+  4: t1 = 1
+  5: goto 7
+  6: t1 = 0
+  7: r = t1
+  8: if x goto 12
+  9: goto 10
+  10: t2 = 1
+  11: goto 13
+  12: t2 = 0
+  13: r = t2
+  14: if x goto 20
+  15: goto 16
+  16: if y goto 18
+  17: goto 22
+  18: if x goto 20
+  19: goto 22
+  20: t3 = 1
+  21: goto 23
+  22: t3 = 0
+  23: r = t3
+  24: if x goto 26
+  25: goto 28
+  26: t4 = y
+  27: goto 29
+  28: t4 = 10
+  29: r = t4
+  30: if x goto 32
+  31: goto 35
+  32: if y goto 35
+  33: goto 34
+  34: r = 1
+  35: goto 36
+  36: goto 38
+  37: goto 35
+  38: return r
+func_end main

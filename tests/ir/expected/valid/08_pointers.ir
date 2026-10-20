@@ -1,0 +1,27 @@
+.data
+
+.text
+func_begin main
+  locals: x:int, arr:int[3], p:int*, q:int*, d:int
+  0: x = 10
+  1: t1 = &x
+  2: p = t1
+  3: t2 = *p
+  4: t3 = t2 + 1
+  5: *p = t3
+  6: t4 = &arr
+  7: q = t4
+  8: t5 = q + 8
+  9: q = t5
+  10: *q = x
+  11: t6 = q
+  12: q = q + 4
+  13: t7 = &arr
+  14: t8 = q - t7
+  15: t9 = t8 / 4
+  16: d = t9
+  17: if p != 0 goto 19
+  18: goto 20
+  19: x = 0
+  20: return d
+func_end main

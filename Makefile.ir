@@ -2,6 +2,7 @@
 #
 # Usage:
 #   make -f Makefile.ir           — build ir_generator
+#   make -f Makefile.ir test      — run the IR test suite
 #   make -f Makefile.ir clean     — remove generated files
 
 CC       = g++
@@ -11,12 +12,12 @@ FLEX     = flex
 SRC_DIR  = src/ir
 TARGET   = ir_generator
 
-.PHONY: all clean
+.PHONY: all clean test
 
 all: $(TARGET)
 
 # Step 1: Bison — ir.y → parser.tab.c / parser.tab.h
-$(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h: $(SRC_DIR)/ir.y $(SRC_DIR)/common.h $(SRC_DIR)/scoped_symbol_table.h $(SRC_DIR)/semantic_types.h
+$(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h: $(SRC_DIR)/ir.y $(SRC_DIR)/common.h $(SRC_DIR)/scoped_symbol_table.h $(SRC_DIR)/semantic_types.h $(SRC_DIR)/ir_gen.h $(SRC_DIR)/type_check.h $(SRC_DIR)/string_pool.h
 	cd $(SRC_DIR) && (set BISON_PKGDATADIR=C:/PROGRA~2/GnuWin32/share/bison& set M4=C:/PROGRA~2/GnuWin32/bin/m4.exe& $(BISON) -d -o parser.tab.c ir.y) || $(BISON) -d -o parser.tab.c ir.y
 
 # Step 2: Flex — ir_lexer.l → lex.yy.ir.c
@@ -26,6 +27,10 @@ $(SRC_DIR)/lex.yy.ir.c: $(SRC_DIR)/ir_lexer.l $(SRC_DIR)/parser.tab.h $(SRC_DIR)
 # Step 3: Compile + link
 $(TARGET): $(SRC_DIR)/parser.tab.c $(SRC_DIR)/lex.yy.ir.c
 	$(CC) $(CFLAGS) $(SRC_DIR)/parser.tab.c $(SRC_DIR)/lex.yy.ir.c -o $(TARGET)
+
+# Run IR tests
+test: $(TARGET)
+	bash ./scripts/run_ir_tests.sh
 
 clean:
 	-rm -f $(SRC_DIR)/lex.yy.c $(SRC_DIR)/lex.yy.*.c $(SRC_DIR)/parser.tab.c $(SRC_DIR)/parser.tab.h $(SRC_DIR)/parser.output $(TARGET) $(TARGET).exe *.o $(SRC_DIR)/*.o 2>/dev/null || \

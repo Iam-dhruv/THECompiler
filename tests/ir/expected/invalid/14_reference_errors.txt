@@ -1,0 +1,6 @@
+Semantic errors found:
+Semantic Error at line 7: invalid initialization of reference 'r1' of type 'int&' from expression of type 'int'
+Semantic Error at line 8: invalid initialization of reference 'r2' of type 'int&' from expression of type 'float'
+Semantic Error at line 9: argument 1 of 'bump' must be an lvalue of type 'int' to bind to 'int&'
+Semantic Error at line 10: argument 1 of 'bump' must be an lvalue of type 'int' to bind to 'int&'
+Semantic Error at line 11: reference 'r3' must be initialized

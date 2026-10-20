@@ -3,16 +3,29 @@
 #include <vector>
 #include <string>
 #include "semantic_types.h"
-#include "common.h"
 
-extern std::vector<TokenRecord> g_tokens;
+enum SymKind { SK_VAR, SK_FUNC, SK_ENUM_CONST, SK_TYPEDEF };
 
 struct SymbolInfo {
-    const char* lexeme;    // interned pointer into StringPool
+    const char* lexeme = nullptr;  // interned pointer into StringPool
+    SymKind kind = SK_VAR;
     TypeInfo type_info;
-    int declared_line;
-    int token_index;
+    int declared_line = 0;
+    std::string ir_name;           // the name the IR uses (renamed if shadowing)
+    long enum_value = 0;           // SK_ENUM_CONST
+    bool static_storage = false;   // global or static: lives in .data
 };
+
+// One entry per overload of a function name. Function names are entered in
+// the global scope as a single SK_FUNC symbol; the overloads live here.
+struct FuncSym {
+    TypeInfo type;            // is_function() == true
+    std::string mangled;
+    bool defined = false;
+    int line = 0;
+};
+
+inline std::unordered_map<std::string, std::vector<FuncSym>> g_functions;
 
 // Scope stack for lexical scoping / name resolution. push_scope/pop_scope
 // track nesting; lookup() walks innermost → outermost.
@@ -23,6 +36,17 @@ class ScopedSymbolTable {
         int child_block_counter = 0;
     };
     std::vector<Scope> scope_stack;
+
+    static SymbolInfo* insert_into(Scope& scope, const char* lexeme, SymbolInfo info) {
+        if (scope.symbols.count(lexeme)) return nullptr;
+        info.lexeme = lexeme;
+        return &(scope.symbols[lexeme] = std::move(info));
+    }
+
+    static SymbolInfo* find_in(Scope& scope, const std::string& lexeme) {
+        auto found = scope.symbols.find(lexeme);
+        return found == scope.symbols.end() ? nullptr : &found->second;
+    }
 
 public:
     ScopedSymbolTable() { scope_stack.push_back({"global", {}, 0}); }
@@ -38,7 +62,7 @@ public:
     }
 
     void pop_scope() {
-        scope_stack.pop_back();
+        if (scope_stack.size() > 1) scope_stack.pop_back();
     }
 
     std::string current_scope_name() const {
@@ -48,19 +72,26 @@ public:
         return result;
     }
 
-    void insert(const char* lexeme, TypeInfo info, int line, int tok_idx) {
-        scope_stack.back().symbols[lexeme] = SymbolInfo{lexeme, info, line, tok_idx};
+    // Insert into the innermost scope; nullptr if the name is already declared there.
+    SymbolInfo* insert(const char* lexeme, SymbolInfo info) {
+        return insert_into(scope_stack.back(), lexeme, std::move(info));
     }
 
-    void insert_global(const char* lexeme, TypeInfo info, int line, int tok_idx) {
-        scope_stack.front().symbols[lexeme] = SymbolInfo{lexeme, info, line, tok_idx};
+    SymbolInfo* insert_global(const char* lexeme, SymbolInfo info) {
+        return insert_into(scope_stack.front(), lexeme, std::move(info));
     }
 
     SymbolInfo* lookup(const std::string& lexeme) {
-        for (auto it = scope_stack.rbegin(); it != scope_stack.rend(); ++it) {
-            auto found = it->symbols.find(lexeme);
-            if (found != it->symbols.end()) return &found->second;
-        }
+        for (auto it = scope_stack.rbegin(); it != scope_stack.rend(); ++it)
+            if (SymbolInfo* s = find_in(*it, lexeme)) return s;
         return nullptr;
+    }
+
+    SymbolInfo* lookup_current(const std::string& lexeme) {
+        return find_in(scope_stack.back(), lexeme);
+    }
+
+    SymbolInfo* lookup_global(const std::string& lexeme) {
+        return find_in(scope_stack.front(), lexeme);
     }
 };

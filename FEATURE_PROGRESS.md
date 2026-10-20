@@ -3,11 +3,13 @@
 Status of every feature in the project specification, tracked per compiler stage.
 
 **Last verified:** 2026-09-23 · branch `parser_1` · commit `e55a1b5` + local fix
-**Scope note:** this project's current deliverable is **lexical + syntactic
-analysis with semantic *labelling*** (identifier classification: type,
-modifier, role, scope) — not type checking. Type checking, preprocessing,
-and 3AC/x86 codegen are separate, later stages and are tracked here only as
-"not started," never as defects.
+(stages 1–3); 2026-10-20 · branch `parser_1` (stage 4, uncommitted)
+**Scope note:** stages 1–3 are **lexical + syntactic analysis with semantic
+*labelling*** (identifier classification: type, modifier, role, scope). Stage
+4 — **type checking + three-address-code generation** — is the current
+assignment and is tracked in [IR generation](#ir-generation-stage-4) below.
+Preprocessing, optimization and x86 codegen are later stages and are tracked
+here only as "not started," never as defects.
 **How this was produced:** every row was checked by building
 `syntax_analyzer`/`lexer_app` and running probe programs through them (cross-
 checked against `gcc` where the C standard is the reference), not by reading
@@ -22,18 +24,16 @@ checked against `gcc` where the C standard is the reference), not by reading
 | 1 | **Lexical analysis** | `src/lexer/lexer.l`, `src/parser/parser_lexer.l` | ✅ Complete |
 | 2 | **Syntax analysis** | `src/parser/parser.y` (LALR(1), 0 conflicts) | ✅ Complete |
 | 3 | **Semantic labelling** | `scoped_symbol_table.h`, `semantic_types.h` | 🟡 Mostly complete — labelling defects below; **type checking is out of scope, not a gap** |
-| 4 | **IR generation (3AC)** | — | ❌ Not started (not yet in scope) |
+| 4 | **Type checking + IR generation (3AC)** | `src/ir/` → `ir_generator` (LALR(1), 0 conflicts) | ✅ Complete — every spec feature, see [below](#ir-generation-stage-4) |
 | 5 | **Optimization** | — | ❌ Not started (not yet in scope) |
 | 6 | **x86 code generation** | — | ❌ Not started (not yet in scope) |
 
 **Legend:** ✅ done · 🟡 partial · ❌ not started
 
-> **Note for later stages, not a current defect.** The parser builds no AST —
-> it labels identifiers inline in grammar actions during a single pass. When
-> 3AC generation begins, control-flow statements will need something
-> revisitable for backpatching (a tree, or an explicit statement list), which
-> the current single-pass design doesn't produce. Flagged here so it isn't a
-> surprise when Stage 4 starts; it is **not** part of the current deliverable.
+> **Resolved in stage 4.** The parser builds no AST, so stage 4 stays single
+> pass and uses **backpatching** (Dragon book §6.6–6.7): jumps are emitted
+> with blank targets, carried in truelist/falselist/nextlist, and filled in
+> once the target quad is known.
 
 ---
 
@@ -377,6 +377,89 @@ local edit to the expected file was reverted, and the Bison deprecation
 warning is gone from the build.
 
 **Parser suite is now 26/26.**
+
+---
+
+## IR generation (stage 4)
+
+`ir_generator <src.c> [-o out.ir]` parses, type-checks and translates in one
+pass and writes linear, numbered three-address code to `<src>.ir`. Any
+lexical, syntax or semantic error is reported on stderr with exit code 1 and
+no file is written. Sources: `src/ir/ir.y` (grammar + declaration/statement
+actions), `type_check.h` (type checking + expression translation),
+`ir_gen.h` (quads, backpatch lists, `.data`, printer), `semantic_types.h`,
+`scoped_symbol_table.h`, `ir_lexer.l`.
+
+**Output.** `.types` (struct/union layouts: member offsets and sizes),
+`.data` (globals, statics, string literals `.strN`), `.text` (one
+`func_begin`/`func_end` block per function listing its params and locals,
+then numbered quads). Indexed quads address bytes: `a[8]` is the object 8
+bytes into `a`. A `.strN` or `&f@sig` operand is an address constant. Quads
+are numbered across the whole file, and jump targets are quad numbers.
+
+### Per-feature status (IR stage)
+
+Every row is covered by a hand-verified test in `tests/ir/valid/` (expected
+IR written by hand from the translation rules, not copied from the output).
+
+| Feature | IR | How it is translated |
+|:--------|:--:|:---------------------|
+| Arithmetic & logical operators | ✅ | `t = a op b`; `&&`/`\|\|`/`!`/relational short-circuit via jump lists; integer constants folded; int↔float casts explicit |
+| `if`-`else` | ✅ | `if (B) M S1 N else M S2` |
+| `for` | ✅ | `for(init; M1 B; M2 incr N) M3 S` — the increment is reached by jumps; a declared counter is scoped to the loop |
+| `while`, `do-while` | ✅ | backpatched; `continue` targets the test |
+| `switch`/`case`/`default` | ✅ | operand evaluated once, test chain after the bodies, fall-through is straight-line flow |
+| Arrays (int, char) | ✅ | byte-offset indexing, brace and string initializers, zero-fill, inferred size |
+| Pointers | ✅ | `&`, `*`, pointer arithmetic scaled by pointee size |
+| Structure | ✅ | real layouts (alignment), `s[off]` / `p + off` |
+| `printf`/`scanf` | ✅ | built-in calls; literals pooled in `.data` |
+| Function call with arguments | ✅ | `param` × n, `t = call f@sig, n`, argument conversion |
+| `goto`, `break`, `continue` | ✅ | label table + pending gotos; loop/switch context stack |
+| `static` | ✅ | static locals become `.data` entries `func.name`, initializer folded once |
+| Recursion | ✅ | function entered before its body |
+| Dynamic memory | ✅ | `new`/`new[]`/`delete`/`delete[]`; `malloc`/`free` built-ins |
+| Function pointer | ✅ | signature-checked; `fp = &f@sig`; `icall` |
+| Command line input | ✅ | `char *argv[]` decays to `char**` (the labelling-stage defect does not apply) |
+| `typedef` | ✅ | lexer asks the symbol table and returns `T_TYPE_NAME` — aliases are usable |
+| Reference | ✅ | stored as a pointer, implicit dereference, by-reference arguments pass `&arg` |
+| `enum`, `union` | ✅ | enumerators constant-folded; union members at offset 0 |
+| `until` loop | ✅ | `while` with true/false exits swapped |
+| Multi-level pointers | ✅ | any depth; one load per `*` |
+| Multi-dimensional arrays | ✅ | row-major; `int m[][3]` parameters are `int(*)[3]` |
+| Function overloading | ✅ | name mangling `name@codes`, resolution exact > conversion, ambiguity reported |
+
+The labelling-stage defects listed above (`static`, function pointer,
+`argv`, `typedef`, reference, multi-level pointer display, overloading) are
+**closed in `src/ir/`**; `src/parser/` is unchanged and still has them.
+
+**Type checking** reports: undeclared/redeclared names, non-lvalue
+assignment, operand type errors, incompatible assignment/argument/return
+types, arity mismatch, ambiguous or missing overloads, overloads differing
+only in return type, function-pointer signature mismatch, bad `*`/`.`/`->`/
+`[]` operands, non-constant array sizes and global initializers,
+`break`/`continue` outside a loop, bad `switch`/`case`, undefined or
+duplicate labels, and reference binding errors (`tests/ir/invalid/`).
+
+**Simplifications** (documented in `ir.y`): floating literals have type
+`float` (no suffixes exist); `&array` yields a pointer to the first element;
+no casts/`sizeof`/comma operator (as in the parser); classes parse, but
+member functions and `this` are rejected (classes are excluded by the spec).
+
+**Smoke run over `tests/parser/valid/` (39 programs):** 32 produce IR. The
+other 7 are correctly rejected for errors their own comments call "a
+type-checking concern": `wrong_shape` assigned to a function pointer,
+overloads differing only in return type, `int partial = cube[0]`, an
+undeclared `never_declared`, `continue` in a `switch` outside any loop
+(`syntax_valid_control_flow.c`, which `gcc` also rejects), and class member
+functions/`this`.
+
+**Found while building stage 4 — open in `src/parser/`, fixed in
+`src/ir/ir_lexer.l`:** the char-literal patterns in `parser_lexer.l` are
+double-escaped (`[^\\'\\n]` excludes the letter `n`; `\\\\[...]` needs
+two backslashes), so `'n'`, `'\n'` and `'\0'` are lexical errors. This is
+why `syntax_valid_pointers_arrays.c` fails at `HEAD`. Separately, the
+checked-in-tree `lexer_app`/`syntax_analyzer` binaries were older than
+their sources; `make lexer parser` rebuilds them (lexer 35/35, parser 54/55).
 
 ---
 

@@ -1,0 +1,4 @@
+Semantic errors found:
+Semantic Error at line 4: functions that differ only in their return type cannot be overloaded ('ambiguous')
+Semantic Error at line 5: return with a value in function returning 'void'
+Semantic Error at line 6: return with no value in function returning 'int'

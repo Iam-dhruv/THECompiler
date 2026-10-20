@@ -1,0 +1,5 @@
+Semantic errors found:
+Semantic Error at line 8: invalid type argument of unary '*' (have 'int')
+Semantic Error at line 9: 'struct P' has no member named 'z'
+Semantic Error at line 10: request for member 'x' in something not a structure or union
+Semantic Error at line 11: array subscript is not an integer ('float')

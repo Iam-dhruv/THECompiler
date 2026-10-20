@@ -1,0 +1,30 @@
+.data
+
+.text
+func_begin main
+  locals: i:int, hits:int
+  0: i = 0
+  1: hits = 0
+  2: if i < 10 goto 4
+  3: goto 19
+  4: t1 = i + 1
+  5: i = t1
+  6: t2 = i
+  7: goto 11
+  8: goto 2
+  9: goto 13
+  10: goto 13
+  11: if t2 == 3 goto 8
+  12: if t2 == 8 goto 9
+  13: if i == 9 goto 15
+  14: goto 16
+  15: goto 19
+  16: t3 = hits + 1
+  17: hits = t3
+  18: goto 2
+  19: if hits < 100 goto 21
+  20: goto 22
+  21: goto 23
+  22: hits = 0
+  23: return hits
+func_end main

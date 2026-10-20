@@ -1,0 +1,49 @@
+.data
+
+.text
+func_begin add@ii
+  params: a:int, b:int
+  0: t1 = a + b
+  1: return t1
+func_end add@ii
+
+func_begin add@ff
+  params: a:float, b:float
+  2: t1 = a + b
+  3: return t1
+func_end add@ff
+
+func_begin mul@ii
+  params: a:int, b:int
+  4: t1 = a * b
+  5: return t1
+func_end mul@ii
+
+func_begin apply@PFiiiEi
+  params: f:int(*)(int,int), x:int
+  6: param x
+  7: param x
+  8: t1 = icall f, 2
+  9: return t1
+func_end apply@PFiiiEi
+
+func_begin main
+  locals: op:int(*)(int,int), r:int
+  10: op = &add@ii
+  11: param 2
+  12: param 3
+  13: t1 = icall op, 2
+  14: r = t1
+  15: op = &mul@ii
+  16: param 4
+  17: param 5
+  18: t2 = icall op, 2
+  19: t3 = r + t2
+  20: r = t3
+  21: param &mul@ii
+  22: param 6
+  23: t4 = call apply@PFiiiEi, 2
+  24: t5 = r + t4
+  25: r = t5
+  26: return r
+func_end main

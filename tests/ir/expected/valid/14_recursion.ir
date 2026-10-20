@@ -1,0 +1,45 @@
+.data
+
+.text
+func_begin factorial@i
+  params: n:int
+  0: if n <= 1 goto 2
+  1: goto 3
+  2: return 1
+  3: t1 = n - 1
+  4: param t1
+  5: t2 = call factorial@i, 1
+  6: t3 = n * t2
+  7: return t3
+func_end factorial@i
+
+func_begin is_even@i
+  params: n:int
+  8: if n == 0 goto 10
+  9: goto 11
+  10: return 1
+  11: t1 = n - 1
+  12: param t1
+  13: t2 = call is_odd@i, 1
+  14: return t2
+func_end is_even@i
+
+func_begin is_odd@i
+  params: n:int
+  15: if n == 0 goto 17
+  16: goto 18
+  17: return 0
+  18: t1 = n - 1
+  19: param t1
+  20: t2 = call is_even@i, 1
+  21: return t2
+func_end is_odd@i
+
+func_begin main
+  22: param 5
+  23: t1 = call factorial@i, 1
+  24: param 4
+  25: t2 = call is_even@i, 1
+  26: t3 = t1 + t2
+  27: return t3
+func_end main

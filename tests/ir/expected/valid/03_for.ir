@@ -1,0 +1,25 @@
+.data
+
+.text
+func_begin main
+  locals: sum:int, i:int
+  0: sum = 0
+  1: i = 0
+  2: if i < 4 goto 7
+  3: goto 10
+  4: t1 = i
+  5: i = i + 1
+  6: goto 2
+  7: t2 = sum + i
+  8: sum = t2
+  9: goto 4
+  10: goto 12
+  11: goto 10
+  12: t3 = sum - 1
+  13: sum = t3
+  14: if sum < 0 goto 16
+  15: goto 11
+  16: goto 18
+  17: goto 11
+  18: return sum
+func_end main

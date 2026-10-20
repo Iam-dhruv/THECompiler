@@ -1,0 +1,26 @@
+.types
+  struct Point: size 8 { x:int @0, y:int @4 }
+
+.data
+  .str0: char[3] (3) = "ok"
+
+.text
+func_begin sub@ii
+  params: a:int, b:int
+  0: t1 = a - b
+  1: return t1
+func_end sub@ii
+
+func_begin main
+  locals: n:int, t:char*, b:int[3], p:struct Point, f:int(*)(int,int)
+  2: n = 2
+  3: t = .str0
+  4: f = &sub@ii
+  5: b[4] = n
+  6: param n
+  7: param 1
+  8: t1 = icall f, 2
+  9: p[4] = t1
+  10: t2 = p[4]
+  11: return t2
+func_end main

@@ -3,6 +3,7 @@
 lexer_app
 syntax_analyzer
 parser_app
+ir_generator
 src/**/*.exe
 src/**/a.exe
 src/**/lexer_app
@@ -35,6 +36,10 @@ stack.hh
 
 # ── Test outputs ────────────────────────────────────────────────────────────
 out/
+# IR files written next to a source by default (expected IR lives in
+# tests/ir/expected/ and is tracked).
+*.ir
+!tests/ir/expected/**/*.ir
 
 # ── Shell artifacts ─────────────────────────────────────────────────────────
 # The Makefiles use Windows-style `2>NUL` redirects. Under a POSIX shell that

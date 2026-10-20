@@ -13,6 +13,7 @@
 extern std::vector<TokenRecord> g_tokens;
 
 extern StringPool g_string_pool;
+extern ScopedSymbolTable g_symtab;
 extern bool g_had_lex_error;
 extern std::vector<std::string> g_lex_errors;
 
@@ -102,17 +103,18 @@ static int classify_ppnumber(const char* text, int line) {
     return PPNUM_INT;
 }
 
-// Records an interned lexeme pointer into g_tokens so grammar actions
-// can retrieve it via g_tokens[yylval.token_index].lexeme.
-#define RET(tokcode) \
-    do { g_tokens.push_back({g_string_pool.intern(yytext)}); \
-         yylval.token_index = (int)g_tokens.size() - 1; \
-         return tokcode; } while (0)
+// Records an interned lexeme pointer (and its line) into g_tokens so grammar
+// actions can retrieve it via g_tokens[yylval.token_index].
+#define RET(tokcode) RET_LEXEME(tokcode, yytext)
 
 #define RET_LEXEME(tokcode, lex) \
-    do { g_tokens.push_back({g_string_pool.intern(lex)}); \
+    do { g_tokens.push_back({g_string_pool.intern(lex), yylineno}); \
          yylval.token_index = (int)g_tokens.size() - 1; \
+         g_prev_token = (tokcode); \
          return tokcode; } while (0)
+
+// Previous token returned, for the typedef-name decision below.
+static int g_prev_token = 0;
 
 
 
@@ -214,9 +216,11 @@ PPNUM       ("."?{DIGIT})({DIGIT}|{LETTER}|"."|[eEpP][+-])*
         return 0;
     }
 
-'([^\\'\\n]|\\\\[ntr\\\\'\"abfv0])'      { RET(T_CHAR_CONST); }
-'([^\\'\\n]|\\\\[ntr\\\\'\"abfv0]){2,}'  { log_lex_error("Error: multi-character char literal at line %d", yylineno); return 0; }
-'([^\\'\\n]|\\\\[ntr\\\\'\"abfv0])*      { log_lex_error("Error: unterminated char literal at line %d", yylineno); return 0; }
+    /* One character, or a backslash escape. (The parser lexer double-escapes
+       these classes, which rejects 'n' and '\0'; fixed here.) */
+'([^\\'\n]|\\[ntr\\'\"abfv0])'      { RET(T_CHAR_CONST); }
+'([^\\'\n]|\\[ntr\\'\"abfv0]){2,}'  { log_lex_error("Error: multi-character char literal at line %d", yylineno); return 0; }
+'([^\\'\n]|\\[ntr\\'\"abfv0])*      { log_lex_error("Error: unterminated char literal at line %d", yylineno); return 0; }
 
 \"                  { str_buf.clear(); str_start_line = yylineno; BEGIN(STRING); }
 
@@ -249,9 +253,18 @@ PPNUM       ("."?{DIGIT})({DIGIT}|{LETTER}|"."|[eEpP][+-])*
 {IDENTIFIER}      {
     auto it = keywords_.find(yytext);
     if (it != keywords_.end()) {
-        g_tokens.push_back({g_string_pool.intern(yytext)});
-        yylval.token_index = (int)g_tokens.size() - 1;
-        return it->second;
+        RET(it->second);
+    }
+    // Lexer feedback for typedef names: an identifier the symbol table knows
+    // as a typedef is a type specifier — except right after struct/union/
+    // enum/class/./->/goto, where only a tag, member or label can follow.
+    bool tag_position = g_prev_token == T_STRUCT || g_prev_token == T_UNION ||
+                        g_prev_token == T_ENUM || g_prev_token == T_CLASS ||
+                        g_prev_token == T_DOT || g_prev_token == T_ARROW ||
+                        g_prev_token == T_GOTO;
+    if (!tag_position) {
+        SymbolInfo* s = g_symtab.lookup(yytext);
+        if (s && s->kind == SK_TYPEDEF) RET(T_TYPE_NAME);
     }
     RET(T_IDENTIFIER);
 }

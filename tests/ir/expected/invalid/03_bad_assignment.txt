@@ -1,0 +1,4 @@
+Semantic errors found:
+Semantic Error at line 6: lvalue required as left operand of assignment
+Semantic Error at line 7: lvalue required as left operand of assignment
+Semantic Error at line 8: incompatible types in assignment ('float' to 'int*')

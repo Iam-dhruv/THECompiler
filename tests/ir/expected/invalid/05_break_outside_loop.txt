@@ -1,0 +1,3 @@
+Semantic errors found:
+Semantic Error at line 4: break statement not within loop or switch
+Semantic Error at line 6: continue statement not within a loop

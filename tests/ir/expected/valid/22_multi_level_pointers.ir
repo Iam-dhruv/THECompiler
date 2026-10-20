@@ -1,0 +1,30 @@
+.data
+  .str0: char[3] (3) = "ab"
+
+.text
+func_begin main
+  locals: x:int, p:int*, pp:int**, ppp:int***, s:char*, ps:char**
+  0: x = 1
+  1: t1 = &x
+  2: p = t1
+  3: t2 = &p
+  4: pp = t2
+  5: t3 = &pp
+  6: ppp = t3
+  7: t4 = *pp
+  8: *t4 = 5
+  9: t5 = *ppp
+  10: t6 = *t5
+  11: t7 = *t6
+  12: t8 = t7 + 1
+  13: x = t8
+  14: s = .str0
+  15: t9 = &s
+  16: ps = t9
+  17: t10 = *ps
+  18: t11 = t10 + 1
+  19: *ps = t11
+  20: t12 = *pp
+  21: t13 = *t12
+  22: return t13
+func_end main
