@@ -1,0 +1,6 @@
+Semantic errors found:
+Semantic Error at line 9: called object is not a function or function pointer ('int(**)(int,int)')
+Semantic Error at line 10: cannot convert function 'add' to 'int(**)(int,int)' in assignment
+Semantic Error at line 11: incompatible types in assignment ('int(*)(int,int)' to 'int(**)(int,int)')
+Semantic Error at line 12: incompatible types in assignment ('int(**)(int,int)' to 'int(*)(int,int)')
+Semantic Error at line 13: incompatible types in assignment ('int(**)(int,int)' to 'int(**)(float,float)')

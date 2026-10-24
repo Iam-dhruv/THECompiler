@@ -250,7 +250,7 @@ inline std::string resolve_funcset_single(ExprAttr* e) {
         return "?";
     }
     e->type = it->second[0].type;
-    e->type.is_func_ptr = true;
+    e->type.func_ptr_depth = 1;
     return "&" + it->second[0].mangled;
 }
 
@@ -391,10 +391,10 @@ inline bool assign_value(ExprAttr* e, TypeInfo to, int line, const std::string& 
 
     if (e->is_funcset) {
         auto it = g_functions.find(e->func_name);
-        if (to.is_func_ptr && it != g_functions.end()) {
+        if (to.is_func_ptr() && it != g_functions.end()) {
             for (const auto& f : it->second) {
                 TypeInfo fp = f.type;
-                fp.is_func_ptr = true;
+                fp.func_ptr_depth = 1;
                 if (same_type(fp, to)) { out = "&" + f.mangled; return true; }
             }
             sem_error(line, "no overload of '%s' matches '%s' in %s",
@@ -410,10 +410,10 @@ inline bool assign_value(ExprAttr* e, TypeInfo to, int line, const std::string& 
     bool ok = false;
     if (to.is_arith() && from.is_arith()) {
         ok = true;
-    } else if (to.is_func_ptr) {
-        ok = from.is_func_ptr && same_type(from, to);
+    } else if (to.is_func_ptr()) {
+        ok = (from.is_func_ptr() && same_type(from, to)) || (e->has_const && e->cval == 0);
     } else if (to.is_pointer()) {
-        if (from.is_pointer() && !from.is_func_ptr)
+        if (from.is_pointer() && !from.is_func_ptr())
             ok = same_type(from, to) || is_void_ptr(from) || is_void_ptr(to);
         else
             ok = e->has_const && e->cval == 0;
@@ -421,7 +421,7 @@ inline bool assign_value(ExprAttr* e, TypeInfo to, int line, const std::string& 
         ok = same_type(from, to);
     }
     if (!ok) {
-        if (from.is_func_ptr && to.is_func_ptr)
+        if (from.is_func_ptr() && to.is_func_ptr())
             sem_error(line, "incompatible function pointer types in %s ('%s' to '%s')",
                       what.c_str(), ts(e->type), ts(to));
         else
@@ -466,7 +466,7 @@ inline bool fold_int(const std::string& op, long a, long b, long& r) {
 }
 
 inline ExprAttr* pointer_arith(const std::string& op, ExprAttr* a, ExprAttr* b, int line) {
-    auto elem_size = [](const TypeInfo& p) { return p.is_func_ptr ? 0 : sizeof_type(pointee(p)); };
+    auto elem_size = [](const TypeInfo& p) { return p.is_func_ptr() ? 0 : sizeof_type(pointee(p)); };
     const TypeInfo& ta = a->type;
     const TypeInfo& tb = b->type;
 
@@ -598,7 +598,7 @@ inline ExprAttr* address_of_expr(ExprAttr* e, int line) {
     }
     TypeInfo t = e->type;
     if (t.is_function()) {           // &*fp
-        t.is_func_ptr = true;
+        t.func_ptr_depth = 1;
         return temp_expr(e->addr, t, line);
     }
     t = t.is_array() ? decay(t) : pointer_to(t);
@@ -613,9 +613,9 @@ inline ExprAttr* deref_expr(ExprAttr* e, int line) {
     ExprAttr* r = new_expr(line);
     r->lv = LV_DEREF;
     r->addr = e->addr;
-    if (e->type.is_func_ptr) {       // *fp designates the function
+    if (e->type.is_func_ptr()) {     // *fp designates the function
         r->type = e->type;
-        r->type.is_func_ptr = false;
+        r->type.func_ptr_depth = 0;
         return r;
     }
     if (!e->type.is_pointer()) {
@@ -680,7 +680,7 @@ inline bool check_modifiable(ExprAttr* e, int line, const char* what) {
 inline ExprAttr* incdec(ExprAttr* e, bool inc, bool post, int line) {
     if (!check_modifiable(e, line, inc ? "increment operand" : "decrement operand"))
         return error_expr(line);
-    if (!e->type.is_scalar() || e->type.is_func_ptr) {
+    if (!e->type.is_scalar() || e->type.is_func_ptr()) {
         sem_error(line, "wrong type argument to %s ('%s')", inc ? "increment" : "decrement", ts(e->type));
         return error_expr(line);
     }
@@ -738,7 +738,7 @@ inline ExprAttr* member_expr(ExprAttr* base, const std::string& name, bool arrow
     if (arrow) {
         make_rvalue(&obj);
         if (bad(&obj)) return error_expr(line);
-        if (!obj.type.is_pointer() || obj.type.is_func_ptr || !pointee(obj.type).is_composite()) {
+        if (!obj.type.is_pointer() || obj.type.is_func_ptr() || !pointee(obj.type).is_composite()) {
             sem_error(line, "invalid type argument of '->' (have '%s')", ts(obj.type));
             return error_expr(line);
         }
@@ -803,7 +803,7 @@ inline ExprAttr* index_expr(ExprAttr* base, ExprAttr* idx, int line) {
 
     make_rvalue(base);
     if (bad(base)) return error_expr(line);
-    if (!base->type.is_pointer() || base->type.is_func_ptr) {
+    if (!base->type.is_pointer() || base->type.is_func_ptr()) {
         sem_error(line, "subscripted value is neither array nor pointer ('%s')", ts(base->type));
         return error_expr(line);
     }
@@ -832,10 +832,10 @@ inline int arg_rank(ExprAttr* a, const TypeInfo& p) {
     }
     if (a->is_funcset) {
         auto it = g_functions.find(a->func_name);
-        if (!p.is_func_ptr || it == g_functions.end()) return -1;
+        if (!p.is_func_ptr() || it == g_functions.end()) return -1;
         for (const auto& f : it->second) {
             TypeInfo fp = f.type;
-            fp.is_func_ptr = true;
+            fp.func_ptr_depth = 1;
             if (same_type(fp, p)) return 0;
         }
         return -1;
@@ -843,8 +843,8 @@ inline int arg_rank(ExprAttr* a, const TypeInfo& p) {
     TypeInfo t = a->is_cond ? int_type() : decay(a->type);
     if (same_type(t, p)) return 0;
     if (t.is_arith() && p.is_arith()) return 1;
-    if (p.is_pointer() && !p.is_func_ptr) {
-        if (t.is_pointer() && !t.is_func_ptr && (is_void_ptr(t) || is_void_ptr(p))) return 1;
+    if (p.is_pointer()) {
+        if (!p.is_func_ptr() && t.is_pointer() && !t.is_func_ptr() && (is_void_ptr(t) || is_void_ptr(p))) return 1;
         if (a->has_const && a->cval == 0) return 1;
     }
     return -1;
@@ -951,7 +951,7 @@ inline ExprAttr* call_expr(ExprAttr* callee, std::vector<ExprAttr*>& args, int l
     } else {
         // fp(...) or (*fp)(...)
         const TypeInfo ft = callee->type;
-        if (!(ft.is_func_ptr || (ft.is_function() && callee->lv == LV_DEREF))) {
+        if (!(ft.is_func_ptr() || (ft.is_function() && callee->lv == LV_DEREF))) {
             sem_error(line, "called object is not a function or function pointer ('%s')", ts(ft));
             return error_expr(line);
         }
@@ -977,7 +977,9 @@ inline ExprAttr* call_expr(ExprAttr* callee, std::vector<ExprAttr*>& args, int l
     }
     std::string t = new_temp();
     emit(op, target, n, t);
-    return temp_expr(t, ret, line);
+    ExprAttr* r = temp_expr(t, ret, line);
+    if (ret.is_reference) r->lv = LV_DEREF;   // t holds the address of the referenced object
+    return r;
 }
 
 // ── new / delete / return ───────────────────────────────────────────────────
@@ -1009,7 +1011,7 @@ inline ExprAttr* new_object(const TypeInfo& type, ExprAttr* count, int line) {
 inline ExprAttr* delete_object(ExprAttr* e, int line) {
     if (bad(e)) return error_expr(line);
     make_rvalue(e);
-    if (!e->type.is_pointer() || e->type.is_func_ptr) {
+    if (!e->type.is_pointer() || e->type.is_func_ptr()) {
         sem_error(line, "type '%s' argument given to delete, expected pointer", ts(e->type));
         return error_expr(line);
     }
@@ -1027,6 +1029,21 @@ inline void return_stmt(ExprAttr* e, int line) {
     if (bad(e)) return;
     if (g_fn.ret.is_void()) {
         sem_error(line, "return with a value in function returning 'void'");
+        return;
+    }
+    if (g_fn.ret.is_reference) {   // return the address of the object being bound
+        TypeInfo rt = g_fn.ret;
+        rt.is_reference = false;
+        if (e->is_cond || e->lv == LV_NONE || e->is_funcset || !same_type(e->type, rt)) {
+            sem_error(line, "cannot bind return value of type '%s' to '%s': an lvalue of type '%s' is required",
+                      ts(e->type), ts(g_fn.ret), ts(rt));
+            return;
+        }
+        if ((e->lv == LV_NAME || e->lv == LV_INDEX) && !e->static_storage) {
+            sem_error(line, "returning a reference to a local variable");
+            return;
+        }
+        emit("return", address_of_object(e));
         return;
     }
     std::string v;

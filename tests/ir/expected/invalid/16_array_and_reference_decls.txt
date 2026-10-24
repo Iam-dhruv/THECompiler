@@ -1,0 +1,13 @@
+Semantic errors found:
+Semantic Error at line 10: returning a reference to a local variable
+Semantic Error at line 11: cannot bind return value of type 'int' to 'int&': an lvalue of type 'int' is required
+Semantic Error at line 12: cannot bind return value of type 'float' to 'int&': an lvalue of type 'int' is required
+Semantic Error at line 14: functions that differ only in their return type cannot be overloaded ('get')
+Semantic Error at line 16: declaration of 'refs' as array of references
+Semantic Error at line 17: declaration of 'inner' as array of references
+Semantic Error at line 18: declaration of 'more' as array of references
+Semantic Error at line 19: declaration of 'pr' as pointer to reference
+Semantic Error at line 20: declaration of 'funcs' as array of functions
+Semantic Error at line 21: declaration of 'f2' as array of functions
+Semantic Error at line 23: called object is not a function or function pointer ('int(*[2])(int,int)')
+Semantic Error at line 24: no overload of 'bad_local' matches 'int(*)()' in initialization

@@ -1,0 +1,63 @@
+.data
+
+.text
+func_begin add@ii
+  params: a:int, b:int
+  0: t1 = a + b
+  1: return t1
+func_end add@ii
+
+func_begin mul@ii
+  params: a:int, b:int
+  2: t1 = a * b
+  3: return t1
+func_end mul@ii
+
+func_begin pick@PPFiiiEPFiiiE
+  params: out:int(**)(int,int), f:int(*)(int,int)
+  4: *out = f
+  5: return
+func_end pick@PPFiiiEPFiiiE
+
+func_begin main
+  locals: op:int(*)(int,int), pp:int(**)(int,int), r:int, ppp:int(***)(int,int), q:int(**)(int,int)
+  6: op = &add@ii
+  7: t1 = &op
+  8: pp = t1
+  9: t2 = *pp
+  10: param 2
+  11: param 3
+  12: t3 = icall t2, 2
+  13: r = t3
+  14: *pp = &mul@ii
+  15: t4 = *pp
+  16: param 4
+  17: param 5
+  18: t5 = icall t4, 2
+  19: t6 = r + t5
+  20: r = t6
+  21: t7 = &op
+  22: param t7
+  23: param &add@ii
+  24: call pick@PPFiiiEPFiiiE, 2
+  25: t8 = &pp
+  26: ppp = t8
+  27: t9 = *ppp
+  28: t10 = *t9
+  29: param 1
+  30: param 2
+  31: t11 = icall t10, 2
+  32: t12 = r + t11
+  33: r = t12
+  34: q = pp
+  35: t13 = *q
+  36: param 1
+  37: param 1
+  38: t14 = icall t13, 2
+  39: t15 = r + t14
+  40: param 6
+  41: param 7
+  42: t16 = icall op, 2
+  43: t17 = t15 + t16
+  44: return t17
+func_end main

@@ -1,0 +1,67 @@
+.data
+  arr: int[4] (16) = 0
+  g: int (4) = 0
+
+.text
+func_begin cell@i
+  params: i:int
+  0: t1 = i * 4
+  1: t2 = &arr
+  2: t3 = t2 + t1
+  3: return t3
+func_end cell@i
+
+func_begin glob@v
+  4: t1 = &g
+  5: return t1
+func_end glob@v
+
+func_begin pass@Ri
+  params: r:int&
+  6: return r
+func_end pass@Ri
+
+func_begin add@ii
+  params: a:int, b:int
+  7: t1 = a + b
+  8: return t1
+func_end add@ii
+
+func_begin main
+  locals: alias:int&, r:int, getter:int&(*)(int), op:int(*)(int,int), rfp:int(*&)(int,int)
+  9: param 2
+  10: t1 = call cell@i, 1
+  11: *t1 = 9
+  12: t2 = call glob@v, 0
+  13: t3 = call glob@v, 0
+  14: t4 = *t3
+  15: t5 = t4 + 1
+  16: *t2 = t5
+  17: param 1
+  18: t6 = call cell@i, 1
+  19: alias = t6
+  20: *alias = 5
+  21: r = 0
+  22: t7 = &r
+  23: param t7
+  24: t8 = call pass@Ri, 1
+  25: *t8 = 3
+  26: getter = &cell@i
+  27: param 0
+  28: t9 = icall getter, 1
+  29: param 2
+  30: t10 = call cell@i, 1
+  31: t11 = *t10
+  32: t12 = t11 + 1
+  33: *t9 = t12
+  34: op = 0
+  35: rfp = &op
+  36: *rfp = &add@ii
+  37: param 1
+  38: param 2
+  39: t13 = icall op, 2
+  40: t14 = r + t13
+  41: t15 = arr[0]
+  42: t16 = t14 + t15
+  43: return t16
+func_end main

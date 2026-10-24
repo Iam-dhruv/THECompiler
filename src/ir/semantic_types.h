@@ -36,7 +36,9 @@ struct CompositeTypeInfo {
 // then (if present) array dimensions around that, then outer_pointer levels
 // of pointer to the whole array. So `int *a[3]` is an array of 3 `int*`, and
 // `int (*p)[3]` — what `int m[][3]` decays to — is a pointer to int[3].
-// Functions and function pointers carry func_info.
+// Functions and function pointers carry func_info; func_ptr_depth counts the
+// pointer levels on the function: 0 a function, 1 int(*)(int), 2 int(**)(int).
+// With array_info too it is an array of those: int (*ops[4])(int).
 struct TypeInfo {
     BaseKind base_kind     = BK_INT;
     int      pointer_depth = 0;
@@ -45,21 +47,25 @@ struct TypeInfo {
     bool     is_const      = false;
     bool     is_static     = false;
     bool     is_reference  = false;   // T& — stored as a pointer in the IR
-    bool     is_func_ptr   = false;   // with func_info: pointer to that function
+    int      func_ptr_depth = 0;      // with func_info: pointers to that function
 
     std::optional<FunctionTypeInfo>  func_info;
     std::optional<ArrayTypeInfo>     array_info;
     std::optional<CompositeTypeInfo> composite_info;
 
     bool is_array()    const { return array_info.has_value() && outer_pointer == 0; }
-    bool is_function() const { return func_info.has_value() && !is_func_ptr; }
+    bool is_function() const { return func_info.has_value() && func_ptr_depth == 0; }
+    // A function pointer that can be called; deeper levels are data pointers.
+    bool is_func_ptr() const {
+        return func_info.has_value() && func_ptr_depth == 1 && !array_info.has_value();
+    }
     bool is_error()    const { return base_kind == BK_ERROR; }
 
     // Not an array, pointer to array, function or function pointer.
     bool is_plain()    const { return !array_info.has_value() && !func_info.has_value(); }
     bool is_void()     const { return is_plain() && pointer_depth == 0 && base_kind == BK_VOID; }
     bool is_pointer()  const {
-        return is_func_ptr || outer_pointer > 0 || (is_plain() && pointer_depth > 0);
+        return (func_ptr_depth > 0 && !array_info) || outer_pointer > 0 || (is_plain() && pointer_depth > 0);
     }
 
     bool is_integral() const {
@@ -145,10 +151,11 @@ inline TypeInfo element_type(const TypeInfo& t) {
     return e;
 }
 
-// Type of *p for a (non-function) pointer p.
+// Type of *p for a pointer p.
 inline TypeInfo pointee(const TypeInfo& t) {
     TypeInfo e = t;
     if (e.outer_pointer > 0) e.outer_pointer--;
+    else if (e.func_info) e.func_ptr_depth--;
     else e.pointer_depth--;
     return e;
 }
@@ -158,6 +165,7 @@ inline TypeInfo pointer_to(const TypeInfo& t) {
     TypeInfo p = t;
     p.is_reference = false;
     if (p.array_info) p.outer_pointer++;
+    else if (p.func_info) p.func_ptr_depth++;
     else p.pointer_depth++;
     return p;
 }
@@ -173,10 +181,11 @@ inline TypeInfo decay(const TypeInfo& t) {
             d.outer_pointer = 1;
         } else {
             d.array_info.reset();
-            d.pointer_depth++;
+            if (d.func_info) d.func_ptr_depth++;   // int (*ops[4])(int) -> int(**)(int)
+            else d.pointer_depth++;
         }
     } else if (d.is_function()) {
-        d.is_func_ptr = true;
+        d.func_ptr_depth = 1;
     }
     return d;
 }
@@ -184,10 +193,10 @@ inline TypeInfo decay(const TypeInfo& t) {
 // ── Size and alignment (bytes) ──────────────────────────────────────────────
 
 inline int sizeof_type(const TypeInfo& t) {
-    if (t.is_reference || t.is_func_ptr || t.outer_pointer > 0) return 8;
+    if (t.is_reference || t.outer_pointer > 0) return 8;
     if (t.is_function()) return 0;
     int size;
-    if (t.pointer_depth > 0) {
+    if (t.pointer_depth > 0 || t.func_ptr_depth > 0) {
         size = 8;
     } else {
         switch (t.base_kind) {
@@ -212,7 +221,7 @@ inline int sizeof_type(const TypeInfo& t) {
 }
 
 inline int alignof_type(const TypeInfo& t) {
-    if (t.is_reference || t.is_func_ptr || t.outer_pointer > 0 || t.pointer_depth > 0) return 8;
+    if (t.is_reference || t.func_ptr_depth > 0 || t.outer_pointer > 0 || t.pointer_depth > 0) return 8;
     switch (t.base_kind) {
         case BK_CHAR:   return 1;
         case BK_INT:
@@ -237,9 +246,13 @@ inline int alignof_type(const TypeInfo& t) {
 inline bool same_type(const TypeInfo& a, const TypeInfo& b) {
     if (a.is_error() || b.is_error()) return true;
     if (a.func_info.has_value() != b.func_info.has_value()) return false;
-    if (a.is_func_ptr != b.is_func_ptr) return false;
+    if (a.func_ptr_depth != b.func_ptr_depth) return false;
+    if (a.outer_pointer != b.outer_pointer) return false;
+    if (a.array_info.has_value() != b.array_info.has_value()) return false;
+    if (a.array_info && a.array_info->dims != b.array_info->dims) return false;
     if (a.func_info) {
-        if (!same_type(a.return_type(), b.return_type())) return false;
+        if (!same_type(a.return_type(), b.return_type()) ||
+            a.return_type().is_reference != b.return_type().is_reference) return false;
         const auto& pa = a.func_info->param_types;
         const auto& pb = b.func_info->param_types;
         if (pa.size() != pb.size()) return false;
@@ -248,9 +261,6 @@ inline bool same_type(const TypeInfo& a, const TypeInfo& b) {
         return true;
     }
     if (a.base_kind != b.base_kind || a.pointer_depth != b.pointer_depth) return false;
-    if (a.outer_pointer != b.outer_pointer) return false;
-    if (a.array_info.has_value() != b.array_info.has_value()) return false;
-    if (a.array_info && a.array_info->dims != b.array_info->dims) return false;
     return a.tag() == b.tag();
 }
 
@@ -271,11 +281,24 @@ inline std::string base_type_name(const TypeInfo& t) {
     }
 }
 
-// C-like spelling: int, char**, int&, int[2][3], int(*)[3], int(*)(int,int).
+inline std::string dims_to_string(const ArrayTypeInfo& a) {
+    std::string s;
+    for (int d : a.dims) s += "[" + (d < 0 ? std::string() : std::to_string(d)) + "]";
+    return s;
+}
+
+// C-like spelling: int, char**, int&, int[2][3], int(*)[3], int(*)(int,int),
+// int(**)(int,int), int(*[4])(int,int), int(*&)(int), int&(*)(int).
 inline std::string type_to_string(const TypeInfo& t) {
     if (t.func_info) {
         std::string s = type_to_string(t.return_type());
-        s += t.is_func_ptr ? "(*)(" : "(";
+        std::string inner = std::string(t.func_ptr_depth, '*') + (t.is_reference ? "&" : "");
+        if (t.array_info) {
+            if (t.outer_pointer > 0) inner += "(" + std::string(t.outer_pointer, '*') + ")";
+            inner += dims_to_string(*t.array_info);
+        }
+        if (!inner.empty()) s += "(" + inner + ")";
+        s += "(";
         const auto& ps = t.func_info->param_types;
         for (size_t i = 0; i < ps.size(); i++) {
             if (i) s += ",";
@@ -286,29 +309,28 @@ inline std::string type_to_string(const TypeInfo& t) {
     std::string s = base_type_name(t) + std::string(t.pointer_depth, '*');
     if (t.outer_pointer > 0) s += "(" + std::string(t.outer_pointer, '*') + ")";
     if (t.is_reference) s += "&";
-    if (t.array_info)
-        for (int d : t.array_info->dims) s += "[" + (d < 0 ? std::string() : std::to_string(d)) + "]";
+    if (t.array_info) s += dims_to_string(*t.array_info);
     return s;
 }
 
 // Parameter code used in mangled names: i c f d v for the basic types,
 // S/U/C/e + length + tag for struct/union/class/enum, one P per pointer (or
 // array) level, PA<n>_ for a pointer to an array of n, a leading R for a
-// reference, PF<ret><params>E for a function pointer.
+// reference, PF<ret><params>E for a function pointer (PPF... one P per level).
 inline std::string mangle_code(const TypeInfo& t) {
     std::string s = t.is_reference ? "R" : "";
-    if (t.func_info) {
-        s += t.is_func_ptr ? "PF" : "F";
-        s += mangle_code(t.return_type());
-        for (const auto& p : t.func_info->param_types) s += mangle_code(p);
-        return s + "E";
-    }
-    int depth = t.pointer_depth;
+    int depth = t.func_info ? t.func_ptr_depth : t.pointer_depth;
     if (t.outer_pointer > 0) {
         s += std::string(t.outer_pointer, 'P');
         for (int d : t.array_info->dims) s += "A" + std::to_string(d) + "_";
     } else if (t.is_array()) {
         depth += (int)t.array_info->dims.size();
+    }
+    if (t.func_info) {
+        s += std::string(depth, 'P') + "F";
+        s += mangle_code(t.return_type());
+        for (const auto& p : t.func_info->param_types) s += mangle_code(p);
+        return s + "E";
     }
     s += std::string(depth, 'P');
     std::string tag = t.tag();

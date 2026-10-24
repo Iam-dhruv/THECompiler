@@ -37,10 +37,12 @@
         int pointer_depth = 0;      // '*'s outside parentheses
         int group_pointer = 0;      // '*'s inside "( ... )", as in (*fp)
         bool grouped = false;
-        bool is_reference = false;
+        bool is_reference = false;  // after a function's (...): it returns a reference
+        bool func_reference = false;    // '&' inside "( ... )" of a function pointer: (*&rfp)(...)
+        int array_pointer = 0;      // parenthesized '*'s before a "[..]": (*p)[3] is 1
         std::vector<int> dims;
         bool is_function = false;
-        bool is_func_ptr = false;
+        int func_ptr_depth = 0;     // (*fp)(...) is 1, (**pp)(...) is 2
         std::vector<ParamDecl> params;
     };
 
@@ -117,25 +119,74 @@
         base.is_static = base.is_typedef = false;
         if (base.is_error()) return base;
 
-        if (d.is_function || d.is_func_ptr) {
+        // A typedef'd reference (typedef int &IntRef) can only be used as is.
+        if (base.is_reference && !d.is_function && !d.func_ptr_depth) {
+            const char* what = !d.dims.empty() ? "array of references"
+                             : (d.pointer_depth || d.group_pointer) ? "pointer to reference"
+                             : d.is_reference ? "reference to reference" : nullptr;
+            if (what) {
+                sem_error(d.line, "declaration of '%s' as %s", d.name, what);
+                return make_basic(BK_ERROR);
+            }
+        }
+
+        if (d.is_function || d.func_ptr_depth) {
             TypeInfo ret = base;
-            ret.pointer_depth += d.pointer_depth;
+            for (int i = 0; i < d.pointer_depth; i++) ret = pointer_to(ret);
+            ret.is_reference = base.is_reference || d.is_reference;
             if (ret.is_array()) {
                 sem_error(d.line, "function '%s' cannot return an array", d.name);
+                return make_basic(BK_ERROR);
+            }
+            if (ret.is_reference && ret.is_void()) {
+                sem_error(d.line, "function '%s' cannot return a reference to void", d.name);
                 return make_basic(BK_ERROR);
             }
             std::vector<TypeInfo> ps;
             for (const auto& p : d.params) ps.push_back(p.type);
             TypeInfo t;
             t.make_function(ret, ps);
-            t.is_func_ptr = d.is_func_ptr;
+            t.func_ptr_depth = d.func_ptr_depth;
+            t.is_reference = d.func_reference;
+            if (!d.dims.empty()) {           // int (*ops[4])(int), int (*(*p)[4])(int)
+                t.make_array(d.dims);
+                t.outer_pointer = d.array_pointer;
+            }
+            return t;
+        }
+
+        // A typedef'd function or function pointer as the base: binop *pp.
+        if (base.func_info) {
+            TypeInfo t = base;
+            int ptrs = d.pointer_depth + d.group_pointer - d.array_pointer;
+            if (base.array_info && (ptrs || d.array_pointer)) {
+                sem_error(d.line, "declarator '%s' over an array-of-function-pointers type is not supported", d.name);
+                return make_basic(BK_ERROR);
+            }
+            t.func_ptr_depth += ptrs;
+            if (!d.dims.empty()) {
+                if (t.func_ptr_depth == 0) {
+                    sem_error(d.line, "declaration of '%s' as array of functions", d.name);
+                    return make_basic(BK_ERROR);
+                }
+                std::vector<int> dims = d.dims;   // binop table[4]; FnTable grid[2] (FnTable an array)
+                if (base.array_info)
+                    dims.insert(dims.end(), base.array_info->dims.begin(), base.array_info->dims.end());
+                t.make_array(dims);
+                t.outer_pointer = d.array_pointer;    // binop (*p)[4]
+            }
+            if (d.is_reference && t.is_function()) {
+                sem_error(d.line, "reference to function '%s' is not supported", d.name);
+                return make_basic(BK_ERROR);
+            }
+            t.is_reference = d.is_reference;
             return t;
         }
 
         // Declarator dims wrap the base type's own (typedef) dims; '*'s inside
         // parentheses point at the whole array: int (*p)[3].
         TypeInfo t = base;
-        t.is_reference = d.is_reference;
+        t.is_reference = base.is_reference || d.is_reference;
         if (base.outer_pointer > 0 && (d.pointer_depth || d.group_pointer || !d.dims.empty())) {
             sem_error(d.line, "declarator '%s' over a pointer-to-array type is not supported", d.name);
             return make_basic(BK_ERROR);
@@ -166,17 +217,64 @@
         for (const auto& p : params)
             if (p.type.is_void())
                 sem_error(p.line, "parameter '%s' has void type", p.name ? p.name : "");
-        if (d->is_function || d->is_func_ptr)
+        if (d->is_function || d->func_ptr_depth)
             sem_error(d->line, "function '%s' cannot return a function", d->name);
         if (d->grouped && d->group_pointer > 0) {
-            if (d->group_pointer > 1)
-                sem_error(d->line, "pointer to function pointer '%s' is not supported", d->name);
-            d->is_func_ptr = true;
+            // Each '*' in (**pp) is one level; those before a "[..]" point at
+            // the array instead: (*(*p)[4]) is a pointer to 4 function pointers.
+            d->func_ptr_depth = d->group_pointer - d->array_pointer;
             d->group_pointer = 0;
+            if (d->func_ptr_depth == 0) {
+                sem_error(d->line, "declaration of '%s' as pointer to array of functions", d->name);
+                d->func_ptr_depth = 1;
+                d->dims.clear();
+                d->array_pointer = 0;
+            }
         } else {
             d->is_function = true;
+            if (!d->dims.empty()) {
+                sem_error(d->line, "declaration of '%s' as array of functions", d->name);
+                d->dims.clear();
+                d->array_pointer = 0;
+            }
+        }
+        // A '&' seen so far was inside the parentheses: (*&rfp)(int) is a
+        // reference to the function pointer. One written later, as in
+        // int &get(), marks the return type.
+        if (d->is_reference) {
+            if (d->is_function) sem_error(d->line, "reference to function '%s' is not supported", d->name);
+            else d->func_reference = true;
+            d->is_reference = false;
         }
         d->params = std::move(params);
+    }
+
+    // '&' applied to a declarator. Anything already subscripted would become
+    // an array of references; int (&ra)[3] subscripts after the '&'.
+    static void mark_reference(DeclInfo* d) {
+        if (d->is_reference) {
+            sem_error(d->line, "declaration of '%s' as reference to reference", d->name);
+        } else if (!d->dims.empty() && !d->is_function && !d->func_ptr_depth) {
+            sem_error(d->line, "declaration of '%s' as array of references", d->name);
+        } else {
+            d->is_reference = true;
+        }
+    }
+
+    // "[n]" applied to a declarator.
+    static void add_dim(DeclInfo* d, int n) {
+        if (d->is_function || d->func_ptr_depth) {
+            sem_error(d->line, "function '%s' returning an array or pointer to array is not supported", d->name);
+            return;
+        }
+        if (d->group_pointer > 0 && d->array_pointer == 0) {
+            if (!d->dims.empty()) {   // int (*(*ops[4])[2])(int)
+                sem_error(d->line, "array of pointers to arrays '%s' is not supported", d->name);
+                return;
+            }
+            d->array_pointer = d->group_pointer;
+        }
+        d->dims.push_back(n);
     }
 
     static ParamDecl* make_param(TypeInfo* base, DeclInfo* d) {
@@ -188,7 +286,7 @@
         if (t.is_array()) {
             t = decay(t);                  // char *argv[] -> char**, int m[][3] -> int(*)[3]
         } else if (t.is_function()) {
-            t.is_func_ptr = true;
+            t.func_ptr_depth = 1;          // int f(int) parameter -> int(*)(int)
         }
         p->type = t;
         return p;
@@ -213,7 +311,8 @@
         auto& set = g_functions[name];
         for (auto& f : set) {
             if (f.mangled != mangled) continue;
-            if (!same_type(f.type.return_type(), t.return_type())) {
+            if (!same_type(f.type.return_type(), t.return_type()) ||
+                f.type.return_type().is_reference != t.return_type().is_reference) {
                 sem_error(line, "functions that differ only in their return type cannot be overloaded ('%s')", name);
                 return mangled;
             }
@@ -1152,8 +1251,8 @@ init_declarator
 declarator
     : direct_declarator                    { $$ = $1; }
     | pointer direct_declarator            { $$ = $2; $$->pointer_depth += $1; }
-    | T_BIT_AND direct_declarator          { $$ = $2; $$->is_reference = true; }
-    | pointer T_BIT_AND direct_declarator  { $$ = $3; $$->pointer_depth += $1; $$->is_reference = true; }
+    | T_BIT_AND direct_declarator          { $$ = $2; mark_reference($$); }
+    | pointer T_BIT_AND direct_declarator  { $$ = $3; mark_reference($$); $$->pointer_depth += $1; }
     ;
 
 pointer
@@ -1173,14 +1272,14 @@ direct_declarator
         $$->pointer_depth = 0;
         $$->grouped = true;
       }
-    | direct_declarator T_LBRACKET T_RBRACKET { $$ = $1; $$->dims.push_back(-1); }
+    | direct_declarator T_LBRACKET T_RBRACKET { $$ = $1; add_dim($$, -1); }
     | direct_declarator T_LBRACKET conditional_expr T_RBRACKET {
         $$ = $1;
         if (!bad($3) && (!$3->has_const || $3->cval <= 0)) {
             sem_error($1->line, "size of array '%s' must be a positive integer constant", $1->name);
-            $$->dims.push_back(1);
+            add_dim($$, 1);
         } else {
-            $$->dims.push_back($3->has_const ? (int)$3->cval : 1);
+            add_dim($$, $3->has_const ? (int)$3->cval : 1);
         }
       }
     | direct_declarator T_LPAREN {
