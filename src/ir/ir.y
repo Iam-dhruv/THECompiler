@@ -1087,634 +1087,634 @@
 
 %%
 
-program
+    program
     : /* empty */
     | program external_decl
     ;
 
-external_decl
+    external_decl
     : function_definition
     | declaration
-    | error T_SEMICOLON        { yyerrok; }
-    | error T_RBRACE           { yyerrok; }
+    | error T_SEMICOLON { yyerrok; }
+    | error T_RBRACE { yyerrok; }
     ;
 
-function_definition
+    function_definition
     : declaration_specifiers declarator { begin_function($1, $2); } function_body {
-        end_function($4);
-      }
+    end_function($4);
+    }
     ;
 
-function_body
-    : T_LBRACE stmt_list_opt T_RBRACE   { $$ = $2; }
+    function_body
+    : T_LBRACE stmt_list_opt T_RBRACE { $$ = $2; }
     ;
 
-/* ── Declarations ──────────────────────────────────────────────────────── */
+    /* ── Declarations ──────────────────────────────────────────────────────── */
 
-declaration
+    declaration
     : declaration_specifiers init_declarator_list T_SEMICOLON
     | declaration_specifiers T_SEMICOLON
     ;
 
-declaration_specifiers
-    : type_specifier                                  { $$ = $1; g_current_decl_type = $1; }
-    | storage_class_specifier declaration_specifiers  {
-        $$ = $2;
-        if ($1 == SC_STATIC)  $$->is_static = true;
-        if ($1 == SC_TYPEDEF) $$->is_typedef = true;
-        g_current_decl_type = $$;
-      }
+    declaration_specifiers
+    : type_specifier { $$ = $1; g_current_decl_type = $1; }
+    | storage_class_specifier declaration_specifiers {
+    $$ = $2;
+    if ($1 == SC_STATIC)  $$->is_static = true;
+    if ($1 == SC_TYPEDEF) $$->is_typedef = true;
+    g_current_decl_type = $$;
+    }
     ;
 
-storage_class_specifier
-    : T_STATIC  { $$ = SC_STATIC; }
+    storage_class_specifier
+    : T_STATIC { $$ = SC_STATIC; }
     | T_VIRTUAL { $$ = SC_NONE; }
-    | T_FRIEND  { $$ = SC_NONE; }
+    | T_FRIEND { $$ = SC_NONE; }
     | T_TYPEDEF { $$ = SC_TYPEDEF; }
     ;
 
-type_specifier
-    : T_INT    { $$ = new TypeInfo(make_basic(BK_INT)); }
-    | T_CHAR   { $$ = new TypeInfo(make_basic(BK_CHAR)); }
-    | T_FLOAT  { $$ = new TypeInfo(make_basic(BK_FLOAT)); }
+    type_specifier
+    : T_INT { $$ = new TypeInfo(make_basic(BK_INT)); }
+    | T_CHAR { $$ = new TypeInfo(make_basic(BK_CHAR)); }
+    | T_FLOAT { $$ = new TypeInfo(make_basic(BK_FLOAT)); }
     | T_DOUBLE { $$ = new TypeInfo(make_basic(BK_DOUBLE)); }
-    | T_VOID   { $$ = new TypeInfo(make_basic(BK_VOID)); }
+    | T_VOID { $$ = new TypeInfo(make_basic(BK_VOID)); }
     | T_TYPE_NAME {
-        SymbolInfo* s = g_symtab.lookup(TOK_TEXT($1));
-        $$ = new TypeInfo(s ? s->type_info : make_basic(BK_ERROR));
-        $$->is_typedef = false;
-      }
-    | struct_or_union_specifier  { $$ = $1; }
-    | enum_specifier             { $$ = $1; }
-    | class_specifier            { $$ = $1; }
+    SymbolInfo* s = g_symtab.lookup(TOK_TEXT($1));
+    $$ = new TypeInfo(s ? s->type_info : make_basic(BK_ERROR));
+    $$->is_typedef = false;
+    }
+    | struct_or_union_specifier { $$ = $1; }
+    | enum_specifier { $$ = $1; }
+    | class_specifier { $$ = $1; }
     ;
 
-struct_or_union
+    struct_or_union
     : T_STRUCT { $$ = BK_STRUCT; }
-    | T_UNION  { $$ = BK_UNION; }
+    | T_UNION { $$ = BK_UNION; }
     ;
 
-struct_or_union_specifier
+    struct_or_union_specifier
     : struct_or_union T_IDENTIFIER {
-        composite_begin((BaseKind)$1, TOK_TEXT($2), TOK_LINE($2));
-      } T_LBRACE member_decl_list T_RBRACE {
-        $$ = composite_end();
-      }
+    composite_begin((BaseKind)$1, TOK_TEXT($2), TOK_LINE($2));
+    } T_LBRACE member_decl_list T_RBRACE {
+    $$ = composite_end();
+    }
     | struct_or_union {
-        composite_begin((BaseKind)$1, "", yylineno);
-      } T_LBRACE member_decl_list T_RBRACE {
-        $$ = composite_end();
-      }
+    composite_begin((BaseKind)$1, "", yylineno);
+    } T_LBRACE member_decl_list T_RBRACE {
+    $$ = composite_end();
+    }
     | struct_or_union T_IDENTIFIER {
-        $$ = composite_ref((BaseKind)$1, TOK_TEXT($2));
-      }
+    $$ = composite_ref((BaseKind)$1, TOK_TEXT($2));
+    }
     ;
 
-member_decl_list
+    member_decl_list
     : /* empty */
     | member_decl_list declaration
     ;
 
-enum_specifier
+    enum_specifier
     : T_ENUM T_IDENTIFIER { g_enum_next = 0; } T_LBRACE enumerator_list T_RBRACE {
-        $$ = enum_type(TOK_TEXT($2));
-      }
+    $$ = enum_type(TOK_TEXT($2));
+    }
     | T_ENUM { g_enum_next = 0; } T_LBRACE enumerator_list T_RBRACE {
-        $$ = enum_type("");
-      }
+    $$ = enum_type("");
+    }
     | T_ENUM T_IDENTIFIER {
-        $$ = enum_type(TOK_TEXT($2));
-      }
+    $$ = enum_type(TOK_TEXT($2));
+    }
     ;
 
-enumerator_list
+    enumerator_list
     : enumerator
     | enumerator_list T_COMMA enumerator
     ;
 
-enumerator
-    : T_IDENTIFIER                           { declare_enumerator($1, nullptr); }
+    enumerator
+    : T_IDENTIFIER { declare_enumerator($1, nullptr); }
     | T_IDENTIFIER T_ASSIGN conditional_expr { declare_enumerator($1, $3); }
     ;
 
-class_specifier
+    class_specifier
     : T_CLASS T_IDENTIFIER {
-        composite_begin(BK_CLASS, TOK_TEXT($2), TOK_LINE($2));
-      } T_LBRACE class_member_list T_RBRACE {
-        $$ = composite_end();
-      }
+    composite_begin(BK_CLASS, TOK_TEXT($2), TOK_LINE($2));
+    } T_LBRACE class_member_list T_RBRACE {
+    $$ = composite_end();
+    }
     | T_CLASS {
-        composite_begin(BK_CLASS, "", yylineno);
-      } T_LBRACE class_member_list T_RBRACE {
-        $$ = composite_end();
-      }
+    composite_begin(BK_CLASS, "", yylineno);
+    } T_LBRACE class_member_list T_RBRACE {
+    $$ = composite_end();
+    }
     | T_CLASS T_IDENTIFIER {
-        $$ = composite_ref(BK_CLASS, TOK_TEXT($2));
-      }
+    $$ = composite_ref(BK_CLASS, TOK_TEXT($2));
+    }
     ;
 
-class_member_list
+    class_member_list
     : /* empty */
     | class_member_list class_member
     ;
 
-class_member
+    class_member
     : access_specifier T_COLON
     | declaration
     | function_definition
     ;
 
-access_specifier
+    access_specifier
     : T_PUBLIC
     | T_PRIVATE
     | T_PROTECTED
     ;
 
-init_declarator_list
+    init_declarator_list
     : init_declarator
     | init_declarator_list T_COMMA init_declarator
     ;
 
-init_declarator
-    : declarator                { declare_object($1, false); }
-    | declarator T_ASSIGN       { $<init_ctx>$ = init_begin($1); }
-      initializer               { init_finish($<init_ctx>3, $4); }
+    init_declarator
+    : declarator { declare_object($1, false); }
+    | declarator T_ASSIGN { $<init_ctx>$ = init_begin($1); }
+    initializer               { init_finish($<init_ctx>3, $4); }
     ;
 
-declarator
-    : direct_declarator                    { $$ = $1; }
-    | pointer direct_declarator            { $$ = $2; $$->pointer_depth += $1; }
-    | T_BIT_AND direct_declarator          { $$ = $2; mark_reference($$); }
-    | pointer T_BIT_AND direct_declarator  { $$ = $3; mark_reference($$); $$->pointer_depth += $1; }
+    declarator
+    : direct_declarator { $$ = $1; }
+    | pointer direct_declarator { $$ = $2; $$->pointer_depth += $1; }
+    | T_BIT_AND direct_declarator { $$ = $2; mark_reference($$); }
+    | pointer T_BIT_AND direct_declarator { $$ = $3; mark_reference($$); $$->pointer_depth += $1; }
     ;
 
-pointer
-    : T_MUL         { $$ = 1; }
+    pointer
+    : T_MUL { $$ = 1; }
     | T_MUL pointer { $$ = 1 + $2; }
     ;
 
-direct_declarator
+    direct_declarator
     : T_IDENTIFIER {
-        $$ = new DeclInfo();
-        $$->name = TOK_TEXT($1);
-        $$->line = TOK_LINE($1);
-      }
+    $$ = new DeclInfo();
+    $$->name = TOK_TEXT($1);
+    $$->line = TOK_LINE($1);
+    }
     | T_LPAREN declarator T_RPAREN {
-        $$ = $2;
-        $$->group_pointer += $$->pointer_depth;
-        $$->pointer_depth = 0;
-        $$->grouped = true;
-      }
+    $$ = $2;
+    $$->group_pointer += $$->pointer_depth;
+    $$->pointer_depth = 0;
+    $$->grouped = true;
+    }
     | direct_declarator T_LBRACKET T_RBRACKET { $$ = $1; add_dim($$, -1); }
     | direct_declarator T_LBRACKET conditional_expr T_RBRACKET {
-        $$ = $1;
-        if (!bad($3) && (!$3->has_const || $3->cval <= 0)) {
-            sem_error($1->line, "size of array '%s' must be a positive integer constant", $1->name);
-            add_dim($$, 1);
-        } else {
-            add_dim($$, $3->has_const ? (int)$3->cval : 1);
-        }
-      }
+    $$ = $1;
+    if (!bad($3) && (!$3->has_const || $3->cval <= 0)) {
+    sem_error($1->line, "size of array '%s' must be a positive integer constant", $1->name);
+    add_dim($$, 1);
+    } else {
+    add_dim($$, $3->has_const ? (int)$3->cval : 1);
+    }
+    }
     | direct_declarator T_LPAREN {
-        g_decl_type_save_stack.push_back(g_current_decl_type);
-      } T_RPAREN {
-        $$ = $1;
-        mark_function($$, {});
-        g_current_decl_type = g_decl_type_save_stack.back();
-        g_decl_type_save_stack.pop_back();
-      }
+    g_decl_type_save_stack.push_back(g_current_decl_type);
+    } T_RPAREN {
+    $$ = $1;
+    mark_function($$, {});
+    g_current_decl_type = g_decl_type_save_stack.back();
+    g_decl_type_save_stack.pop_back();
+    }
     | direct_declarator T_LPAREN {
-        g_decl_type_save_stack.push_back(g_current_decl_type);
-      } param_list T_RPAREN {
-        $$ = $1;
-        mark_function($$, *$4);
-        g_current_decl_type = g_decl_type_save_stack.back();
-        g_decl_type_save_stack.pop_back();
-      }
+    g_decl_type_save_stack.push_back(g_current_decl_type);
+    } param_list T_RPAREN {
+    $$ = $1;
+    mark_function($$, *$4);
+    g_current_decl_type = g_decl_type_save_stack.back();
+    g_decl_type_save_stack.pop_back();
+    }
     ;
 
-param_list
-    : param_decl                    { $$ = new std::vector<ParamDecl>{*$1}; }
+    param_list
+    : param_decl { $$ = new std::vector<ParamDecl>{*$1}; }
     | param_list T_COMMA param_decl { $$ = $1; $$->push_back(*$3); }
     ;
 
-param_decl
+    param_decl
     : declaration_specifiers declarator { $$ = make_param($1, $2); }
-    | declaration_specifiers            { $$ = make_param($1, nullptr); }
+    | declaration_specifiers { $$ = make_param($1, nullptr); }
     ;
 
-initializer
+    initializer
     : assignment_expr {
-        to_value($1);
-        $$ = new InitNode;
-        $$->expr = $1;
-      }
-    | T_LBRACE initializer_list T_RBRACE           { $$ = $2; }
-    | T_LBRACE initializer_list T_COMMA T_RBRACE   { $$ = $2; }
+    to_value($1);
+    $$ = new InitNode;
+    $$->expr = $1;
+    }
+    | T_LBRACE initializer_list T_RBRACE { $$ = $2; }
+    | T_LBRACE initializer_list T_COMMA T_RBRACE { $$ = $2; }
     ;
 
-initializer_list
+    initializer_list
     : initializer {
-        $$ = new InitNode;
-        $$->is_list = true;
-        $$->items.push_back($1);
-      }
+    $$ = new InitNode;
+    $$->is_list = true;
+    $$->items.push_back($1);
+    }
     | initializer_list T_COMMA initializer { $$ = $1; $$->items.push_back($3); }
     ;
 
-/* ── Statements ────────────────────────────────────────────────────────── */
+    /* ── Statements ────────────────────────────────────────────────────────── */
 
-M
+    M
     : /* empty */ { $$ = nextquad(); }
     ;
 
-N
+    N
     : /* empty */ { $$ = new List(makelist(emit_goto())); }
     ;
 
-scope_enter
+    scope_enter
     : /* empty */ { g_symtab.push_block_scope(); }
     ;
 
-loop_enter
+    loop_enter
     : /* empty */ { g_fn.jumps.push_back(JumpCtx{}); }
     ;
 
-compound_stmt
+    compound_stmt
     : T_LBRACE scope_enter stmt_list_opt T_RBRACE { g_symtab.pop_scope(); $$ = $3; }
     ;
 
-stmt_list_opt
+    stmt_list_opt
     : /* empty */ { $$ = new List; }
-    | stmt_list   { $$ = $1; }
+    | stmt_list { $$ = $1; }
     ;
 
-stmt_list
-    : stmt                { $$ = $1; }
-    | stmt_list M stmt    { backpatch(*$1, $2); $$ = $3; }
+    stmt_list
+    : stmt { $$ = $1; }
+    | stmt_list M stmt { backpatch(*$1, $2); $$ = $3; }
     ;
 
-stmt
-    : compound_stmt       { $$ = $1; }
-    | expr_stmt           { $$ = $1; }
-    | selection_stmt      { $$ = $1; }
-    | iteration_stmt      { $$ = $1; }
-    | jump_stmt           { $$ = $1; }
-    | labeled_stmt        { $$ = $1; }
-    | declaration         { $$ = new List; }
-    | error T_SEMICOLON   { yyerrok; $$ = new List; }
+    stmt
+    : compound_stmt { $$ = $1; }
+    | expr_stmt { $$ = $1; }
+    | selection_stmt { $$ = $1; }
+    | iteration_stmt { $$ = $1; }
+    | jump_stmt { $$ = $1; }
+    | labeled_stmt { $$ = $1; }
+    | declaration { $$ = new List; }
+    | error T_SEMICOLON { yyerrok; $$ = new List; }
     ;
 
-expr_stmt
-    : T_SEMICOLON         { $$ = new List; }
-    | expr T_SEMICOLON    {
-        $$ = new List($1->is_cond ? merge($1->truelist, $1->falselist) : List{});
-      }
+    expr_stmt
+    : T_SEMICOLON { $$ = new List; }
+    | expr T_SEMICOLON {
+    $$ = new List($1->is_cond ? merge($1->truelist, $1->falselist) : List{});
+    }
     ;
 
-cond
-    : expr                { to_cond($1); $$ = $1; }
+    cond
+    : expr { to_cond($1); $$ = $1; }
     ;
 
-selection_stmt
+    selection_stmt
     : T_IF T_LPAREN cond T_RPAREN M stmt %prec IFX {
-        backpatch($3->truelist, $5);
-        $$ = new List(merge($3->falselist, *$6));
-      }
+    backpatch($3->truelist, $5);
+    $$ = new List(merge($3->falselist, *$6));
+    }
     | T_IF T_LPAREN cond T_RPAREN M stmt T_ELSE N M stmt {
-        backpatch($3->truelist, $5);
-        backpatch($3->falselist, $9);
-        $$ = new List(merge(merge(*$6, *$8), *$10));
-      }
+    backpatch($3->truelist, $5);
+    backpatch($3->falselist, $9);
+    $$ = new List(merge(merge(*$6, *$8), *$10));
+    }
     | T_SWITCH T_LPAREN expr T_RPAREN {
-        switch_begin($3, TOK_LINE($<token_index>1));
-      } T_LBRACE scope_enter switch_case_list T_RBRACE {
-        g_symtab.pop_scope();
-        $$ = switch_end();
-      }
+    switch_begin($3, TOK_LINE($<token_index>1));
+    } T_LBRACE scope_enter switch_case_list T_RBRACE {
+    g_symtab.pop_scope();
+    $$ = switch_end();
+    }
     ;
 
-switch_case_list
+    switch_case_list
     : /* empty */
     | switch_case_list switch_case
     ;
 
-/* A case body falls through into whatever follows it. */
-switch_case
+    /* A case body falls through into whatever follows it. */
+    switch_case
     : T_CASE conditional_expr T_COLON {
-        switch_case_label($2, TOK_LINE($<token_index>1));
-      } stmt_list_opt {
-        backpatch(*$5, nextquad());
-      }
+    switch_case_label($2, TOK_LINE($<token_index>1));
+    } stmt_list_opt {
+    backpatch(*$5, nextquad());
+    }
     | T_DEFAULT T_COLON {
-        switch_default_label(TOK_LINE($<token_index>1));
-      } stmt_list_opt {
-        backpatch(*$4, nextquad());
-      }
+    switch_default_label(TOK_LINE($<token_index>1));
+    } stmt_list_opt {
+    backpatch(*$4, nextquad());
+    }
     ;
 
-iteration_stmt
+    iteration_stmt
     : T_WHILE M T_LPAREN cond T_RPAREN M loop_enter stmt {
-        backpatch(*$8, $2);
-        backpatch($4->truelist, $6);
-        JumpCtx c = leave_loop();
-        backpatch(c.continues, $2);
-        emit_goto($2);
-        $$ = new List(merge($4->falselist, c.breaks));
-      }
+    backpatch(*$8, $2);
+    backpatch($4->truelist, $6);
+    JumpCtx c = leave_loop();
+    backpatch(c.continues, $2);
+    emit_goto($2);
+    $$ = new List(merge($4->falselist, c.breaks));
+    }
     | T_UNTIL M T_LPAREN cond T_RPAREN M loop_enter stmt {
-        backpatch(*$8, $2);
-        backpatch($4->falselist, $6);
-        JumpCtx c = leave_loop();
-        backpatch(c.continues, $2);
-        emit_goto($2);
-        $$ = new List(merge($4->truelist, c.breaks));
-      }
+    backpatch(*$8, $2);
+    backpatch($4->falselist, $6);
+    JumpCtx c = leave_loop();
+    backpatch(c.continues, $2);
+    emit_goto($2);
+    $$ = new List(merge($4->truelist, c.breaks));
+    }
     | T_DO M loop_enter stmt T_WHILE M T_LPAREN cond T_RPAREN T_SEMICOLON {
-        backpatch(*$4, $6);
-        backpatch($8->truelist, $2);
-        JumpCtx c = leave_loop();
-        backpatch(c.continues, $6);
-        $$ = new List(merge($8->falselist, c.breaks));
-      }
+    backpatch(*$4, $6);
+    backpatch($8->truelist, $2);
+    JumpCtx c = leave_loop();
+    backpatch(c.continues, $6);
+    $$ = new List(merge($8->falselist, c.breaks));
+    }
     | T_DO M loop_enter stmt T_UNTIL M T_LPAREN cond T_RPAREN T_SEMICOLON {
-        backpatch(*$4, $6);
-        backpatch($8->falselist, $2);
-        JumpCtx c = leave_loop();
-        backpatch(c.continues, $6);
-        $$ = new List(merge($8->truelist, c.breaks));
-      }
+    backpatch(*$4, $6);
+    backpatch($8->falselist, $2);
+    JumpCtx c = leave_loop();
+    backpatch(c.continues, $6);
+    $$ = new List(merge($8->truelist, c.breaks));
+    }
     /* init; M1 cond; M2 incr N  M3 body: cond.true -> M3, body.next -> M2, N -> M1 */
     | T_FOR T_LPAREN scope_enter for_init M for_cond T_SEMICOLON M for_incr_opt N T_RPAREN M loop_enter stmt {
-        backpatch(*$4, $5);
-        backpatch($6->truelist, $12);
-        backpatch(*$10, $5);
-        backpatch(*$14, $8);
-        JumpCtx c = leave_loop();
-        backpatch(c.continues, $8);
-        emit_goto($8);
-        g_symtab.pop_scope();
-        $$ = new List(merge($6->falselist, c.breaks));
-      }
+    backpatch(*$4, $5);
+    backpatch($6->truelist, $12);
+    backpatch(*$10, $5);
+    backpatch(*$14, $8);
+    JumpCtx c = leave_loop();
+    backpatch(c.continues, $8);
+    emit_goto($8);
+    g_symtab.pop_scope();
+    $$ = new List(merge($6->falselist, c.breaks));
+    }
     ;
 
-for_init
-    : expr_stmt       { $$ = $1; }
-    | declaration     { $$ = new List; }
+    for_init
+    : expr_stmt { $$ = $1; }
+    | declaration { $$ = new List; }
     ;
 
-/* An omitted condition is always true: jump straight to the body. */
-for_cond
+    /* An omitted condition is always true: jump straight to the body. */
+    for_cond
     : /* empty */ {
-        $$ = new_expr(yylineno);
-        $$->is_cond = true;
-        $$->truelist = makelist(emit_goto());
-      }
-    | expr            { to_cond($1); $$ = $1; }
+    $$ = new_expr(yylineno);
+    $$->is_cond = true;
+    $$->truelist = makelist(emit_goto());
+    }
+    | expr { to_cond($1); $$ = $1; }
     ;
 
-for_incr_opt
+    for_incr_opt
     : /* empty */
     | expr {
-        if ($1->is_cond) backpatch(merge($1->truelist, $1->falselist), nextquad());
-      }
+    if ($1->is_cond) backpatch(merge($1->truelist, $1->falselist), nextquad());
+    }
     ;
 
-jump_stmt
+    jump_stmt
     : T_GOTO T_IDENTIFIER T_SEMICOLON { goto_stmt($2); $$ = new List; }
-    | T_CONTINUE T_SEMICOLON          { continue_stmt(TOK_LINE($<token_index>1)); $$ = new List; }
-    | T_BREAK T_SEMICOLON             { break_stmt(TOK_LINE($<token_index>1)); $$ = new List; }
-    | T_RETURN T_SEMICOLON            { return_stmt(nullptr, TOK_LINE($<token_index>1)); $$ = new List; }
-    | T_RETURN expr T_SEMICOLON       { return_stmt($2, TOK_LINE($<token_index>1)); $$ = new List; }
+    | T_CONTINUE T_SEMICOLON { continue_stmt(TOK_LINE($<token_index>1)); $$ = new List; }
+    | T_BREAK T_SEMICOLON { break_stmt(TOK_LINE($<token_index>1)); $$ = new List; }
+    | T_RETURN T_SEMICOLON { return_stmt(nullptr, TOK_LINE($<token_index>1)); $$ = new List; }
+    | T_RETURN expr T_SEMICOLON { return_stmt($2, TOK_LINE($<token_index>1)); $$ = new List; }
     ;
 
-labeled_stmt
+    labeled_stmt
     : T_IDENTIFIER T_COLON { define_label($1); } stmt { $$ = $4; }
     ;
 
-/* ── Expressions — layered precedence (no casts, no sizeof, no comma op) ── */
+    /* ── Expressions — layered precedence (no casts, no sizeof, no comma op) ── */
 
-primary_expr
+    primary_expr
     : T_IDENTIFIER {
-        $$ = identifier_expr($1);
-      }
+    $$ = identifier_expr($1);
+    }
     | T_INT_CONST {
-        $$ = int_const_expr(std::strtol(TOK_TEXT($1), nullptr, 0), TOK_LINE($1));
-      }
+    $$ = int_const_expr(std::strtol(TOK_TEXT($1), nullptr, 0), TOK_LINE($1));
+    }
     | T_FLOAT_CONST {
-        $$ = new_expr(TOK_LINE($1));
-        $$->type = make_basic(BK_FLOAT);
-        $$->addr = TOK_TEXT($1);
-        $$->is_float_lit = true;
-      }
+    $$ = new_expr(TOK_LINE($1));
+    $$->type = make_basic(BK_FLOAT);
+    $$->addr = TOK_TEXT($1);
+    $$->is_float_lit = true;
+    }
     | T_CHAR_CONST {
-        $$ = int_const_expr(char_value(TOK_TEXT($1)), TOK_LINE($1));
-        $$->type = make_basic(BK_CHAR);
-        $$->addr = TOK_TEXT($1);
-      }
+    $$ = int_const_expr(char_value(TOK_TEXT($1)), TOK_LINE($1));
+    $$->type = make_basic(BK_CHAR);
+    $$->addr = TOK_TEXT($1);
+    }
     | T_STRING_LITERAL {
-        std::string lex = TOK_TEXT($1);
-        $$ = new_expr(TOK_LINE($1));
-        $$->type = make_basic(BK_CHAR, 1);
-        $$->is_string = true;
-        $$->str_value = lex.substr(1, lex.size() - 2);
-      }
+    std::string lex = TOK_TEXT($1);
+    $$ = new_expr(TOK_LINE($1));
+    $$->type = make_basic(BK_CHAR, 1);
+    $$->is_string = true;
+    $$->str_value = lex.substr(1, lex.size() - 2);
+    }
     | T_THIS {
-        sem_error(TOK_LINE($<token_index>1), "'this' is not supported (classes are excluded from IR generation)");
-        $$ = error_expr(TOK_LINE($<token_index>1));
-      }
+    sem_error(TOK_LINE($<token_index>1), "'this' is not supported (classes are excluded from IR generation)");
+    $$ = error_expr(TOK_LINE($<token_index>1));
+    }
     | T_LPAREN expr T_RPAREN { $$ = $2; }
     ;
 
-postfix_expr
+    postfix_expr
     : primary_expr { $$ = $1; }
     | postfix_expr T_LBRACKET expr T_RBRACKET {
-        $$ = index_expr($1, $3, TOK_LINE($<token_index>2));
-      }
+    $$ = index_expr($1, $3, TOK_LINE($<token_index>2));
+    }
     | postfix_expr T_LPAREN T_RPAREN {
-        std::vector<ExprAttr*> none;
-        $$ = call_expr($1, none, TOK_LINE($<token_index>2));
-      }
+    std::vector<ExprAttr*> none;
+    $$ = call_expr($1, none, TOK_LINE($<token_index>2));
+    }
     | postfix_expr T_LPAREN argument_expr_list T_RPAREN {
-        $$ = call_expr($1, *$3, TOK_LINE($<token_index>2));
-      }
+    $$ = call_expr($1, *$3, TOK_LINE($<token_index>2));
+    }
     | postfix_expr T_DOT T_IDENTIFIER {
-        $$ = member_expr($1, TOK_TEXT($3), false, TOK_LINE($3));
-      }
+    $$ = member_expr($1, TOK_TEXT($3), false, TOK_LINE($3));
+    }
     | postfix_expr T_ARROW T_IDENTIFIER {
-        $$ = member_expr($1, TOK_TEXT($3), true, TOK_LINE($3));
-      }
+    $$ = member_expr($1, TOK_TEXT($3), true, TOK_LINE($3));
+    }
     | postfix_expr T_INCR { $$ = incdec($1, true, true, TOK_LINE($<token_index>2)); }
     | postfix_expr T_DECR { $$ = incdec($1, false, true, TOK_LINE($<token_index>2)); }
     ;
 
-/* Each argument is turned into a value before the next one is parsed, so
-   its jump code (if any) can't skip the following arguments' code. */
-argument_expr_list
+    /* Each argument is turned into a value before the next one is parsed, so
+    its jump code (if any) can't skip the following arguments' code. */
+    argument_expr_list
     : assignment_expr {
-        to_value($1);
-        $$ = new std::vector<ExprAttr*>{$1};
-      }
+    to_value($1);
+    $$ = new std::vector<ExprAttr*>{$1};
+    }
     | argument_expr_list T_COMMA assignment_expr {
-        to_value($3);
-        $$ = $1;
-        $$->push_back($3);
-      }
+    to_value($3);
+    $$ = $1;
+    $$->push_back($3);
+    }
     ;
 
-unary_expr
-    : postfix_expr                 { $$ = $1; }
-    | T_INCR unary_expr            { $$ = incdec($2, true, false, TOK_LINE($<token_index>1)); }
-    | T_DECR unary_expr            { $$ = incdec($2, false, false, TOK_LINE($<token_index>1)); }
-    | unary_operator unary_expr    { $$ = unary_op(TOK_TEXT($1), $2, TOK_LINE($1)); }
-    | T_NEW type_specifier         { $$ = new_object(*$2, nullptr, TOK_LINE($<token_index>1)); }
+    unary_expr
+    : postfix_expr { $$ = $1; }
+    | T_INCR unary_expr { $$ = incdec($2, true, false, TOK_LINE($<token_index>1)); }
+    | T_DECR unary_expr { $$ = incdec($2, false, false, TOK_LINE($<token_index>1)); }
+    | unary_operator unary_expr { $$ = unary_op(TOK_TEXT($1), $2, TOK_LINE($1)); }
+    | T_NEW type_specifier { $$ = new_object(*$2, nullptr, TOK_LINE($<token_index>1)); }
     | T_NEW type_specifier T_LBRACKET conditional_expr T_RBRACKET {
-        $$ = new_object(*$2, $4, TOK_LINE($<token_index>1));
-      }
-    | T_DELETE unary_expr          { $$ = delete_object($2, TOK_LINE($<token_index>1)); }
+    $$ = new_object(*$2, $4, TOK_LINE($<token_index>1));
+    }
+    | T_DELETE unary_expr { $$ = delete_object($2, TOK_LINE($<token_index>1)); }
     | T_DELETE T_LBRACKET T_RBRACKET unary_expr {
-        $$ = delete_object($4, TOK_LINE($<token_index>1));
-      }
+    $$ = delete_object($4, TOK_LINE($<token_index>1));
+    }
     ;
 
-unary_operator
+    unary_operator
     : T_BIT_AND { $$ = $<token_index>1; }
-    | T_MUL     { $$ = $<token_index>1; }
-    | T_PLUS    { $$ = $<token_index>1; }
-    | T_MINUS   { $$ = $<token_index>1; }
+    | T_MUL { $$ = $<token_index>1; }
+    | T_PLUS { $$ = $<token_index>1; }
+    | T_MINUS { $$ = $<token_index>1; }
     | T_BIT_NOT { $$ = $<token_index>1; }
-    | T_NOT     { $$ = $<token_index>1; }
+    | T_NOT { $$ = $<token_index>1; }
     ;
 
-/* In every binary rule the left operand is made a value (mid-rule action)
-   before the right operand is parsed: a left operand in jump form must be
-   materialized before the right operand's code, or its jumps would skip it. */
+    /* In every binary rule the left operand is made a value (mid-rule action)
+    before the right operand is parsed: a left operand in jump form must be
+    materialized before the right operand's code, or its jumps would skip it. */
 
-multiplicative_expr
+    multiplicative_expr
     : unary_expr { $$ = $1; }
     | multiplicative_expr T_MUL { make_rvalue($1); } unary_expr {
-        $$ = arith_binary("*", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = arith_binary("*", $1, $4, TOK_LINE($<token_index>2));
+    }
     | multiplicative_expr T_DIV { make_rvalue($1); } unary_expr {
-        $$ = arith_binary("/", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = arith_binary("/", $1, $4, TOK_LINE($<token_index>2));
+    }
     | multiplicative_expr T_MOD { make_rvalue($1); } unary_expr {
-        $$ = arith_binary("%", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = arith_binary("%", $1, $4, TOK_LINE($<token_index>2));
+    }
     ;
 
-additive_expr
+    additive_expr
     : multiplicative_expr { $$ = $1; }
     | additive_expr T_PLUS { make_rvalue($1); } multiplicative_expr {
-        $$ = arith_binary("+", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = arith_binary("+", $1, $4, TOK_LINE($<token_index>2));
+    }
     | additive_expr T_MINUS { make_rvalue($1); } multiplicative_expr {
-        $$ = arith_binary("-", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = arith_binary("-", $1, $4, TOK_LINE($<token_index>2));
+    }
     ;
 
-shift_expr
+    shift_expr
     : additive_expr { $$ = $1; }
     | shift_expr T_LSHIFT { make_rvalue($1); } additive_expr {
-        $$ = arith_binary("<<", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = arith_binary("<<", $1, $4, TOK_LINE($<token_index>2));
+    }
     | shift_expr T_RSHIFT { make_rvalue($1); } additive_expr {
-        $$ = arith_binary(">>", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = arith_binary(">>", $1, $4, TOK_LINE($<token_index>2));
+    }
     ;
 
-relational_expr
+    relational_expr
     : shift_expr { $$ = $1; }
     | relational_expr T_LT { make_rvalue($1); } shift_expr {
-        $$ = relational("<", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = relational("<", $1, $4, TOK_LINE($<token_index>2));
+    }
     | relational_expr T_GT { make_rvalue($1); } shift_expr {
-        $$ = relational(">", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = relational(">", $1, $4, TOK_LINE($<token_index>2));
+    }
     | relational_expr T_LE { make_rvalue($1); } shift_expr {
-        $$ = relational("<=", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = relational("<=", $1, $4, TOK_LINE($<token_index>2));
+    }
     | relational_expr T_GE { make_rvalue($1); } shift_expr {
-        $$ = relational(">=", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = relational(">=", $1, $4, TOK_LINE($<token_index>2));
+    }
     ;
 
-equality_expr
+    equality_expr
     : relational_expr { $$ = $1; }
     | equality_expr T_EQ { make_rvalue($1); } relational_expr {
-        $$ = relational("==", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = relational("==", $1, $4, TOK_LINE($<token_index>2));
+    }
     | equality_expr T_NE { make_rvalue($1); } relational_expr {
-        $$ = relational("!=", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = relational("!=", $1, $4, TOK_LINE($<token_index>2));
+    }
     ;
 
-and_expr
+    and_expr
     : equality_expr { $$ = $1; }
     | and_expr T_BIT_AND { make_rvalue($1); } equality_expr {
-        $$ = arith_binary("&", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = arith_binary("&", $1, $4, TOK_LINE($<token_index>2));
+    }
     ;
 
-exclusive_or_expr
+    exclusive_or_expr
     : and_expr { $$ = $1; }
     | exclusive_or_expr T_BIT_XOR { make_rvalue($1); } and_expr {
-        $$ = arith_binary("^", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = arith_binary("^", $1, $4, TOK_LINE($<token_index>2));
+    }
     ;
 
-inclusive_or_expr
+    inclusive_or_expr
     : exclusive_or_expr { $$ = $1; }
     | inclusive_or_expr T_BIT_OR { make_rvalue($1); } exclusive_or_expr {
-        $$ = arith_binary("|", $1, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = arith_binary("|", $1, $4, TOK_LINE($<token_index>2));
+    }
     ;
 
-logical_and_expr
+    logical_and_expr
     : inclusive_or_expr { $$ = $1; }
     | logical_and_expr T_AND { to_cond($1); $<ival>$ = nextquad(); } inclusive_or_expr {
-        $$ = logical(true, $1, $<ival>3, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = logical(true, $1, $<ival>3, $4, TOK_LINE($<token_index>2));
+    }
     ;
 
-logical_or_expr
+    logical_or_expr
     : logical_and_expr { $$ = $1; }
     | logical_or_expr T_OR { to_cond($1); $<ival>$ = nextquad(); } logical_and_expr {
-        $$ = logical(false, $1, $<ival>3, $4, TOK_LINE($<token_index>2));
-      }
+    $$ = logical(false, $1, $<ival>3, $4, TOK_LINE($<token_index>2));
+    }
     ;
 
-conditional_expr
+    conditional_expr
     : logical_or_expr { $$ = $1; }
     | logical_or_expr T_QUESTION { to_cond($1); $<ival>$ = nextquad(); }
-      expr T_COLON { $<tern>$ = ternary_mid($4); }
-      conditional_expr {
-        $$ = ternary_end($1, $<ival>3, $<tern>6, $7, TOK_LINE($<token_index>2));
-      }
+    expr T_COLON { $<tern>$ = ternary_mid($4); }
+    conditional_expr {
+    $$ = ternary_end($1, $<ival>3, $<tern>6, $7, TOK_LINE($<token_index>2));
+    }
     ;
 
-assignment_expr
+    assignment_expr
     : conditional_expr { $$ = $1; }
     | unary_expr assignment_operator assignment_expr {
-        $$ = assign_expr(TOK_TEXT($2), $1, $3, TOK_LINE($2));
-      }
+    $$ = assign_expr(TOK_TEXT($2), $1, $3, TOK_LINE($2));
+    }
     ;
 
-assignment_operator
-    : T_ASSIGN          { $$ = $<token_index>1; }
-    | T_PLUS_ASSIGN     { $$ = $<token_index>1; }
-    | T_MINUS_ASSIGN    { $$ = $<token_index>1; }
-    | T_MUL_ASSIGN      { $$ = $<token_index>1; }
-    | T_DIV_ASSIGN      { $$ = $<token_index>1; }
-    | T_MOD_ASSIGN      { $$ = $<token_index>1; }
-    | T_AND_ASSIGN      { $$ = $<token_index>1; }
-    | T_OR_ASSIGN       { $$ = $<token_index>1; }
-    | T_XOR_ASSIGN      { $$ = $<token_index>1; }
-    | T_LSHIFT_ASSIGN   { $$ = $<token_index>1; }
-    | T_RSHIFT_ASSIGN   { $$ = $<token_index>1; }
+    assignment_operator
+    : T_ASSIGN { $$ = $<token_index>1; }
+    | T_PLUS_ASSIGN { $$ = $<token_index>1; }
+    | T_MINUS_ASSIGN { $$ = $<token_index>1; }
+    | T_MUL_ASSIGN { $$ = $<token_index>1; }
+    | T_DIV_ASSIGN { $$ = $<token_index>1; }
+    | T_MOD_ASSIGN { $$ = $<token_index>1; }
+    | T_AND_ASSIGN { $$ = $<token_index>1; }
+    | T_OR_ASSIGN { $$ = $<token_index>1; }
+    | T_XOR_ASSIGN { $$ = $<token_index>1; }
+    | T_LSHIFT_ASSIGN { $$ = $<token_index>1; }
+    | T_RSHIFT_ASSIGN { $$ = $<token_index>1; }
     ;
 
-expr
+    expr
     : assignment_expr { $$ = $1; }
     ;
 

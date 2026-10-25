@@ -46,7 +46,7 @@ out/
 # creates a file literally named NUL (containing the failed `move` message),
 # regenerated on every build. It has been committed by accident before
 # (see commit 6c001c5, "Delete src/NUL").
-NUL
+src/**/NUL
 
 # ── System / Editor files ───────────────────────────────────────────────────
 .DS_Store
@@ -57,4 +57,5 @@ Thumbs.db
 # ── Phase Notes & Requirements Tracking (user configured) ───────────────────
 implementation_plan.md
 REQUIREMENTS.md
-./docs
+docs/
+FEATURE_PROGRESS.md
