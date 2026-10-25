@@ -129,6 +129,10 @@ address of a function.
   `name@<parameter codes>` (`add@ii`, `add@ff`), which is what makes
   overloading possible. Codes: `i` int, `c` char, `f` float, `d` double,
   `P` pointer, `R` reference, `S5Point` struct Point, `v` no parameters.
+- **Function overloading & Pareto dominance:** candidates are resolved from
+  their arguments; ties among viable candidates are broken using C++-style
+  Pareto dominance (a candidate must be strictly better on at least one
+  argument and no worse on any; otherwise it is ambiguous).
 - **Memory layout:** structs get real offsets (each member aligned to its
   own size); arrays are row-major; pointer arithmetic is scaled by the
   element size.
@@ -136,24 +140,28 @@ address of a function.
 
 ### Features
 
-All 24 features of the specification are translated, each with a test in
-`tests/ir/valid/` whose expected IR was written by hand:
+All 30 IR test cases (covering the full specification and edge cases) are
+translated, each with a test in `tests/ir/valid/` whose expected IR was
+written by hand:
 
 | Basic | Advanced |
 |:------|:---------|
-| Arithmetic & logical operators (`01`) | Recursion (`14`) |
-| `if` / `if-else` (`02`) | Dynamic memory: `new`, `delete`, `malloc`, `free` (`15`) |
-| `for` loop (`03`) | Function pointers (`16`) |
-| `while` loop (`04`) | Command-line input `argc` / `argv` (`17`) |
-| `do-while` loop (`05`) | `typedef` (`18`) |
-| `switch` / `case` / `default` (`06`) | References (`19`) |
-| Arrays, int and char (`07`) | `enum`, `union` (`20`) |
-| Pointers (`08`) | `until` loop (`21`) |
-| Structures (`09`) | Multi-level pointers (`22`) |
-| `printf` / `scanf` (`10`) | Multi-dimensional arrays (`23`) |
-| Function calls with arguments (`11`) | Function overloading (`24`) |
-| `goto`, `break`, `continue` (`12`) | Short-circuit boolean values (`25`) |
-| `static` (`13`) | Implicit type conversions (`26`) |
+| Minimal program (`00`) | Recursion (`14`) |
+| Arithmetic & logical operators (`01`) | Dynamic memory: `new`, `delete`, `malloc`, `free` (`15`) |
+| `if` / `if-else` (`02`) | Function pointers (`16`) |
+| `for` loop (`03`) | Command-line input `argc` / `argv` (`17`) |
+| `while` loop (`04`) | `typedef` (`18`) |
+| `do-while` loop (`05`) | References (`19`) |
+| `switch` / `case` / `default` (`06`) | `enum`, `union` (`20`) |
+| Arrays, int and char (`07`) | `until` loop (`21`) |
+| Pointers (`08`) | Multi-level pointers (`22`) |
+| Structures (`09`) | Multi-dimensional arrays (`23`) |
+| `printf` / `scanf` (`10`) | Function overloading with Pareto dominance (`24`) |
+| Function calls with arguments (`11`) | Short-circuit boolean values (`25`) |
+| `goto`, `break`, `continue` (`12`) | Implicit type conversions (`26`) |
+| `static` (`13`) | Pointer to function pointer (`27`) |
+| | Function pointer arrays (`28`) |
+| | Reference returns (`29`) |
 
 ### Type checking
 
@@ -257,8 +265,8 @@ make clean
 | Suite | Valid | Invalid | Checked against |
 |:------|:-----:|:-------:|:----------------|
 | Lexer (`tests/lexer/`) | 21 | 14 | expected token tables / error messages |
-| Parser (`tests/parser/`) | 38 | 17 | expected 4-column reports / syntax errors |
-| IR (`tests/ir/`) | 27 | 15 | hand-written expected `.ir` / semantic errors |
+| Parser (`tests/parser/`) | 37 | 17 | expected 4-column reports / syntax errors |
+| IR (`tests/ir/`) | 30 | 17 | hand-written expected `.ir` / semantic errors |
 
 For an IR test, `tests/ir/valid/<name>.c` must produce exactly
 `tests/ir/expected/valid/<name>.ir`, and `tests/ir/invalid/<name>.c` must
@@ -311,17 +319,38 @@ THECompiler/
 
 ---
 
-## Language Notes and Limitations
+## Language Notes and Differences from the C Standard
 
-- No C-style casts, `sizeof`, comma operator or preprocessor (`#include`);
-  `printf`, `scanf`, `malloc` and `free` are built in instead.
-- Floating-point literals have type `float` (the language has no suffixes).
-- Classes are excluded by the specification: they parse in the syntax
-  analyzer, but member functions and `this` are rejected by `ir_generator`.
-- `typedef` names are usable as types in `ir_generator` (the lexer consults
-  the symbol table); the stage-2 `syntax_analyzer` still rejects them.
-- Lexical errors are fatal — unterminated strings, invalid characters, etc.
-  stop analysis immediately.
-- **Known issue (stage 2):** `src/parser/parser_lexer.l` rejects some char
-  literals (`'n'`, `'\n'`, `'\0'`), which fails one parser test
-  (`syntax_valid_pointers_arrays.c`). The IR lexer has the fix.
+THECompiler compiles a C/C++ hybrid dialect designed for single-pass compilation and intermediate code generation. While largely compatible with standard C syntax, it deliberately introduces modern C++ features, custom constructs, and excludes several complex C constructs.
+
+### 1. C++ Features Adopted (Not present in ISO C)
+
+- **Function Overloading & Name Mangling:** Functions can share the same identifier if their parameter signatures differ (`add(int, int)` vs `add(float, float)`). Symbols are mangled (`name@<param_codes>`), and calls are resolved using C++-style **Pareto dominance** ranking.
+- **Reference Types (`&`):** Supports lvalue references (`int &r = x;`) in local variables, function parameters, and function return types. References are implemented as immutable address constants under the hood.
+- **C++ Memory Management:** In addition to standard `malloc()` and `free()`, the grammar supports `new T`, `new T[size]`, `delete p`, and `delete[] arr` as dedicated keywords emitting 3AC allocation instructions.
+- **Class and OOP Constructs (Parser Stage):** `class`, access specifiers (`public:`, `private:`, `protected:`), and `this` are recognized by the parser. 
+### 2. Custom Language Extensions
+
+- **`until` Loops:** A first-class looping construct acting as the logical inversion of `while`:
+  - `until (cond) { ... }` — loops while `cond` evaluates to false (terminates when `cond` becomes true).
+  - `do { ... } until (cond);` — executes the body at least once, repeating until `cond` becomes true.
+
+### 3. Excluded C Standard Features
+
+- **No Preprocessor (`#`):** No `#include`, `#define`, `#ifdef`, or macro expansion. The `#` character is treated as a lexical error.
+- **Built-in Standard Library:** Because `#include <stdio.h>` and `<stdlib.h>` are absent, essential functions (`printf`, `scanf`, `malloc`, `free`) are recognized directly by the compiler as undeclared built-ins.
+- **No C-Style Casts:** Explicit casts of the form `(type)expr` are excluded from the grammar to eliminate grammar ambiguities with parenthesized expressions in single-pass parsing without ASTs. Type conversions occur implicitly during assignment, argument passing, and arithmetic.
+- **No `sizeof` Operator:** Sizing is handled internally by the compiler during type layout.
+- **No Comma Operator:** Commas are only recognized as delimiters in argument lists, parameter lists, and declarations; they cannot be used to sequence expressions (`x = (a, b)`).
+- **No Variadic Prototype Declarations (`...`):** User-defined functions cannot declare variable-argument ellipses. Only the built-ins `printf` and `scanf` accept arbitrary argument counts.
+
+### 4. Semantic & Lexical Deviations from ISO C (C99/C11)
+
+| Feature | Standard C (ISO C99/C11) | THECompiler | Reason / Design Decision |
+| :--- | :--- | :--- | :--- |
+| **Floating-Point Literals** | Type `double` by default; requires `f`/`F` suffix for `float`. | Always type `float`; suffixes (`f`, `d`, `L`) are not supported. | Simplifies literal classification without numeric suffixes. |
+| **Non-Decimal Literals** | Supports octal (`0777`), C99 hex floats (`0x1.fp3`), and binary (`0b101` in C23/GCC). | Only standard decimal integers, decimal floats, and hex integers (`0x...`) are accepted. Octal and binary are rejected. | Prevents silent bugs from accidental leading zeros (e.g. `08` / `007`). |
+| **Format String Validation** | Often checked via non-standard compiler extensions (`gcc -Wformat`). | Format specifiers are not validated at compile time. | Per C11 §7.21.6.1p9, format mismatches are runtime undefined behavior, not translation errors. |
+| **Lexical Errors** | May recover or attempt warning. | All lexical errors (malformed exponents, stray dots, unterminated strings/chars) are immediately fatal. | Prevents corrupted tokens from causing misleading syntax errors downstream. |
+| **Static Storage Local Variables** | Preserves state across calls; lives in `.data`. | Preserves state; renamed as `<function>.<name>` in `.data` and initialized at compile time without re-entry overhead. | Guarantees zero runtime initialization cost inside the function body. |
+| **Typedef Usability** | Globally and locally scoped aliases immediately usable anywhere in standard C. | Stage 2 (`syntax_analyzer`) labels typedef names; Stage 4 (`ir_generator`) feeds typedef names back from the symbol table to the lexer as `T_TYPE_NAME`. | Overcomes the classic typedef-name problem in single-pass parsing. |
