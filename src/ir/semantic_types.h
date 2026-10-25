@@ -322,7 +322,7 @@ inline std::string mangle_code(const TypeInfo& t) {
     int depth = t.func_info ? t.func_ptr_depth : t.pointer_depth;
     if (t.outer_pointer > 0) {
         s += std::string(t.outer_pointer, 'P');
-        for (int d : t.array_info->dims) s += "A" + std::to_string(d) + "_";
+        for (int d : t.array_info->dims)  s += "A" + std::to_string(d) + "_";
     } else if (t.is_array()) {
         depth += (int)t.array_info->dims.size();
     }

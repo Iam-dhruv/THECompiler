@@ -850,27 +850,62 @@ inline int arg_rank(ExprAttr* a, const TypeInfo& p) {
     return -1;
 }
 
-// Picks the overload with the best worst-argument rank; ties are ambiguous.
+// Overload resolution: selects the best viable candidate via Pareto dominance
+// (as in C++: strictly better on at least one parameter and no worse on any).
 inline const FuncSym* resolve_overload(const std::string& name, std::vector<ExprAttr*>& args, int line) {
     const auto& cands = g_functions[name];
-    int best_rank = 99;
-    std::vector<const FuncSym*> best;
+    struct CandMatch {
+        const FuncSym* func;
+        std::vector<int> ranks;
+    };
+    std::vector<CandMatch> viable;
+
     for (const auto& f : cands) {
         const auto& ps = f.type.func_info->param_types;
         if (ps.size() != args.size()) continue;
-        int worst = 0;
-        bool viable = true;
-        for (size_t i = 0; i < ps.size() && viable; i++) {
+        bool ok = true;
+        std::vector<int> ranks;
+        ranks.reserve(ps.size());
+        for (size_t i = 0; i < ps.size(); i++) {
             int r = arg_rank(args[i], ps[i]);
-            if (r < 0) viable = false;
-            else worst = std::max(worst, r);
+            if (r < 0) { ok = false; break; }
+            ranks.push_back(r);
         }
-        if (!viable) continue;
-        if (worst < best_rank) { best_rank = worst; best = {&f}; }
-        else if (worst == best_rank) best.push_back(&f);
+        if (ok) viable.push_back({&f, std::move(ranks)});
     }
-    if (best.size() == 1) return best[0];
-    if (best.size() > 1) {
+
+    if (!viable.empty()) {
+        if (viable.size() == 1) return viable[0].func;
+
+        // Candidate A dominates candidate B iff A is <= B on all arguments
+        // and A < B on at least one argument.
+        auto dominates = [](const std::vector<int>& a, const std::vector<int>& b) {
+            bool strictly_better = false;
+            for (size_t i = 0; i < a.size(); i++) {
+                if (a[i] > b[i]) return false;
+                if (a[i] < b[i]) strictly_better = true;
+            }
+            return strictly_better;
+        };
+
+        const FuncSym* best_cand = nullptr;
+        for (size_t i = 0; i < viable.size(); i++) {
+            bool dominates_all = true;
+            for (size_t j = 0; j < viable.size(); j++) {
+                if (i == j) continue;
+                if (!dominates(viable[i].ranks, viable[j].ranks)) {
+                    dominates_all = false;
+                    break;
+                }
+            }
+            if (dominates_all) {
+                best_cand = viable[i].func;
+                break;
+            }
+        }
+
+        if (best_cand) return best_cand;
+
         sem_error(line, "call of overloaded '%s' is ambiguous", name.c_str());
         return nullptr;
     }

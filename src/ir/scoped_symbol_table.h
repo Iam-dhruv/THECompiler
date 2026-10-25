@@ -79,7 +79,7 @@ public:
 
     SymbolInfo* insert_global(const char* lexeme, SymbolInfo info) {
         return insert_into(scope_stack.front(), lexeme, std::move(info));
-    }
+    }           
 
     SymbolInfo* lookup(const std::string& lexeme) {
         for (auto it = scope_stack.rbegin(); it != scope_stack.rend(); ++it)

@@ -1,44 +1,48 @@
 .data
 
 .text
-func_begin add@ii
-  params: a:int, b:int
-  0: t1 = a + b
-  1: return t1
-func_end add@ii
-
 func_begin add@ff
   params: a:float, b:float
-  2: t1 = a + b
-  3: return t1
+  0: t1 = a + b
+  1: t2 = (int) t1
+  2: return t2
 func_end add@ff
+
+func_begin add@dd
+  params: a:double, b:double
+  3: t1 = a + b
+  4: t2 = (float) t1
+  5: return t2
+func_end add@dd
 
 func_begin add@iii
   params: a:int, b:int, c:int
-  4: t1 = a + b
-  5: t2 = t1 + c
-  6: return t2
+  6: t1 = a + b
+  7: t2 = t1 + c
+  8: return t2
 func_end add@iii
 
 func_begin main
   locals: i:int, f:float, t:int, g:float
-  7: param 1
-  8: param 2
-  9: t1 = call add@ii, 2
-  10: i = t1
-  11: param 1.5
-  12: param 2.5
-  13: t2 = call add@ff, 2
-  14: f = t2
-  15: param 1
-  16: param 2
-  17: param 3
-  18: t3 = call add@iii, 3
-  19: t = t3
-  20: param f
-  21: param 1.0
-  22: t4 = call add@ff, 2
-  23: g = t4
-  24: t5 = i + t
-  25: return t5
+  9: param 1.0
+  10: param 2.5
+  11: t1 = call add@ff, 2
+  12: i = t1
+  13: param 1.5
+  14: param 2.5
+  15: t2 = call add@ff, 2
+  16: t3 = (float) t2
+  17: f = t3
+  18: param 1
+  19: param 2
+  20: param 3
+  21: t4 = call add@iii, 3
+  22: t = t4
+  23: param f
+  24: param 1.0
+  25: t5 = call add@ff, 2
+  26: t6 = (float) t5
+  27: g = t6
+  28: t7 = i + t
+  29: return t7
 func_end main

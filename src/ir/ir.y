@@ -1066,18 +1066,11 @@
 %token T_SEMICOLON T_COMMA T_LBRACE T_RBRACE T_LPAREN T_RPAREN
 %token T_LBRACKET T_RBRACKET
 
-%type <type_info>    declaration_specifiers type_specifier
-                      struct_or_union_specifier enum_specifier class_specifier
+%type <type_info>    declaration_specifiers type_specifier struct_or_union_specifier enum_specifier class_specifier
 %type <decl_info>    declarator direct_declarator
 %type <ival>         pointer struct_or_union storage_class_specifier M
-%type <list>         N stmt stmt_list stmt_list_opt compound_stmt expr_stmt
-                      selection_stmt iteration_stmt jump_stmt labeled_stmt
-                      function_body for_init
-%type <expr>         primary_expr postfix_expr unary_expr multiplicative_expr
-                      additive_expr shift_expr relational_expr equality_expr
-                      and_expr exclusive_or_expr inclusive_or_expr
-                      logical_and_expr logical_or_expr conditional_expr
-                      assignment_expr expr cond for_cond
+%type <list>         N stmt stmt_list stmt_list_opt compound_stmt expr_stmt selection_stmt iteration_stmt jump_stmt labeled_stmt function_body for_init
+%type <expr>         primary_expr postfix_expr unary_expr multiplicative_expr additive_expr shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr logical_and_expr logical_or_expr conditional_expr assignment_expr expr cond for_cond
 %type <args>         argument_expr_list
 %type <params>       param_list
 %type <param>        param_decl
