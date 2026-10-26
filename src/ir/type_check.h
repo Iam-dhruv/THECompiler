@@ -215,6 +215,53 @@ inline TypeInfo builtin_return(const std::string& n) {
     return int_type();
 }
 
+inline bool is_char_ptr(const TypeInfo& t) {
+    return t.is_plain() && t.base_kind == BK_CHAR && t.pointer_depth == 1;
+}
+
+// Built-ins have no prototype, so their argument rules are checked here.
+// Arguments are already rvalues (arrays decayed). Reports every bad argument.
+inline bool check_builtin_args(const std::string& n, const std::vector<ExprAttr*>& args, int line) {
+    bool ok = true;
+    if (n == "malloc" || n == "free") {
+        if (args.size() != 1) {
+            sem_error(line, "function '%s' expects 1 argument(s) but %zu were given", n.c_str(), args.size());
+            return false;
+        }
+        const TypeInfo& t = args[0]->type;
+        if (n == "malloc" && !t.is_integral()) {
+            sem_error(line, "argument 1 of 'malloc' must have integral type ('%s')", ts(t));
+            ok = false;
+        }
+        if (n == "free" && (!t.is_pointer() || t.is_func_ptr())) {
+            sem_error(line, "argument 1 of 'free' must be a pointer ('%s')", ts(t));
+            ok = false;
+        }
+        return ok;
+    }
+
+    // printf / scanf: a format string, then the values / targets
+    if (args.empty()) {
+        sem_error(line, "too few arguments to function '%s'", n.c_str());
+        return false;
+    }
+    if (!is_char_ptr(args[0]->type)) {
+        sem_error(line, "format argument of '%s' must be 'char*' ('%s')", n.c_str(), ts(args[0]->type));
+        ok = false;
+    }
+    if (n == "scanf") {
+        for (size_t i = 1; i < args.size(); i++) {
+            const TypeInfo& t = args[i]->type;
+            // scanf writes through each target, so it needs a data pointer
+            if (!t.is_pointer() || t.is_func_ptr()) {
+                sem_error(line, "argument %zu of 'scanf' must be a pointer ('%s')", i + 1, ts(t));
+                ok = false;
+            }
+        }
+    }
+    return ok;
+}
+
 // ── Value / address / store ─────────────────────────────────────────────────
 
 inline void to_value(ExprAttr* e);
@@ -881,6 +928,8 @@ inline const FuncSym* resolve_overload(const std::string& name, std::vector<Expr
                       name.c_str(), ps.size(), args.size());
             return nullptr;
         }
+        // Report every mismatched argument, not just the first.
+        bool reported = false;
         for (size_t i = 0; i < ps.size(); i++) {
             if (arg_rank(args[i], ps[i]) >= 0) continue;
             if (ps[i].is_reference)
@@ -889,8 +938,9 @@ inline const FuncSym* resolve_overload(const std::string& name, std::vector<Expr
             else
                 sem_error(line, "incompatible types in argument %zu of '%s' ('%s' to '%s')",
                           i + 1, name.c_str(), ts(args[i]->type), ts(ps[i]));
-            return nullptr;
+            reported = true;
         }
+        if (reported) return nullptr;
     }
     sem_error(line, "no matching function for call to '%s'", name.c_str());
     return nullptr;
@@ -900,22 +950,24 @@ inline const FuncSym* resolve_overload(const std::string& name, std::vector<Expr
 // argument's address.
 inline bool convert_args(std::vector<ExprAttr*>& args, const std::vector<TypeInfo>& ps,
                          const std::string& fname, int line, std::vector<std::string>& vals) {
+    bool ok = true;   // keep going after a bad argument so every one is reported
     for (size_t i = 0; i < args.size(); i++) {
         if (ps[i].is_reference) {
             if (arg_rank(args[i], ps[i]) < 0) {
                 sem_error(line, "argument %zu of '%s' must be an lvalue of type '%s' to bind to '%s'",
                           i + 1, fname.c_str(), ts(decay(ps[i])), ts(ps[i]));
-                return false;
+                ok = false;
+                continue;
             }
             vals.push_back(address_of_object(args[i]));
         } else {
             std::string v;
             std::string what = "argument " + std::to_string(i + 1) + " of '" + fname + "'";
-            if (!assign_value(args[i], ps[i], line, what, v)) return false;
+            if (!assign_value(args[i], ps[i], line, what, v)) { ok = false; continue; }
             vals.push_back(v);
         }
     }
-    return true;
+    return ok;
 }
 
 inline ExprAttr* call_expr(ExprAttr* callee, std::vector<ExprAttr*>& args, int line) {
@@ -939,6 +991,7 @@ inline ExprAttr* call_expr(ExprAttr* callee, std::vector<ExprAttr*>& args, int l
             }
             vals.push_back(a->addr);
         }
+        if (!check_builtin_args(callee->func_name, args, line)) return error_expr(line);
         ret = builtin_return(callee->func_name);
         target = callee->func_name;
     } else if (callee->is_funcset) {
