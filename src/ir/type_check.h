@@ -897,27 +897,45 @@ inline int arg_rank(ExprAttr* a, const TypeInfo& p) {
     return -1;
 }
 
-// Picks the overload with the best worst-argument rank; ties are ambiguous.
+// True if rank vector a is at least as good as b for every argument and
+// strictly better for at least one (Pareto dominance).
+inline bool better_ranks(const std::vector<int>& a, const std::vector<int>& b) {
+    bool strictly = false;
+    for (size_t i = 0; i < a.size(); i++) {
+        if (a[i] > b[i]) return false;
+        if (a[i] < b[i]) strictly = true;
+    }
+    return strictly;
+}
+
+// Pareto resolution: the chosen overload must be better than every other
+// viable overload; if no single candidate is, the call is ambiguous.
 inline const FuncSym* resolve_overload(const std::string& name, std::vector<ExprAttr*>& args, int line) {
     const auto& cands = g_functions[name];
-    int best_rank = 99;
-    std::vector<const FuncSym*> best;
+    std::vector<const FuncSym*> viable;
+    std::vector<std::vector<int>> ranks;
     for (const auto& f : cands) {
         const auto& ps = f.type.func_info->param_types;
         if (ps.size() != args.size()) continue;
-        int worst = 0;
-        bool viable = true;
-        for (size_t i = 0; i < ps.size() && viable; i++) {
+        std::vector<int> rv;
+        bool ok = true;
+        for (size_t i = 0; i < ps.size() && ok; i++) {
             int r = arg_rank(args[i], ps[i]);
-            if (r < 0) viable = false;
-            else worst = std::max(worst, r);
+            if (r < 0) ok = false;
+            else rv.push_back(r);
         }
-        if (!viable) continue;
-        if (worst < best_rank) { best_rank = worst; best = {&f}; }
-        else if (worst == best_rank) best.push_back(&f);
+        if (!ok) continue;
+        viable.push_back(&f);
+        ranks.push_back(rv);
     }
-    if (best.size() == 1) return best[0];
-    if (best.size() > 1) {
+    if (viable.size() == 1) return viable[0];
+    if (viable.size() > 1) {
+        for (size_t i = 0; i < viable.size(); i++) {
+            bool beats_all = true;
+            for (size_t j = 0; j < viable.size() && beats_all; j++)
+                if (j != i && !better_ranks(ranks[i], ranks[j])) beats_all = false;
+            if (beats_all) return viable[i];
+        }
         sem_error(line, "call of overloaded '%s' is ambiguous", name.c_str());
         return nullptr;
     }
